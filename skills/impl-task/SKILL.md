@@ -1,6 +1,6 @@
 ---
 name: impl-task
-description: Implement a task — pick it up, implement it, summarise, codify learnings.
+description: Implement a task — pick it up, implement it, summarise, codify learnings. Workflow: /define-task → /plan-task → /impl-task.
 ---
 
 # Implement Task

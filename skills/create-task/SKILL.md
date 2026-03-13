@@ -1,6 +1,6 @@
 ---
 name: create-task
-description: Create a task file (standalone, epic, or epic sub-task). Utility — called by /define-task or directly by the user.
+description: Create a task file (standalone, epic, or epic sub-task). Utility — called by /define-task or directly by the user. Related: /define-task.
 ---
 
 # Create Task
