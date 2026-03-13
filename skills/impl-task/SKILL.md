@@ -15,20 +15,20 @@ If the intent is ambiguous, ask.
 
 ## Workflow context
 
-This is the second phase of the `/write-task` → `/impl-task` workflow:
+This is Phase 3 of the task workflow:
 
 ```
-Explore & discuss → /write-task → commit task → new session → /impl-task → commit code + summary
+/define-task → /plan-task → new session → /impl-task → commit code + summary
 ```
 
-The task was written during an exploration session that had all the "why"
-context. This session starts fresh — the task is self-contained, carrying
-everything needed to implement without the original exploration context.
+The task was defined during an exploration session and planned in a separate
+step. This session starts fresh — the task is self-contained, carrying
+everything needed to implement without the original context.
 
 ## Step 1: Read and Understand
 
-1. **Read the task** and locate the `#### Implementation plan`.
-2. If no plan exists, stop and tell the user to run `/write-task` first.
+1. **Read the task** and locate the `## Implementation plan`.
+2. If no plan exists, stop and tell the user to run `/plan-task` first.
 3. **If the task has an `epic:` field** in its frontmatter, read the epic file
    for strategic context (goal, ordering, dependencies, kill criteria).
 4. **Read CLAUDE.md** and any files referenced by the task.
