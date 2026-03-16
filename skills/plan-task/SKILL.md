@@ -82,7 +82,7 @@ If a model isn't available, stop and tell the user before proceeding.
 - **Disagreements** — the interesting decisions; for each, state which is stronger and why
 - **Gaps** — things none of the plans caught
 
-Write a single synthesized plan — don't pick a winner and discard the rest.
+Write a single synthesized plan — don't pick a winner and discard the rest. Carry rejected approaches from the disagreements into the plan's "Alternatives considered" section so the implementing agent doesn't rediscover and pursue them.
 
 **Iterative refinement.** Critique the synthesized plan, revise, repeat until convergence. Each round uses a different lens to avoid re-running the same check:
 
@@ -105,8 +105,6 @@ Write a single synthesized plan — don't pick a winner and discard the rest.
 - Then edge cases and variations
 - Structural changes (refactoring) before behavioural changes when both are needed
 
-For non-obvious approaches, briefly state why this approach over alternatives. Don't justify every decision — only where a reasonable agent might choose differently.
-
 Add **non-goals** when scope creep is likely — name things the agent might do that it shouldn't.
 
 ### Plan format
@@ -118,8 +116,11 @@ Write the plan as a new section in the task file:
 
 ### Approach
 
-[One paragraph: strategy and why. For non-obvious choices, name the alternative
-considered and why rejected. Omit for straightforward tasks.]
+[One paragraph: strategy and why. Omit for straightforward tasks.]
+
+### Alternatives considered
+
+- [Rejected approach] — [why rejected. Omit section if no plausible alternative.]
 
 ### Non-goals
 
