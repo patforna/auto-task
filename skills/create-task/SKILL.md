@@ -7,7 +7,7 @@ description: Create a task file (standalone, epic, or epic sub-task). Utility â€
 
 ## Usage
 
-`/create-task [optional further user instructions]`
+`/create-task [further user instructions]`
 
 The session context or the optional user instructions should make it clear whether we're creating:
 - a standalone task

@@ -7,7 +7,7 @@ description: Turn a defined task into a sequenced implementation plan ready for 
 
 ## Usage
 
-`/plan-task <task-path> [optional further instructions]`
+`/plan-task <task-path> [further user instructions]`
 
 ## Goal
 
