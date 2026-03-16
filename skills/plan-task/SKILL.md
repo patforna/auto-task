@@ -1,6 +1,6 @@
 ---
 name: plan-task
-description: Turn a defined task into a sequenced implementation plan ready for handoff. Invoke when the user requests it.
+description: Turn a defined task into a sequenced implementation plan ready for handoff. Workflow: /define-task → /plan-task → /impl-task.
 ---
 
 # Plan Task
@@ -14,14 +14,6 @@ description: Turn a defined task into a sequenced implementation plan ready for 
 Turn a defined task into an implementation plan that closes the decision space without doing the work.
 
 The task definition says **what** to build and **why**. The plan says **how to verify it's built** — sequenced into steps that each prove a behaviour. The implementing agent starts in a fresh session with only the task file and the repo. The plan must be self-contained.
-
-## Context
-
-Phase 2 in the task workflow:
-
-1. Explore & define (`/define-task`) — captures intent, ACs, notes
-2. **Plan (`/plan-task`) — sequences the implementation (this skill)**
-3. Implement (`/impl-task`) — executes in a fresh session
 
 ## What belongs in a plan
 
@@ -41,24 +33,74 @@ Things you'd be nervous about:
 - Anything already in CLAUDE.md (testing, conventions, style)
 - Universal truths ("write tests", "handle errors", "follow patterns")
 
-## Step 1: Orient
+## Step 1: Orient and recommend
 
 Read the task. Read the code it will touch — at minimum the modules named in the ACs or description. Understand the current structure before deciding what to change.
 
-If the task has an `epic:` field, read the epic for ordering and dependency context.
+If the task belongs to an epic, read the epic for ordering and dependency context.
 
-**Gate:** If you can confidently sequence the implementation from the ACs alone — the approach is obvious, the files are few, no tricky ordering — tell the user. The task may be simple enough to skip planning and go straight to `/impl-task`.
+**Recommend an approach:**
+
+- **Skip planning** — the approach is obvious, files are few, no tricky ordering. Go straight to `/impl-task`.
+- **Single model** — straightforward task with a clear approach.
+- **Dialectic** — multiple valid approaches, cross-cutting concerns, or novel architecture. Plan diversity surfaces blind spots a single model misses (PlanSearch: diversity beats detail).
+
+Show the recommendation and wait for the user's go.
 
 ## Step 2: Design the plan
 
-Sequence the work into steps. Each step names a **concrete behaviour to verify**, not an implementation instruction.
+### Single model
 
-Properties of a good step:
+Design the plan directly — sequence the work into steps, each naming a **concrete behaviour to verify**. After drafting, run one pre-mortem pass: "Assume an agent followed this plan and the task failed. What went wrong?" Revise if it surfaces anything structural.
+
+### Dialectic
+
+The goal is **perspective diversity** — genuinely different plans, not N variations of the same idea. Different models have different architectural biases, so multi-model generation is the mechanism.
+
+**Generate 3 plans in parallel** — one per frontier model:
+
+**Opus** — background agent:
+> Read the task at {task_path} and the code it touches. Read AGENTS.md.
+> Produce an implementation plan (not code): approach with rationale,
+> sequenced steps with verification checks, non-goals.
+> Write to /tmp/{slug}-plan-opus.md
+
+**Codex** — headless via bash:
+```bash
+codex exec --full-auto "Read the task at {task_path} and the code it touches. Read AGENTS.md. Produce an implementation plan (not code): approach with rationale, sequenced steps with verification checks, non-goals. Write to /tmp/{slug}-plan-codex.md"
+```
+
+**Gemini** — headless via bash:
+```bash
+gemini exec "Read the task at {task_path} and the code it touches. Read AGENTS.md. Produce an implementation plan (not code): approach with rationale, sequenced steps with verification checks, non-goals. Write to /tmp/{slug}-plan-gemini.md"
+```
+
+If a model isn't available, stop and tell the user before proceeding.
+
+**Synthesize, don't select.** Read all 3 plans. Compare:
+- **Agreements** — high confidence; take directly
+- **Disagreements** — the interesting decisions; for each, state which is stronger and why
+- **Gaps** — things none of the plans caught
+
+Write a single synthesized plan — don't pick a winner and discard the rest.
+
+**Iterative refinement.** Critique the synthesized plan, revise, repeat until convergence. Each round uses a different lens to avoid re-running the same check:
+
+1. **Pre-mortem** — "Assume an agent followed this plan and the task failed. What went wrong?" (missing preconditions, ordering dependencies, merge contradictions)
+2. **Verification audit** — for each step, can the check actually be run? Does it prove the behaviour it claims to?
+3. **Scope and blast radius** — what might the agent touch that it shouldn't? What scope creep vectors exist?
+4. **Fresh read** — read the plan cold as if you'd never seen the task. Is it self-contained? Would a capable agent in a fresh session know what to do?
+
+**Convergence signal:** stop when a round produces only cosmetic changes (wording, formatting) rather than structural ones (new steps, reordering, changed approach). Typically 2-4 rounds. If still finding structural issues after round 4, flag to the user — the task may need re-scoping.
+
+### Properties of a good step
+
 - **Verifiable** — has a concrete check (a test, a CLI command, expected output)
 - **Independent** — can fail without invalidating subsequent steps where possible
 - **Behaviour-level** — describes what the system does, not how the code is structured
 
-Sequencing strategy:
+### Sequencing strategy
+
 - Walking skeleton or happy path first — thinnest end-to-end path
 - Then edge cases and variations
 - Structural changes (refactoring) before behavioural changes when both are needed
@@ -99,4 +141,4 @@ Before presenting:
 
 ## Step 3: Review
 
-Present the plan to the user. After approval, write the plan into the task file and commit.
+Present the plan to the user. After approval, commit.
