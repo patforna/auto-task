@@ -1,6 +1,6 @@
 ---
 name: plan-task
-description: Turn a defined task into a sequenced implementation plan ready for handoff. Workflow: /define-task → /plan-task → /impl-task.
+description: Turn a defined task into a sequenced implementation plan ready for handoff. Workflow: /define-task → /plan-task → /impl-task → /review-task.
 ---
 
 # Plan Task
@@ -14,6 +14,15 @@ description: Turn a defined task into a sequenced implementation plan ready for 
 Turn a defined task into an implementation plan that closes the decision space without doing the work.
 
 The task definition says **what** to build and **why**. The plan says **how to verify it's built** — sequenced into steps that each prove a behaviour. The implementing agent starts in a fresh session with only the task file and the repo. The plan must be self-contained.
+
+## Workflow context
+
+```
+/define-task  →  /plan-task (this skill)  →  /impl-task  →  /review-task
+```
+
+Each step runs in a new session. The task file carries everything the next
+agent needs — it is the handoff between sessions.
 
 ## What belongs in a plan
 
@@ -60,19 +69,19 @@ The goal is **perspective diversity** — genuinely different plans, not N varia
 **Generate 3 plans in parallel** — one per frontier model:
 
 **Opus** — background agent:
-> Read the task at {task_path} and the code it touches. Read AGENTS.md.
+> Read the task at {task_path} and the code it touches. Read CLAUDE.md.
 > Produce an implementation plan (not code): approach with rationale,
 > sequenced steps with verification checks, non-goals.
 > Write to /tmp/{slug}-plan-opus.md
 
 **Codex** — headless via bash:
 ```bash
-codex exec --full-auto "Read the task at {task_path} and the code it touches. Read AGENTS.md. Produce an implementation plan (not code): approach with rationale, sequenced steps with verification checks, non-goals. Write to /tmp/{slug}-plan-codex.md"
+codex exec --full-auto "Read the task at {task_path} and the code it touches. Read CLAUDE.md. Produce an implementation plan (not code): approach with rationale, sequenced steps with verification checks, non-goals. Write to /tmp/{slug}-plan-codex.md"
 ```
 
 **Gemini** — headless via bash:
 ```bash
-gemini exec "Read the task at {task_path} and the code it touches. Read AGENTS.md. Produce an implementation plan (not code): approach with rationale, sequenced steps with verification checks, non-goals. Write to /tmp/{slug}-plan-gemini.md"
+gemini exec "Read the task at {task_path} and the code it touches. Read CLAUDE.md. Produce an implementation plan (not code): approach with rationale, sequenced steps with verification checks, non-goals. Write to /tmp/{slug}-plan-gemini.md"
 ```
 
 If a model isn't available, stop and tell the user before proceeding.
