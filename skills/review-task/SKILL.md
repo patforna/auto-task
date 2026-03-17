@@ -1,6 +1,6 @@
 ---
 name: review-task
-description: Verify a completed task against its specification in a fresh session. Invoke when the user requests it.
+description: Verify a completed task against its specification in a fresh session. Workflow: /define-task → /plan-task → /impl-task → /review-task. Invoke when the user requests it.
 ---
 
 # Review Task
@@ -15,20 +15,14 @@ Verify that a completed task satisfies its specification. This is a
 verification pass, not a code quality review — the question is "did it do
 what was asked?", not "is the code good?"
 
-## Context
+## Workflow context
 
-Phase 4 in the task workflow:
+```
+/define-task  →  /plan-task  →  /impl-task  →  /review-task (this skill)
+```
 
-1. Explore & define (`/define-task`)
-2. Plan (`/plan-task`)
-3. Implement (`/impl-task`)
-4. **Verify (`/review-task`) — this skill**
-
-This skill MUST run in a **fresh session** — not the session that implemented
-the task. Self-review is empirically unreliable due to confirmation bias and
-anchoring. The implementing agent will miss issues that a fresh reviewer
-catches. As the task file is self-contained, no implementation context is
-needed.
+Each step runs in a new session. The task file carries everything the next
+agent needs — it is the handoff between sessions.
 
 ## Step 1: Orient
 
@@ -89,11 +83,12 @@ Present findings structured as:
 - [Intent misalignment, plan deviation, or completeness issue]
 ```
 
-If the verdict is **PASS** — the task is ready for human sign-off.
+If the verdict is **PASS** — set `status: done` in the task's frontmatter
+(and update the epic table if applicable). Commit the status update.
 
 If the verdict is **FAIL** — list the specific gaps. The human decides
 whether to re-run `/impl-task` with the findings, adjust the task, or accept
-as-is.
+as-is. Status stays `wip`.
 
 ## What this skill does NOT do
 

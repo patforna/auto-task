@@ -1,61 +1,127 @@
 ---
 name: impl-task
-description: Implement a task — pick it up, implement it, summarise, codify learnings. Workflow: /define-task → /plan-task → /impl-task.
+description: Implement a task — pick it up, execute the plan using TDD, summarise. Workflow: /define-task → /plan-task → /impl-task → /review-task.
 ---
 
 # Implement Task
 
-Pick up a written task and execute its implementation plan. Write a summary
-when done and codify any learnings.
+## Usage
 
-**Usage:** `/impl-task <task-path>`
+`/impl-task <task-path>`
 
 The argument is a path to a task file.
 If the intent is ambiguous, ask.
 
+## Goal
+
+Pick up a planned task and execute it using test-driven development.
+Commit after each step. Write a summary when done and codify any learnings.
+
 ## Workflow context
 
-This is Phase 3 of the task workflow:
-
 ```
-/define-task → /plan-task → new session → /impl-task → commit code + summary
+/define-task  →  /plan-task  →  /impl-task (this skill)  →  /review-task
 ```
 
-The task was defined during an exploration session and planned in a separate
-step. This session starts fresh — the task is self-contained, carrying
-everything needed to implement without the original context.
+Each step runs in a new session. The task file carries everything the next
+agent needs — it is the handoff between sessions.
 
-## Step 1: Read and Understand
+## Step 1: Orient
 
 1. **Read the task** and locate the `## Implementation plan`.
-2. If no plan exists, stop and tell the user to run `/plan-task` first.
-3. **If the task has an `epic:` field** in its frontmatter, read the epic file
-   for strategic context (goal, ordering, dependencies, kill criteria).
-4. **Read CLAUDE.md** and any files referenced by the task.
+   If no plan exists, stop and tell the user to run `/plan-task` first.
+2. If the task has an `epic:` field, read the epic for strategic context.
+3. **Read CLAUDE.md** — every rule is a constraint on your implementation.
+4. Read files referenced by the task and the code each plan step will touch.
+   Load per step as you go — don't read the entire codebase upfront.
 5. **Read the acceptance criteria** — these are your success conditions.
-6. Confirm you understand the plan — no silent assumptions.
+6. Set `status: wip` in the task's frontmatter (and update the epic table if applicable).
+7. Confirm you understand the plan. If anything is ambiguous, ask before coding.
 
-## Step 2: Implement
+## Step 2: Implement (per plan step)
 
-Follow the plan step by step. For each step:
+Work through the plan step by step. Each step names a behaviour to verify —
+that behaviour is your first test.
 
-- Use TDD style (test first, then implement) unless the step is pure wiring.
-- Run the verification check after each step.
-- If you deviate from the plan, update the plan in the task to reflect reality.
+### The TDD cycle
 
-After all steps pass, run the full check:
+For each step that has testable behaviour:
 
-```bash
-just check
-```
+**Red** — Write a small failing test for the behaviour the step names. Run it.
+Confirm it fails.
 
-## Step 3: Commit
+**Green** — Make it pass. Choose your strategy by confidence:
 
-- `git pull --rebase` first.
-- Commit with a message referencing the task.
-- Do NOT push — wait for explicit approval.
+| Strategy               | When                    | How                                                     |
+|:-----------------------|:------------------------|:--------------------------------------------------------|
+| **Obvious Implementation** | Confident, clear logic  | Write the real code directly. If unexpected red, back down. |
+| **Fake It**            | Uncertain or complex    | Return a constant, then replace with real logic as duplication surfaces. |
+| **Triangulation**      | Unsure how to generalise | Write a second test demanding different output, then generalise. |
 
-## Step 4: Summarise
+Run the relevant test(s) after every Red and Green step — not the full suite.
+
+**Refactor** — Remove duplication introduced by getting to green. This includes
+duplication between test and production code. AI tends to only add complexity
+(inhale) — you must actively simplify (exhale) after each green. This is not
+optional tidying; it is load-bearing for your ability to continue working.
+
+Repeat the cycle until the plan step's behaviour is fully covered. A step may
+need multiple TDD cycles (one per test case).
+
+### Pure wiring steps
+
+If a step is pure wiring with no testable behaviour (e.g., adding a CLI flag
+that delegates to an existing function): implement directly. No test needed.
+
+### Verify and commit (per plan step)
+
+After all TDD cycles for a step are green and refactored (or for wiring steps,
+after implementation):
+
+1. **Verify** — `just check` (full suite + lint + typecheck + format).
+2. **Commit** — `just commit "<step description> (refs <task>)" <changed-files>`.
+   Do NOT push.
+
+### When things go wrong
+
+- **Test fails after implementation**: Try to fix. If stuck after 2 attempts,
+  revert to last green state and take a smaller step.
+- **Plan step seems wrong**: Update the plan in the task file, note the
+  deviation, continue.
+- **Scope creep discovered**: Stop. Note what was found. Flag to user.
+  Do not silently fix unrelated issues.
+- **`just check` fails on unrelated code**: Flag to user rather than fixing
+  silently — it may be someone else's in-progress work.
+
+### Step size
+
+Smaller steps when uncertain, surprised, or in unfamiliar territory. Bigger
+steps when confident. An unexpected red means shift down to smaller steps.
+An unexpected green means review your test — it may be wrong. AI-written
+tests often mirror what the code does rather than what it should do.
+
+For complex logic (especially quant code), consult the TDD reference below
+for the full Beck-style pattern catalog (Child Test, Triangulation, Value
+Objects, etc.).
+
+## Step 3: Final verification
+
+After all plan steps pass:
+
+1. Run `just check` one final time.
+2. Review the full diff: `git diff` from first implementation commit to HEAD.
+3. **Scope check** — does the diff touch only what the plan requires? Flag
+   anything unexpected.
+4. **AC check** — for each acceptance criterion, verify it is demonstrably met
+   (by a test, by observable output, or by code inspection). If an AC is not
+   met, go back and implement it.
+5. **Hygiene check** — no debug prints, no TODO comments you introduced, no
+   commented-out code, no unrelated formatting changes.
+
+This is NOT a comprehensive code review (that's `/code-review`'s job and
+`/review-task` in a fresh session). This is a quick scope-and-hygiene pass.
+
+## Step 4: Summarise and codify
 
 Write a summary directly into the task, below the implementation plan:
 
@@ -70,31 +136,34 @@ Commits: [short hashes]
 Keep it concise — one paragraph is usually enough. The plan + summary together
 tell the full story; no need to repeat what the plan already says.
 
-Commit the task update.
+If the implementation surfaced something worth preserving, codify it in the
+right place and reference it from the summary:
 
-## Step 5: Codify Learnings
-
-If the implementation surfaced anything worth preserving beyond this task:
-
-- **Domain insight or gotcha** → `docs/knowledge.md`
+- **Domain surprise** → `docs/knowledge.md`
 - **Design decision with rationale** → `docs/decisions.md`
 - **New rule or convention** → `CLAUDE.md`
+- **Plan deviated** — note the deviation type in the summary so future
+  planning improves.
 
-Reference the addition in the summary (e.g., "added rolling-window guard to CLAUDE.md").
+If nothing was surprising, skip the codification — just write the summary.
 
-If nothing was surprising, skip this step.
+Commit the task update.
 
-## Step 6: Update Status
-
-- Set `status: done` in the task's frontmatter.
-- **If the task belongs to an epic**, update the task's status in the epic's
-  task index table. If all tasks in the epic are now done, set the epic's
-  status to `done` too.
+Status note: `/review-task` sets `status: done` after verification passes.
+This skill sets `wip` at the start (Step 1) — don't set `done` here.
 
 ## Anti-Patterns
 
-- Implementing without reading the plan and acceptance criteria first
-- Writing the summary before implementation is complete
-- Summarising what the code does instead of what changed and why
-- Codifying learnings that are obvious or already documented
-- Deviating from the plan without updating it in the task
+- Implementing without reading the plan and acceptance criteria first.
+- Writing all code then all tests (test-after). Write the test FIRST.
+- Skipping the refactor step — complexity accumulates and stalls progress.
+- One big commit at the end instead of per-step commits.
+- Silently fixing unrelated issues found during implementation.
+- Writing the summary before implementation is complete.
+- Summarising what the code does instead of what changed and why.
+- Deviating from the plan without updating it in the task.
+- Reading the entire codebase upfront — load files as each step needs them.
+
+## TDD Reference (Beck-style)
+
+!`sed '1,/^---$/d' .claude/skills/tdd/SKILL.md`
