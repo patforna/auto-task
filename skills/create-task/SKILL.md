@@ -38,11 +38,22 @@ frontmatter and the parent epic's table.
 
 Follow this structure:
 
+### Task types
+
+| Type       | Meaning                            |
+|------------|------------------------------------|
+| `feat`     | Product increment, new capability  |
+| `tech`     | Refactor, cleanup, architecture    |
+| `bug`      | Something broken                   |
+| `research` | Spike, analysis, evaluation        |
+| `other`    | Anything else                      |
+
 ```markdown
 ---
 title: <task title>
 date: <YYYY-MM-DD>
 status: new
+type: <feat|tech|bug|research|other>
 ---
 
 # [Task title]
