@@ -22,6 +22,18 @@ Create a `tasks/<NNN>-<slug>.md` file where `<NNN>` is the next available zero-p
 
 Check `ls tasks/` to find the current highest number.
 
+### Status lifecycle
+
+| Status     | Meaning                                    | Set by         |
+|------------|------------------------------------------- |----------------|
+| `new`      | Defined, not yet started                   | `/create-task` |
+| `wip`      | Implementation in progress                 | `/impl-task`   |
+| `done`     | Resolved (shipped, or rejected with notes) | `/review-task` |
+| `rejected` | Investigated and decided against           | manual         |
+
+Use `just task-status <file> <status>` to update — it handles both the
+frontmatter and the parent epic's table.
+
 ### Task template
 
 Follow this structure:

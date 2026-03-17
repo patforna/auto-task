@@ -83,8 +83,8 @@ Present findings structured as:
 - [Intent misalignment, plan deviation, or completeness issue]
 ```
 
-If the verdict is **PASS** — set `status: done` in the task's frontmatter
-(and update the epic table if applicable). Commit the status update.
+If the verdict is **PASS** — run `just task-status <task-file> done` (updates
+frontmatter and epic table). Commit the status update.
 
 If the verdict is **FAIL** — list the specific gaps. The human decides
 whether to re-run `/impl-task` with the findings, adjust the task, or accept
