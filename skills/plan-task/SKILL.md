@@ -42,11 +42,9 @@ Things you'd be nervous about:
 - Anything already in CLAUDE.md (testing, conventions, style)
 - Universal truths ("write tests", "handle errors", "follow patterns")
 
-## Step 1: Orient and recommend
+## Step 1: Readiness check
 
-Read the task.
-
-**Readiness gate.** Before exploring the code, verify the task is plannable. Agents cannot detect when they're working from ambiguous specs — they silently resolve ambiguity, usually wrong. This gate prevents that.
+Read the task. Before exploring the code, verify the task is plannable. Agents cannot detect when they're working from ambiguous specs — they silently resolve ambiguity, usually wrong. This gate prevents that.
 
 **Skip this gate for epics** (they have sub-task tables, not ACs — plan the sub-tasks instead).
 
@@ -64,6 +62,8 @@ If any check fails, **stop**. Do not plan around ambiguity — it compounds down
 - Clarifying questions where possible — grounded in the code, not generic ("do you want X excluded from ranking, or just flagged?" rather than "can you clarify?").
 - Suggest running `/define-task <task-path>` to flesh out the task, or let the user fix inline.
 
+## Step 2: Orient and recommend
+
 Read the code the task will touch — at minimum the modules named in the ACs or description. Understand the current structure before deciding what to change.
 
 If the task belongs to an epic, read the epic for ordering and dependency context.
@@ -76,7 +76,7 @@ If the task belongs to an epic, read the epic for ordering and dependency contex
 
 Show the recommendation and wait for the user's go.
 
-## Step 2: Design the plan
+## Step 3: Design the plan
 
 ### Single model
 
@@ -169,6 +169,6 @@ Before presenting:
 2. **Pseudocode test** — does any step describe *how* to write code? Relax it.
 3. **Length test** — can the user review this in under 5 minutes? Shorten.
 
-## Step 3: Review
+## Step 4: Review
 
 Present the plan to the user. After approval, commit.
