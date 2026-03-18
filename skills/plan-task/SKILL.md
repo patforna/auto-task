@@ -44,7 +44,27 @@ Things you'd be nervous about:
 
 ## Step 1: Orient and recommend
 
-Read the task. Read the code it will touch — at minimum the modules named in the ACs or description. Understand the current structure before deciding what to change.
+Read the task.
+
+**Readiness gate.** Before exploring the code, verify the task is plannable. Agents cannot detect when they're working from ambiguous specs — they silently resolve ambiguity, usually wrong. This gate prevents that.
+
+**Skip this gate for epics** (they have sub-task tables, not ACs — plan the sub-tasks instead).
+
+For **research** tasks (`type: research`), apply a lighter check: require a clear question or hypothesis, a defined deliverable, and a scope boundary. Don't require falsifiable behavioural ACs.
+
+For all other tasks, check:
+
+1. **Acceptance criteria exist** — not TODOs, placeholders, or "have a think"-style prompts. The create-task template uses `TODO: Add ACs` — if that's still there, the task isn't defined.
+2. **Rationale is present** — the task explains *why* (motivation/problem), not just *what*. Without the why, you'll fill the gap with a reasonable but possibly wrong assumption.
+3. **Criteria are falsifiable** — no vague language: "works correctly", "handles edge cases", "is robust", "clean", "acceptable". Each criterion has an unambiguous pass/fail.
+4. **No unresolved questions** — no embedded "should we...?", "TBD", "TODO", "have a think", "need to decide". These are conversation artifacts that should have been resolved in `/define-task`.
+
+If any check fails, **stop**. Do not plan around ambiguity — it compounds downstream. Present:
+- Which checks failed, with the specific text that triggered each.
+- Clarifying questions where possible — grounded in the code, not generic ("do you want X excluded from ranking, or just flagged?" rather than "can you clarify?").
+- Suggest running `/define-task <task-path>` to flesh out the task, or let the user fix inline.
+
+Read the code the task will touch — at minimum the modules named in the ACs or description. Understand the current structure before deciding what to change.
 
 If the task belongs to an epic, read the epic for ordering and dependency context.
 
