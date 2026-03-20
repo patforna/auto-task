@@ -118,7 +118,7 @@ After all plan steps pass:
 5. **Hygiene check** — no debug prints, no TODO comments you introduced, no
    commented-out code, no unrelated formatting changes.
 
-This is NOT a comprehensive code review (that's `/code-review`'s job and
+This is NOT a comprehensive code review (that's `/dialectic-review`'s job and
 `/review-task` in a fresh session). This is a quick scope-and-hygiene pass.
 
 ## Step 4: Summarise and codify

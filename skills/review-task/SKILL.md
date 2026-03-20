@@ -92,7 +92,7 @@ as-is. Status stays `wip`.
 
 ## What this skill does NOT do
 
-- Code quality review (design, style, conventions) — use `/code-review`
+- Code quality review (design, style, conventions) — use `/dialectic-review`
 - Run linters or type checkers — `just check` handles that
 - Suggest improvements beyond the task scope
 - Rewrite code or fix issues (flag them; let the human decide)
