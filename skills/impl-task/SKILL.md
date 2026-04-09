@@ -40,8 +40,10 @@ agent needs — it is the handoff between sessions.
 
 ## Step 2: Implement (per plan step)
 
-Work through the plan step by step. Each step names a behaviour to verify —
-that behaviour is your first test.
+Work through the plan step by step. Re-read the current plan step and its
+verification criteria before proceeding to each new step.
+
+Each step names a behaviour to verify — that behaviour is your first test.
 
 ### The TDD cycle
 
