@@ -168,4 +168,4 @@ This skill sets `wip` at the start (Step 1) — don't set `done` here.
 
 ## TDD Reference (Beck-style)
 
-!`sed '1,/^---$/d' .claude/skills/tdd/SKILL.md`
+!`awk 'p; /^---$/ && NR>1 {p=1}' .claude/skills/tdd/SKILL.md`
