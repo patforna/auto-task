@@ -18,9 +18,16 @@ If it's not clear, please stop and ask the user to clarify.
 
 ## Standalone task
 
-Create a `tasks/<NNN>-<slug>.md` file where `<NNN>` is the next available zero-padded sequential number and `<slug>` is a short title slug derived from the session context or additional user instructions.
+Run:
 
-Check `ls tasks/` to find the current highest number.
+```
+just create-task "Task Title"        # type defaults to feat
+just create-task "Task Title" tech   # explicit type (feat, tech, bug, research, other)
+```
+
+This picks the next sequence number, slugifies the title, and creates
+`tasks/NNN-slug.md` with `status: new`. Open the file and fill in the
+description, acceptance criteria, and notes.
 
 ### Status lifecycle
 
@@ -34,10 +41,6 @@ Check `ls tasks/` to find the current highest number.
 Use `just task-status <file> <status>` to update — it handles both the
 frontmatter and the parent epic's table.
 
-### Task template
-
-Follow this structure:
-
 ### Task types
 
 | Type       | Meaning                            |
@@ -47,27 +50,6 @@ Follow this structure:
 | `bug`      | Something broken                   |
 | `research` | Spike, analysis, evaluation        |
 | `other`    | Anything else                      |
-
-```markdown
----
-title: <task title>
-date: <YYYY-MM-DD>
-status: new
-type: <feat|tech|bug|research|other>
----
-
-# [Task title]
-
-TODO: Add Task description
-
-## Acceptance criteria
-
-TODO: Add ACs
-
-## Notes
-
-TODO: Add Notes
-```
 
 ## Epic
 
