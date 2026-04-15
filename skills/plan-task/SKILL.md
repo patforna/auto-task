@@ -42,7 +42,11 @@ Things you'd be nervous about:
 - Anything already in CLAUDE.md (testing, conventions, style)
 - Universal truths ("write tests", "handle errors", "follow patterns")
 
-## Step 1: Readiness check
+## Step 1: Clarify
+
+Run `/clarify-task <task-path>` to surface and resolve ambiguities before planning. Skip if the user confirms it was already run in this session.
+
+## Step 2: Readiness check
 
 Read the task. Before exploring the code, verify the task is plannable. Agents cannot detect when they're working from ambiguous specs — they silently resolve ambiguity, usually wrong. This gate prevents that.
 
@@ -62,7 +66,7 @@ If any check fails, **stop**. Do not plan around ambiguity — it compounds down
 - Clarifying questions where possible — grounded in the code, not generic ("do you want X excluded from ranking, or just flagged?" rather than "can you clarify?").
 - Suggest running `/define-task <task-path>` to flesh out the task, or let the user fix inline.
 
-## Step 2: Orient and recommend
+## Step 3: Orient and recommend
 
 Read the code the task will touch — at minimum the modules named in the ACs or description. Understand the current structure before deciding what to change.
 
@@ -76,7 +80,7 @@ If the task belongs to an epic, read the epic for ordering and dependency contex
 
 Show the recommendation and wait for the user's go.
 
-## Step 3: Design the plan
+## Step 4: Design the plan
 
 ### Single model
 
@@ -169,6 +173,6 @@ Before presenting:
 2. **Pseudocode test** — does any step describe *how* to write code? Relax it.
 3. **Length test** — can the user review this in under 5 minutes? Shorten.
 
-## Step 4: Review
+## Step 5: Review
 
 Present the plan to the user. After approval, commit.
