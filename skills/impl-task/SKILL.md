@@ -70,6 +70,12 @@ optional tidying; it is load-bearing for your ability to continue working.
 Repeat the cycle until the plan step's behaviour is fully covered. A step may
 need multiple TDD cycles (one per test case).
 
+**Real vs fake coverage**: if a new method is added to both a concrete
+infrastructure class (parquet repo, DB client, API client) and a fake, the
+TDD cycle via the fake verifies the interface contract — but does NOT cover
+the real implementation's code path. Check whether the concrete class has an
+integration test file; if so, add the new method there directly.
+
 ### Pure wiring steps
 
 If a step is pure wiring with no testable behaviour (e.g., adding a CLI flag
@@ -165,6 +171,9 @@ This skill sets `wip` at the start (Step 1) — don't set `done` here.
 - Summarising what the code does instead of what changed and why.
 - Deviating from the plan without updating it in the task.
 - Reading the entire codebase upfront — load files as each step needs them.
+- Relying on fake-based coverage for a real infrastructure class — fakes test
+  the interface, not the implementation. If the class has an integration test
+  file, add the new method there.
 
 ## TDD Reference (Beck-style)
 
