@@ -142,10 +142,17 @@ Add **non-goals** when scope creep is likely — name things the agent might do 
 
 ### Plan format
 
-Write the plan as a new section in the task file:
+Write the plan as a new section in the task file. Lead with a **short-form summary** — one bullet per step, each one line, so a reader can get the shape of the plan in 30 seconds before diving into step detail.
 
 ```markdown
 ## Implementation plan
+
+### Summary
+
+1. [Step 1 title] — [one-line hook]
+2. [Step 2 title] — [one-line hook]
+3. [Step 3 title] — [one-line hook]
+   ...
 
 ### Approach
 
@@ -166,6 +173,8 @@ Write the plan as a new section in the task file:
 3. [Behaviour to verify] → verify: [concrete check]
 ```
 
+Keep summary bullets and step numbers in lockstep — bullet N matches step N.
+
 ### Self-check
 
 Before presenting:
@@ -175,4 +184,4 @@ Before presenting:
 
 ## Step 5: Review
 
-Present the plan to the user. After approval, commit.
+Print the **Summary** section verbatim to the console so the user gets the shape of the plan without opening the task file. Then wait for approval. After approval, commit.
