@@ -132,22 +132,32 @@ This is NOT a comprehensive code review (that's `/cross-pollinate-code-review`'s
 ## Step 4: Summarise and codify
 
 Write a TLDR into the task, below the implementation plan. Bullet points
-only. No prose essays, no tables, no review transcripts, no narration of
-the process. The reader wants to know what now exists and any flags — not
-a diary of how you got there.
+only. Plain English, conceptual level — describe **what now exists and
+why it matters**, not a file-by-file inventory. The reader is a future
+human trying to understand the change at a glance, not an auditor checking
+each code path.
 
-Target: 5-10 bullets total. If it takes more than that, you're padding.
+Target: ~5 bullets. If you need more than that, you're padding.
+
+**Be extremely sparing with code paths, symbol names, and config keys.**
+Most bullets shouldn't contain any. A code reference earns its place only
+when the concept is incomprehensible without it. "Loads the test env file
+at import time" beats "calls `load_dotenv(_ENV_TEST, override=True)` in
+`backend/conftest.py`".
 
 ```markdown
 #### Summary
 
-- [What exists now — file/module + its role, one line each]
-- [Any deviation from the plan worth remembering, one line]
-- [Any flag / known boundary, one line]
+- [What exists now, at a conceptual level]
+- [How it behaves / the property it gives you]
+- [Any deviation from the plan worth remembering]
+- [Any flag / known boundary]
 ```
 
 Do NOT include:
 - Commit hashes (git log has them)
+- File paths or module names unless genuinely load-bearing for comprehension
+- Symbol names, config keys, function signatures, one-liner code snippets
 - Review-loop transcripts or verdict tables (the review is not the work)
 - Re-statements of what the plan already said
 - Process narration ("implemented in a worktree", "converged after N rounds")
@@ -177,7 +187,7 @@ This skill sets `wip` at the start (Step 1) — don't set `done` here.
 - Writing the summary before implementation is complete.
 - Summarising what the code does instead of what changed and why.
 - Writing a prose essay / review transcript / verdict table as the summary.
-  It's a TLDR — bullets only, 5-10 bullets max.
+  It's a TLDR — ~5 bullets, plain English, sparing on code paths.
 - Deviating from the plan without updating it in the task.
 - Reading the entire codebase upfront — load files as each step needs them.
 - Relying on fake-based coverage for a real infrastructure class — fakes test
