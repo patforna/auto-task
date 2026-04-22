@@ -131,27 +131,34 @@ This is NOT a comprehensive code review (that's `/cross-pollinate-code-review`'s
 
 ## Step 4: Summarise and codify
 
-Write a summary directly into the task, below the implementation plan:
+Write a TLDR into the task, below the implementation plan. Bullet points
+only. No prose essays, no tables, no review transcripts, no narration of
+the process. The reader wants to know what now exists and any flags — not
+a diary of how you got there.
+
+Target: 5-10 bullets total. If it takes more than that, you're padding.
 
 ```markdown
 #### Summary
 
-[What was actually built. Note any deviations from the plan.]
-
-Commits: [short hashes]
+- [What exists now — file/module + its role, one line each]
+- [Any deviation from the plan worth remembering, one line]
+- [Any flag / known boundary, one line]
 ```
 
-Keep it concise — one paragraph is usually enough. The plan + summary together
-tell the full story; no need to repeat what the plan already says.
+Do NOT include:
+- Commit hashes (git log has them)
+- Review-loop transcripts or verdict tables (the review is not the work)
+- Re-statements of what the plan already said
+- Process narration ("implemented in a worktree", "converged after N rounds")
+- "Deviations from the plan" as a separate section unless there are >2
 
 If the implementation surfaced something worth preserving, codify it in the
-right place and reference it from the summary:
+right place — do NOT inline it into the summary:
 
 - **Domain surprise** → `docs/knowledge.md`
 - **Design decision with rationale** → `docs/decisions.md`
 - **New rule or convention** → `CLAUDE.md`
-- **Plan deviated** — note the deviation type in the summary so future
-  planning improves.
 
 If nothing was surprising, skip the codification — just write the summary.
 
@@ -169,6 +176,8 @@ This skill sets `wip` at the start (Step 1) — don't set `done` here.
 - Silently fixing unrelated issues found during implementation.
 - Writing the summary before implementation is complete.
 - Summarising what the code does instead of what changed and why.
+- Writing a prose essay / review transcript / verdict table as the summary.
+  It's a TLDR — bullets only, 5-10 bullets max.
 - Deviating from the plan without updating it in the task.
 - Reading the entire codebase upfront — load files as each step needs them.
 - Relying on fake-based coverage for a real infrastructure class — fakes test
