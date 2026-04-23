@@ -31,15 +31,7 @@ description, acceptance criteria, and notes.
 
 ### Status lifecycle
 
-| Status     | Meaning                                    | Set by         |
-|------------|------------------------------------------- |----------------|
-| `new`      | Defined, not yet started                   | `/create-task` |
-| `wip`      | Implementation in progress                 | `/impl-task`   |
-| `done`     | Resolved (shipped, or rejected with notes) | `/review-task` |
-| `rejected` | Investigated and decided against           | manual         |
-
-Use `just task-status <file> <status>` to update — it handles both the
-frontmatter and the parent epic's table.
+See [CLAUDE.md § Tasks](../../../CLAUDE.md#tasks) — single source of truth for status values and the `just task-status` flow.
 
 ### Task types
 
