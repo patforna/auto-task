@@ -1,6 +1,6 @@
 ---
 name: impl-task
-description: Implement a task — pick it up, execute the plan using TDD, summarise. Workflow: /define-task → /plan-task → /impl-task → /review-task.
+description: Implement a task — pick it up, execute the plan using TDD, summarise. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task.
 ---
 
 # Implement Task
@@ -17,14 +17,15 @@ If the intent is ambiguous, ask.
 Pick up a planned task and execute it using test-driven development.
 Commit after each step. Write a summary when done and codify any learnings.
 
-## Workflow context
+## Context
+
+This skill is typically run as part of a larger workflow:
 
 ```
-/define-task  →  /plan-task  →  /impl-task (this skill)  →  /review-task
+/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task
 ```
 
-Each step runs in a new session. The task file carries everything the next
-agent needs — it is the handoff between sessions.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `docs/tasks`) plus repo state carry everything the next agent needs.
 
 ## Step 1: Orient
 

@@ -33,7 +33,7 @@ Skip silently when any of these hold:
 - **Epic task** — has a sub-task table, not ACs. Clarify the sub-tasks individually, not the epic.
 - **Already clarified in this session** — the user confirms clarify has just run and nothing has changed since.
 
-If the task is so under-specified that you can't form grounded questions at all, stop and suggest running `/define-task <task-path>` to flesh it out before trying to clarify.
+If the task is so under-specified that you can't form grounded questions at all, stop and suggest running `/create-task <task-path>` to flesh it out before trying to clarify.
 
 ## Step 1: Read the task and the code it touches
 

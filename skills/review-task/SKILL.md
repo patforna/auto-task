@@ -1,6 +1,6 @@
 ---
 name: review-task
-description: Verify a completed task against its specification in a fresh session. Workflow: /define-task → /plan-task → /impl-task → /review-task. Invoke when the user requests it.
+description: Verify a completed task against its specification in a fresh session. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task.
 ---
 
 # Review Task
@@ -15,14 +15,15 @@ Verify that a completed task satisfies its specification. This is a
 verification pass, not a code quality review — the question is "did it do
 what was asked?", not "is the code good?"
 
-## Workflow context
+## Context
+
+This skill is typically run as part of a larger workflow:
 
 ```
-/define-task  →  /plan-task  →  /impl-task  →  /review-task (this skill)
+/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task
 ```
 
-Each step runs in a new session. The task file carries everything the next
-agent needs — it is the handoff between sessions.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `docs/tasks`) plus repo state carry everything the next agent needs.
 
 ## Step 1: Orient
 
