@@ -1,6 +1,6 @@
 ---
 name: plan-task
-description: Turn a defined task into a sequenced implementation plan ready for handoff. Workflow: /define-task → /plan-task → /impl-task → /review-task.
+description: Turn a defined task into a sequenced implementation plan ready for handoff. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task.
 ---
 
 # Plan Task
@@ -15,14 +15,15 @@ Turn a defined task into an implementation plan that closes the decision space w
 
 The task definition says **what** to build and **why**. The plan says **how to verify it's built** — sequenced into steps that each prove a behaviour. The implementing agent starts in a fresh session with only the task file and the repo. The plan must be self-contained.
 
-## Workflow context
+## Context
+
+This skill is typically run as part of a larger workflow:
 
 ```
-/define-task  →  /plan-task (this skill)  →  /impl-task  →  /review-task
+/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task
 ```
 
-Each step runs in a new session. The task file carries everything the next
-agent needs — it is the handoff between sessions.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `docs/tasks`) plus repo state carry everything the next agent needs.
 
 ## What belongs in a plan
 
@@ -44,29 +45,9 @@ Things you'd be nervous about:
 
 ## Step 1: Clarify
 
-Run `/clarify-task <task-path>` to surface and resolve ambiguities before planning. Skip if the user confirms it was already run in this session.
+Run `/clarify-task <task-path>` to surface and resolve ambiguities before planning. Skip if the user confirms it was already run in this session and the task hasn't changed since. Clarify handles placeholder/epic/research short-circuits itself, so it's safe to call unconditionally.
 
-## Step 2: Readiness check
-
-Read the task. Before exploring the code, verify the task is plannable. Agents cannot detect when they're working from ambiguous specs — they silently resolve ambiguity, usually wrong. This gate prevents that.
-
-**Skip this gate for epics** (they have sub-task tables, not ACs — plan the sub-tasks instead).
-
-For **research** tasks (`type: research`), apply a lighter check: require a clear question or hypothesis, a defined deliverable, and a scope boundary. Don't require falsifiable behavioural ACs.
-
-For all other tasks, check:
-
-1. **Acceptance criteria exist** — not TODOs, placeholders, or "have a think"-style prompts. The create-task template uses `TODO: Add ACs` — if that's still there, the task isn't defined.
-2. **Rationale is present** — the task explains *why* (motivation/problem), not just *what*. Without the why, you'll fill the gap with a reasonable but possibly wrong assumption.
-3. **Criteria are falsifiable** — no vague language: "works correctly", "handles edge cases", "is robust", "clean", "acceptable". Each criterion has an unambiguous pass/fail.
-4. **No unresolved questions** — no embedded "should we...?", "TBD", "TODO", "have a think", "need to decide". These are conversation artifacts that should have been resolved in `/define-task`.
-
-If any check fails, **stop**. Do not plan around ambiguity — it compounds downstream. Present:
-- Which checks failed, with the specific text that triggered each.
-- Clarifying questions where possible — grounded in the code, not generic ("do you want X excluded from ranking, or just flagged?" rather than "can you clarify?").
-- Suggest running `/define-task <task-path>` to flesh out the task, or let the user fix inline.
-
-## Step 3: Orient and recommend
+## Step 2: Orient and recommend
 
 Read the code the task will touch — at minimum the modules named in the ACs or description. Understand the current structure before deciding what to change.
 
@@ -80,7 +61,7 @@ If the task belongs to an epic, read the epic for ordering and dependency contex
 
 Show the recommendation and wait for the user's go.
 
-## Step 4: Design the plan
+## Step 3: Design the plan
 
 ### Single model
 
@@ -182,6 +163,6 @@ Before presenting:
 2. **Pseudocode test** — does any step describe *how* to write code? Relax it.
 3. **Length test** — can the user review this in under 5 minutes? Shorten.
 
-## Step 5: Review
+## Step 4: Review
 
 Print the **Summary** section verbatim to the console so the user gets the shape of the plan without opening the task file. Then wait for approval. After approval, commit.
