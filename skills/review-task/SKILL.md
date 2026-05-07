@@ -1,6 +1,6 @@
 ---
 name: review-task
-description: Verify a completed task against its specification in a fresh session. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task.
+description: Verify that a task has been completed according to its intent and criteria. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task.
 ---
 
 # Review Task
@@ -11,9 +11,7 @@ description: Verify a completed task against its specification in a fresh sessio
 
 ## Goal
 
-Verify that a completed task satisfies its specification. This is a
-verification pass, not a code quality review — the question is "did it do
-what was asked?", not "is the code good?"
+Verify that a task has been completed according to its intent and criteria.
 
 ## Context
 
@@ -23,77 +21,37 @@ This skill is typically run as part of a larger workflow:
 /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `docs/tasks`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.
 
-## Step 1: Orient
+## Guidance (DO NOT IGNORE!)
 
-Read the task file. Identify:
-- Description (the *why*)
-- Acceptance criteria (the *what*)
-- Implementation plan (the *how*, including any deviations noted)
-- Summary (what was actually built)
-- Notes (constraints, gotchas, pointers)
+<!-- Curate as we go along. -->
 
-Read the code the task touched — the diff, the tests, neighbouring files for
-context. Read CLAUDE.md for project rules.
+These rules govern how to perform the review. Internalise and follow them throughout.
 
-## Step 2: Verify each AC
+- Flag issues — do not attempt to fix them; let the user decide.
+
+## Step 1: Build context
+
+Read the task and the code that was implemented. Ensure you fully understand the task's intent, criteria and what was implemented.
+
+## Step 2: Verify ACs
 
 For each acceptance criterion, determine: **pass**, **fail**, or **unclear**.
 
-A criterion passes when you can point to **specific evidence** — a test that
-exercises it, observable behaviour in the code, or output from running it.
-"The code looks like it would work" is not evidence; a passing test is.
+A criterion passes when you can point to **specific evidence** — for example, a test that exercises it, observable behaviour in the code, or output from running it. "The code looks like it would work" is not evidence; a passing test is.
 
-Run `just check` to confirm the test suite passes.
+## Step 3: Verify intent
 
-If you need to run specific tests or commands to verify an AC, do so. Cite
-the evidence.
+In addition to checking ACs:
 
-## Step 3: Check for gaps
+- Check that the implementation truly matches the *why* in the description. It's easy to meet every AC but miss the intent.
+- If there were deviations from the plan, check that they are justified.
 
-Beyond individual ACs:
+## Step 4: Summarise
 
-- **Intent alignment** — Does the implementation match the *why* in the
-  description? An agent can satisfy every criterion but miss the intent.
-- **Plan deviations** — Were deviations documented in the summary? Are they
-  justified?
-- **Completeness** — Are there ACs that were partially implemented, silently
-  skipped, or interpreted in a surprising way?
-- **Summary accuracy** — Does the task summary reflect what was actually
-  built?
+Say whether the review passed or, if not, present a summary of your findings and wait for user input.
 
-## Step 4: Verdict
+## Step 5: Wrap up
 
-Present findings structured as:
-
-```
-## Review: [task title]
-
-### Verdict: PASS | FAIL
-
-### AC verification
-
-| # | Criterion (short)        | Status  | Evidence                    |
-|---|--------------------------|---------|------------------------------|
-| 1 | [abbreviated AC]         | pass    | [test name / observation]    |
-| 2 | [abbreviated AC]         | fail    | [what's missing]             |
-
-### Gaps (if any)
-
-- [Intent misalignment, plan deviation, or completeness issue]
-```
-
-If the verdict is **PASS** — run `just task-status <task-file> done` (updates
-frontmatter and epic table). Commit the status update.
-
-If the verdict is **FAIL** — list the specific gaps. The human decides
-whether to re-run `/impl-task` with the findings, adjust the task, or accept
-as-is. Status stays `ready-for-signoff`.
-
-## What this skill does NOT do
-
-- Code quality review (design, style, conventions) — use `/cross-pollinate-code-review`
-- Run linters or type checkers — `just check` handles that
-- Suggest improvements beyond the task scope
-- Rewrite code or fix issues (flag them; let the human decide)
+If there are no findings, or the user has asked you to proceed, update the task status by running `just task-status <task-file> ready-for-signoff`.
