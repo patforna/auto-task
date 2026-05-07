@@ -64,3 +64,11 @@ When editing the task file:
 ## Step 5: Verify
 
 Spawn a sub-agent to re-run Steps 1–2 on the updated task and report any remaining issues. If new issues surface, address them via Steps 3–4. Cap at 3 rounds.
+
+## Step 6: Mark ready
+
+Finally, set the task status to `ready-for-dev`:
+
+```
+just task-status <task-file> ready-for-dev
+```

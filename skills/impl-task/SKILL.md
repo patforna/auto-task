@@ -36,7 +36,7 @@ As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's 
 4. Read files referenced by the task and the code each plan step will touch.
    Load per step as you go — don't read the entire codebase upfront.
 5. **Read the acceptance criteria** — these are your success conditions.
-6. Set status to wip: `just task-status <task-file> wip` (updates frontmatter and epic table).
+6. Set status to in-dev: `just task-status <task-file> in-dev` (updates frontmatter and epic table).
 7. Confirm you understand the plan. If anything is ambiguous, ask before coding.
 
 ## Step 2: Implement (per plan step)
@@ -175,8 +175,15 @@ If nothing was surprising, skip the codification — just write the summary.
 
 Commit the task update.
 
-Status note: `/review-task` sets `status: done` via `just task-status` after verification passes.
-This skill sets `wip` at the start (Step 1) — don't set `done` here.
+## Step 5: Mark ready for signoff
+
+Finally, set the task status to `ready-for-signoff`:
+
+```
+just task-status <task-file> ready-for-signoff
+```
+
+`/review-task` will move it to `done` after verification passes — don't set `done` here.
 
 ## Anti-Patterns
 

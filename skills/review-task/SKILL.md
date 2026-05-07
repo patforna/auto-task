@@ -89,7 +89,7 @@ frontmatter and epic table). Commit the status update.
 
 If the verdict is **FAIL** — list the specific gaps. The human decides
 whether to re-run `/impl-task` with the findings, adjust the task, or accept
-as-is. Status stays `wip`.
+as-is. Status stays `ready-for-signoff`.
 
 ## What this skill does NOT do
 
