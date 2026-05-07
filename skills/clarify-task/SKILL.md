@@ -67,8 +67,5 @@ Spawn a sub-agent to re-run Steps 1–2 on the updated task and report any remai
 
 ## Step 6: Mark ready
 
-Finally, set the task status to `ready-for-dev`:
-
-```
-just task-status <task-file> ready-for-dev
+Finally, update the task status by running `just task-status <task-file> ready-for-dev`.
 ```
