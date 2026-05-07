@@ -58,7 +58,7 @@ Fully read, internalise and use `/tdd` to drive implementation. Do not write or 
 - If tests keep failing after 3 implementation attempts, revert to the last green state and take a smaller step.
 - If the build fails on unrelated changes, flag it to the user. Don't fix silently — it may be someone else's work in progress.
 
-## Step 4: Review
+## Step 4: Self-review
 
 After completing all planned steps, review `git diff` from your first commit to HEAD:
 
