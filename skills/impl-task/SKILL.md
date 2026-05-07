@@ -1,21 +1,17 @@
 ---
 name: impl-task
-description: Implement a task — pick it up, execute the plan using TDD, summarise. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task.
+description: Implement a task by executing its implementation plan. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task.
 ---
 
 # Implement Task
 
 ## Usage
 
-`/impl-task <task-path>`
-
-The argument is a path to a task file.
-If the intent is ambiguous, ask.
+`/impl-task <task-path> [further user instructions]`
 
 ## Goal
 
-Pick up a planned task and execute it using test-driven development.
-Commit after each step. Write a summary when done and codify any learnings.
+Implement a task by executing its implementation plan.
 
 ## Context
 
@@ -25,183 +21,64 @@ This skill is typically run as part of a larger workflow:
 /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `docs/tasks`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.
 
-## Step 1: Orient
+## Guidance (DO NOT IGNORE!)
 
-1. **Read the task** and locate the `## Implementation plan`.
-   If no plan exists, stop and tell the user to run `/plan-task` first.
-2. If the task has an `epic:` field, read the epic for strategic context.
-3. **Read CLAUDE.md** — every rule is a constraint on your implementation.
-4. Read files referenced by the task and the code each plan step will touch.
-   Load per step as you go — don't read the entire codebase upfront.
-5. **Read the acceptance criteria** — these are your success conditions.
-6. Set status to in-dev: `just task-status <task-file> in-dev` (updates frontmatter and epic table).
-7. Confirm you understand the plan. If anything is ambiguous, ask before coding.
+<!-- Curate as we go along. -->
 
-## Step 2: Implement (per plan step)
+These rules govern how to execute the implementation. Internalise and follow them throughout.
 
-Work through the plan step by step. Re-read the current plan step and its
-verification criteria before proceeding to each new step.
+- Commit early and often.
+- Include `(task/NNN)` in the commit.
+- Look for and internalise existing style, patterns, conventions. Don't deviate unless the plan explicitly asks for it.
+- Maintain the testing pyramid. Test at the lowest possible level. Few, mostly happy-path tests at the top of the pyramid (e2e, component).
+- Do not use I/O, randomness, or real date/time in unit tests.
+- Take small steps when uncertain, surprised, or in unfamiliar territory; bigger steps when confident. An unexpected red means shift down to smaller steps. An unexpected green means review your test with fresh eyes — there are probably gaps.
 
-Each step names a behaviour to verify — that behaviour is your first test.
+## Step 1: Task readiness
 
-### The TDD cycle
+If the task does not contain an `Implementation plan` section (usually set by `/plan-task`), stop, flag it to the user and ask how to proceed.
 
-For each step that has testable behaviour:
+Otherwise, update the task status by running `just task-status <task-file> in-dev`.
 
-**Red** — Write a small failing test for the behaviour the step names. Run it.
-Confirm it fails.
+## Step 2: Build context
 
-**Green** — Make it pass. Choose your strategy by confidence:
+Read the task and the code the implementation plan will touch. If in doubt, err on the side of reading too much. Ensure you fully understand the task, implementation plan and current state of the codebase before proceeding.
 
-| Strategy               | When                    | How                                                     |
-|:-----------------------|:------------------------|:--------------------------------------------------------|
-| **Obvious Implementation** | Confident, clear logic  | Write the real code directly. If unexpected red, back down. |
-| **Fake It**            | Uncertain or complex    | Return a constant, then replace with real logic as duplication surfaces. |
-| **Triangulation**      | Unsure how to generalise | Write a second test demanding different output, then generalise. |
+## Step 3: Implement
 
-Run the relevant test(s) after every Red and Green step — not the full suite.
+Work through the implementation plan step by step. Re-read the implementation plan so it's fresh in your context before proceeding to the next step.
 
-**Refactor** — Remove duplication introduced by getting to green. This includes
-duplication between test and production code. AI tends to only add complexity
-(inhale) — you must actively simplify (exhale) after each green. This is not
-optional tidying; it is load-bearing for your ability to continue working.
-
-Repeat the cycle until the plan step's behaviour is fully covered. A step may
-need multiple TDD cycles (one per test case).
-
-**Real vs fake coverage**: if a new method is added to both a concrete
-infrastructure class (parquet repo, DB client, API client) and a fake, the
-TDD cycle via the fake verifies the interface contract — but does NOT cover
-the real implementation's code path. Check whether the concrete class has an
-integration test file; if so, add the new method there directly.
-
-### Pure wiring steps
-
-If a step is pure wiring with no testable behaviour (e.g., adding a CLI flag
-that delegates to an existing function): implement directly. No test needed.
-
-### Verify and commit (per plan step)
-
-After all TDD cycles for a step are green and refactored (or for wiring steps,
-after implementation):
-
-1. **Verify** — `just check` (full suite + lint + typecheck + format).
-2. **Commit** — `just commit "<step description> (refs <task>)" <changed-files>`.
-   Do NOT push.
+Fully read, internalise and use `/tdd` to drive implementation. Do not write or modify production code without a failing test.
 
 ### When things go wrong
 
-- **Test fails after implementation**: Try to fix. If stuck after 2 attempts,
-  revert to last green state and take a smaller step.
-- **Plan step seems wrong**: Update the plan in the task file, note the
-  deviation, continue.
-- **Scope creep discovered**: Stop. Note what was found. Flag to user.
-  Do not silently fix unrelated issues.
-- **`just check` fails on unrelated code**: Flag to user rather than fixing
-  silently — it may be someone else's in-progress work.
+- If an implementation plan step seems wrong or missing, try to resolve the issue and note it down in `Implementation notes` (see below).
+- If tests keep failing after 3 implementation attempts, revert to the last green state and take a smaller step.
+- If the build fails on unrelated changes, flag it to the user. Don't fix silently — it may be someone else's work in progress.
 
-### Step size
+## Step 4: Review
 
-Smaller steps when uncertain, surprised, or in unfamiliar territory. Bigger
-steps when confident. An unexpected red means shift down to smaller steps.
-An unexpected green means review your test — it may be wrong. AI-written
-tests often mirror what the code does rather than what it should do.
+After completing all planned steps, review `git diff` from your first commit to HEAD:
 
-For complex logic (especially quant code), consult the TDD reference below
-for the full Beck-style pattern catalog (Child Test, Triangulation, Value
-Objects, etc.).
+- Does the diff touch only what the plan requires? If not, resolve.
+- Verify that each AC is demonstrably met. If not, resolve.
+- Ensure there are no unwanted leftovers that you introduced (e.g. debug prints, TODO comments, commented-out or obsolete code, etc.).
 
-## Step 3: Final verification
+## Step 5: Wrap up
 
-After all plan steps pass:
+Add an `## Implementation notes` section to the end of the task file, noting anything worth flagging or preserving — in plain English. For example:
 
-1. Run `just check` one final time.
-2. Review the full diff: `git diff` from first implementation commit to HEAD.
-3. **Scope check** — does the diff touch only what the plan requires? Flag
-   anything unexpected.
-4. **AC check** — for each acceptance criterion, verify it is demonstrably met
-   (by a test, by observable output, or by code inspection). If an AC is not
-   met, go back and implement it.
-5. **Hygiene check** — no debug prints, no TODO comments you introduced, no
-   commented-out code, no unrelated formatting changes.
-
-This is NOT a comprehensive code review (that's `/cross-pollinate-code-review`'s job and
-`/review-task` in a fresh session). This is a quick scope-and-hygiene pass.
-
-## Step 4: Summarise and codify
-
-Write a TLDR into the task, below the implementation plan. Bullet points
-only. Plain English, conceptual level — describe **what now exists and
-why it matters**, not a file-by-file inventory. The reader is a future
-human trying to understand the change at a glance, not an auditor checking
-each code path.
-
-Target: ~5 bullets. If you need more than that, you're padding.
-
-**Be extremely sparing with code paths, symbol names, and config keys.**
-Most bullets shouldn't contain any. A code reference earns its place only
-when the concept is incomprehensible without it. "Loads the test env file
-at import time" beats "calls `load_dotenv(_ENV_TEST, override=True)` in
-`backend/conftest.py`".
-
-```markdown
-#### Summary
-
-- [What exists now, at a conceptual level]
-- [How it behaves / the property it gives you]
-- [Any deviation from the plan worth remembering]
-- [Any flag / known boundary]
-```
-
-Do NOT include:
-- Commit hashes (git log has them)
-- File paths or module names unless genuinely load-bearing for comprehension
-- Symbol names, config keys, function signatures, one-liner code snippets
-- Review-loop transcripts or verdict tables (the review is not the work)
-- Re-statements of what the plan already said
-- Process narration ("implemented in a worktree", "converged after N rounds")
-- "Deviations from the plan" as a separate section unless there are >2
-
-If the implementation surfaced something worth preserving, codify it in the
-right place — do NOT inline it into the summary:
-
-- **Domain surprise** → `docs/knowledge.md`
-- **Design decision with rationale** → `docs/decisions.md`
-- **New rule or convention** → `CLAUDE.md`
-
-If nothing was surprising, skip the codification — just write the summary.
+- Any deviations from the plan.
+- Any surprises encountered during implementation.
+- Any learnings worth codifying (incl. how).
+- Any non-obvious assumptions that were made implicitly.
+- Any non-obvious follow-up work not yet captured.
+- etc.
 
 Commit the task update.
 
-## Step 5: Mark ready for signoff
+## Step 6: Integrate feedback
 
-Finally, set the task status to `ready-for-signoff`:
-
-```
-just task-status <task-file> ready-for-signoff
-```
-
-`/review-task` will move it to `done` after verification passes — don't set `done` here.
-
-## Anti-Patterns
-
-- Implementing without reading the plan and acceptance criteria first.
-- Writing all code then all tests (test-after). Write the test FIRST.
-- Skipping the refactor step — complexity accumulates and stalls progress.
-- One big commit at the end instead of per-step commits.
-- Silently fixing unrelated issues found during implementation.
-- Writing the summary before implementation is complete.
-- Summarising what the code does instead of what changed and why.
-- Writing a prose essay / review transcript / verdict table as the summary.
-  It's a TLDR — ~5 bullets, plain English, sparing on code paths.
-- Deviating from the plan without updating it in the task.
-- Reading the entire codebase upfront — load files as each step needs them.
-- Relying on fake-based coverage for a real infrastructure class — fakes test
-  the interface, not the implementation. If the class has an integration test
-  file, add the new method there.
-
-## TDD Reference (Beck-style)
-
-!`awk 'p; /^---$/ && NR>1 {p=1}' .claude/skills/tdd/SKILL.md`
+Wait for the user to provide feedback. Once provided, address it, commit, respond.
