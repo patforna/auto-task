@@ -69,6 +69,6 @@ Add an `## Implementation plan` section to the task file using the structure bel
 - Not yet captured insights, assumptions, flags, constraints, decisions, etc.
 - Anything worth capturing for posterity.]
 
-## Step 4: Print summary
+## Step 4: Summarise
 
-Print a summary of the plan (i.e. TLDR and Notes) to the console.
+Present a summary of the plan (i.e. TLDR and Notes).
