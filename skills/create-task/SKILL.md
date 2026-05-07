@@ -21,7 +21,7 @@ This skill is typically run as part of a larger workflow:
 /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `tasks/`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.
 
 ## Guidance (DO NOT IGNORE!)
 
