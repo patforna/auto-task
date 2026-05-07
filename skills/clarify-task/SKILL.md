@@ -7,7 +7,7 @@ description: Use this skill to resolve ambiguities, clarify vague criteria and m
 
 ## Usage
 
-`/clarify-task <task-path>`
+`/clarify-task <task-path> [further user instructions]`
 
 ## Goal
 
