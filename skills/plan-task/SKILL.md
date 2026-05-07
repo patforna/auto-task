@@ -1,6 +1,6 @@
 ---
 name: plan-task
-description: Turn a defined task into a sequenced implementation plan ready for handoff. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task.
+description: Write an implementation plan for a well-defined task. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task.
 ---
 
 # Plan Task
@@ -11,9 +11,7 @@ description: Turn a defined task into a sequenced implementation plan ready for 
 
 ## Goal
 
-Turn a defined task into an implementation plan that closes the decision space without doing the work.
-
-The task definition says **what** to build and **why**. The plan says **how to verify it's built** — sequenced into steps that each prove a behaviour. The implementing agent starts in a fresh session with only the task file and the repo. The plan must be self-contained.
+Given a well-defined task (the "why" and "what"), write an implementation plan (the "how") that closes the decision space for an implementing agent.
 
 ## Context
 
@@ -23,146 +21,54 @@ This skill is typically run as part of a larger workflow:
 /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `docs/tasks`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.
 
-## What belongs in a plan
+## Guidance (DO NOT IGNORE!)
 
-**The nervousness heuristic:** Remove the plan. Give the implementing agent just the task definition. What would you be nervous about? Those things — and only those things — belong in the plan.
+<!-- Curate as we go along. -->
 
-Things you'd be nervous about:
-- The agent extending the wrong module (name the right one)
-- An existing utility the agent should reuse but wouldn't find easily (point to it)
-- Non-obvious ordering between steps (sequence them)
-- A constraint on approach that affects correctness (state it)
+These rules govern what belongs in the plan and how to write it. Internalise and follow them throughout.
 
-## What doesn't belong
+- Write for a competent outsider. They can write code, name things, follow patterns but they don't have in-team context beyond what's in the task and the repo.
+- Be maximally succinct. Capture the plan with the fewest words that remove ambiguity. Plan length obviously follows complexity but don't pad.
+- What would you be nervous about if you gave the agent only the task and codebase but no plan? Address those (and only those) things.
+- If (and only if) load-bearing, add pointers to existing code (modules, classes, functions, utilities, etc. to consider), sequencing when ordering matters for correctness, constraints on approach when more than one is plausible.
+- Lock down details of cross-boundary contracts in the plan (e.g. API shapes, DB/parquet schemas, symbols reachable across package boundaries, etc.).
+- Leave decision on internal details to the implementer - no pseudocode, no names for new files/classes/functions, no exact line numbers, no details that will go stale quickly.
+- Do not restate universal truths ("write tests", "handle errors", "follow patterns").
+- Avoid placeholders, i.e. no "TBD"s, no "handle edge cases", no "similar to step 3". If it's worth writing down, be concrete.
+- Use plain English and write like a senior engineer briefing a teammate, not like an AI producing a spec. Avoid AI-slop language and padding.
 
-- Pseudocode — if it reads like "code written in English", it's too detailed
-- Names for new files, classes, or functions — let the agent decide from the codebase
-- Implementation details derivable from reading the code
-- Anything already in CLAUDE.md (testing, conventions, style)
-- Universal truths ("write tests", "handle errors", "follow patterns")
+## Step 1: Check task readiness
 
-## Step 1: Clarify
+If the task's status is not `ready-for-dev` (usually set at the end of `/clarify-task`), stop, flag it to the user and ask how to proceed.
 
-Run `/clarify-task <task-path>` to surface and resolve ambiguities before planning. Skip if the user confirms it was already run in this session and the task hasn't changed since. Clarify handles placeholder/epic/research short-circuits itself, so it's safe to call unconditionally.
+## Step 2: Build context
 
-## Step 2: Orient and recommend
+Read the task and the code the plan will likely touch. If in doubt, err on the side of reading too much. Ensure you fully understand the task and current state of the codebase before proceeding.
 
-Read the code the task will touch — at minimum the modules named in the ACs or description. Understand the current structure before deciding what to change.
+## Step 3: Write the plan
 
-If the task belongs to an epic, read the epic for ordering and dependency context.
-
-**Recommend an approach:**
-
-- **Skip planning** — the approach is obvious, files are few, no tricky ordering. Go straight to `/impl-task`.
-- **Single model** — straightforward task with a clear approach.
-- **Dialectic** — multiple valid approaches, cross-cutting concerns, or novel architecture. Plan diversity surfaces blind spots a single model misses (PlanSearch: diversity beats detail).
-
-Show the recommendation and wait for the user's go.
-
-## Step 3: Design the plan
-
-### Single model
-
-Design the plan directly — sequence the work into steps, each naming a **concrete behaviour to verify**. After drafting, run one pre-mortem pass: "Assume an agent followed this plan and the task failed. What went wrong?" Revise if it surfaces anything structural.
-
-### Dialectic
-
-The goal is **perspective diversity** — genuinely different plans, not N variations of the same idea. Different models have different architectural biases, so multi-model generation is the mechanism.
-
-**Generate 3 plans in parallel** — one per frontier model:
-
-**Opus** — background agent:
-> Read the task at {task_path} and the code it touches. Read CLAUDE.md.
-> Produce an implementation plan (not code): approach with rationale,
-> sequenced steps with verification checks, non-goals.
-> Write to /tmp/{slug}-plan-opus.md
-
-**Codex** — headless via bash:
-```bash
-codex exec --full-auto "Read the task at {task_path} and the code it touches. Read CLAUDE.md. Produce an implementation plan (not code): approach with rationale, sequenced steps with verification checks, non-goals. Write to /tmp/{slug}-plan-codex.md"
-```
-
-**Gemini** — headless via bash:
-```bash
-gemini exec "Read the task at {task_path} and the code it touches. Read CLAUDE.md. Produce an implementation plan (not code): approach with rationale, sequenced steps with verification checks, non-goals. Write to /tmp/{slug}-plan-gemini.md"
-```
-
-If a model isn't available, stop and tell the user before proceeding.
-
-**Synthesize, don't select.** Read all 3 plans. Compare:
-- **Agreements** — high confidence; take directly
-- **Disagreements** — the interesting decisions; for each, state which is stronger and why
-- **Gaps** — things none of the plans caught
-
-Write a single synthesized plan — don't pick a winner and discard the rest. Carry rejected approaches from the disagreements into the plan's "Alternatives considered" section so the implementing agent doesn't rediscover and pursue them.
-
-**Iterative refinement.** Critique the synthesized plan, revise, repeat until convergence. Each round uses a different lens to avoid re-running the same check:
-
-1. **Pre-mortem** — "Assume an agent followed this plan and the task failed. What went wrong?" (missing preconditions, ordering dependencies, merge contradictions)
-2. **Verification audit** — for each step, can the check actually be run? Does it prove the behaviour it claims to?
-3. **Scope and blast radius** — what might the agent touch that it shouldn't? What scope creep vectors exist?
-4. **Fresh read** — read the plan cold as if you'd never seen the task. Is it self-contained? Would a capable agent in a fresh session know what to do?
-
-**Convergence signal:** stop when a round produces only cosmetic changes (wording, formatting) rather than structural ones (new steps, reordering, changed approach). Typically 2-4 rounds. If still finding structural issues after round 4, flag to the user — the task may need re-scoping.
-
-### Properties of a good step
-
-- **Verifiable** — has a concrete check (a test, a CLI command, expected output)
-- **Independent** — can fail without invalidating subsequent steps where possible
-- **Behaviour-level** — describes what the system does, not how the code is structured
-
-### Sequencing strategy
-
-- Walking skeleton or happy path first — thinnest end-to-end path
-- Then edge cases and variations
-- Structural changes (refactoring) before behavioural changes when both are needed
-
-Add **non-goals** when scope creep is likely — name things the agent might do that it shouldn't.
-
-### Plan format
-
-Write the plan as a new section in the task file. Lead with a **short-form summary** — one bullet per step, each one line, so a reader can get the shape of the plan in 30 seconds before diving into step detail.
+Add an `## Implementation plan` section to the task file using the structure below (drop sections that aren't needed):
 
 ```markdown
 ## Implementation plan
 
-### Summary
+### TLDR
 
-1. [Step 1 title] — [one-line hook]
-2. [Step 2 title] — [one-line hook]
-3. [Step 3 title] — [one-line hook]
-   ...
-
-### Approach
-
-[One paragraph: strategy and why. Omit for straightforward tasks.]
-
-### Alternatives considered
-
-- [Rejected approach] — [why rejected. Omit section if no plausible alternative.]
-
-### Non-goals
-
-- [Things the agent might do but shouldn't. Omit section if no scope creep risk.]
+[One short sentence or paragraph summarising the plan. Omit for trivial plans.]
 
 ### Steps
 
-1. [Behaviour to verify] → verify: [concrete check]
-2. [Behaviour to verify] → verify: [concrete check]
-3. [Behaviour to verify] → verify: [concrete check]
-```
+[Numbered list of steps - imperative, specific, terse]
 
-Keep summary bullets and step numbers in lockstep — bullet N matches step N.
+### Notes
 
-### Self-check
+[Only add as short bullets when truly valuable:
+- Things you'd be nervous whether a new agent gets right if not written down.
+- Not yet captured insights, assumptions, flags, constraints, decisions, etc.
+- Anything worth capturing for posterity.]
 
-Before presenting:
-1. **Nervousness test** — remove the plan, read only the ACs. Anything make you nervous? Is it addressed?
-2. **Pseudocode test** — does any step describe *how* to write code? Relax it.
-3. **Length test** — can the user review this in under 5 minutes? Shorten.
+## Step 4: Print summary
 
-## Step 4: Review
-
-Print the **Summary** section verbatim to the console so the user gets the shape of the plan without opening the task file. Then wait for approval. After approval, commit.
+Print a summary of the plan (i.e. TLDR and Notes) to the console.
