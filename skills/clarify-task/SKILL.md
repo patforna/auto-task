@@ -36,7 +36,7 @@ Triggers (non-exhaustive):
 
 - Motivation missing - task says *what* but not *why*.
 - Incomplete content - trailing-off sentences, TODOs, TBDs, "should we...?", etc.
-- Acceptance criteria weak - vague, untestable, or missing boundary/edge cases (see `/create-task` § Acceptance Criteria).
+- Acceptance criteria weak - vague, untestable, or missing boundary/edge cases (see `/create-task` § Acceptance criteria).
 - Unclear scope - a criterion two reasonable agents would read differently.
 - Semantic ambiguity - same term, field, column, etc. meaning different things (e.g. "days" = calendar or trading?).
 - Implicit assumptions - things the implementer must assume that aren't stated.

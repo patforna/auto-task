@@ -74,7 +74,7 @@ type: {task_type}
 
 TODO: Add description
 
-## Acceptance Criteria
+## Acceptance criteria
 
 TODO: Add ACs
 
@@ -85,7 +85,7 @@ TODO: Add notes
 
 ## Step 3: Write the task
 
-**Crystallise** the information you gathered in Step 1 and fill it into the task file sections - "Description", "Acceptance Criteria", "Notes".
+**Crystallise** the information you gathered in Step 1 and fill it into the task file sections - "Description", "Acceptance criteria", "Notes".
 
 ### Description
 
@@ -94,7 +94,7 @@ Describe what the task is about. Focus on the **why** and the **what**:
 - **Why:** what issue or opportunity motivates this change?
 - **What:** what will be different after this change?
 
-Save the rest for the "Acceptance Criteria" or "Notes" sections.
+Save the rest for the "Acceptance criteria" or "Notes" sections.
 
 #### Examples
 
@@ -112,7 +112,7 @@ Currently, earnings dates are only loaded up to "today".
 This task is about fetching upcoming earnings dates so that we, for example, can determine if we're close to an upcoming earnings date.
 ```
 
-### Acceptance Criteria
+### Acceptance criteria
 
 Add (just) enough ACs so that two reasonable agents would:
 
@@ -138,7 +138,7 @@ Ensure each AC has the following properties:
 ```markdown
 # Get Upcoming Earnings Dates
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - After running `load`, the earnings-dates parquet contains existing past data + n weeks of future data.
 - If future data changes (move, add, delete) and we re-run `load`, the future data in parquet reflects the latest state correctly.
@@ -149,7 +149,7 @@ Ensure each AC has the following properties:
 ```markdown
 # Show Ticker Data in Frontend
 
-## Acceptance Criteria
+## Acceptance criteria
 
 - When navigating to the frontend, I see a table, with a header and content like below:
 
@@ -239,11 +239,11 @@ If clarifying an epic, make sure that the epic task and all sub-tasks are clarif
 
 Present the task(s) to the user for review. The user will provide feedback if applicable and initiate next steps.
 
-## Appendix: Creating Epics
+## Appendix: Creating epics
 
 An epic is simply a high-level task that aggregates a number of sub-tasks.
 
-To create an epic, follow the instructions for creating a standalone task. Drop the `Acceptance Criteria` section and instead add a `Tasks` section to the end. Example:
+To create an epic, follow the instructions for creating a standalone task. Drop the `Acceptance criteria` section and instead add a `Tasks` section to the end. Example:
 
 ```markdown
 ## Tasks
