@@ -1,6 +1,6 @@
 ---
 name: auto-task
-description: Drive a ready-for-dev task end-to-end: plan, implement, review, ship. Autonomous by default.
+description: use to drive a well-defined task end-to-end with minimal human input: plan, implement, review, ship.
 ---
 
 # Auto Task
@@ -11,14 +11,16 @@ description: Drive a ready-for-dev task end-to-end: plan, implement, review, shi
 
 ## Goal
 
-Drive a ready-for-dev task end-to-end with minimal human input — chain `/plan-task` → `/impl-task` → `/code-review` → `/review-task` → `/ship-task` in one autonomous pass. Stop only when human input is genuinely required (push approval, ship gate, irreducible ambiguity).
+Drive a well-defined task end-to-end with minimal human input. 
+
+ `/plan-task` → `/impl-task` → `/code-review` → `/review-task` → `/ship-task`. Stop only when human input is genuinely required (ship gate, irreducible ambiguity, etc.).
 
 ## Context
 
 Workflow:
 
 ```
-/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task → /ship-task
+create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
 ```
 
 ## Guidance (DO NOT IGNORE!)
@@ -39,7 +41,7 @@ Internalise and follow these rules:
 
 ## Step 1: Confirm
 
-Find the task and output it's title and status.
+Find the task and output it's title and status. Bonus points for using figlet =)
 
 ## Step 2: Worktree
 
