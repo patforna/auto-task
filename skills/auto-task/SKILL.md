@@ -21,6 +21,7 @@ Workflow:
 
 ```
 create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
+                            └───────────────────────── auto-task ─────────────────────────┘
 ```
 
 ## Guidance (DO NOT IGNORE!)
