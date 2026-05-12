@@ -1,6 +1,6 @@
 ---
 name: auto-task
-description: TODO
+description: Drive a ready-for-dev task end-to-end: plan, implement, review, ship. Autonomous by default.
 ---
 
 # Auto Task
@@ -10,6 +10,8 @@ description: TODO
 `/auto-task <task> [further user instructions]`
 
 ## Goal
+
+Drive a ready-for-dev task end-to-end with minimal human input — chain `/plan-task` → `/impl-task` → `/code-review` → `/review-task` → `/ship-task` in one autonomous pass. Stop only when human input is genuinely required (push approval, ship gate, irreducible ambiguity).
 
 ## Context
 
