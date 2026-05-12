@@ -78,7 +78,9 @@ Write a plan using the structure below (drop sections that aren't needed):
 
 ## Step 4: Self-audit
 
-Re-read the Guidance section (incl. Anti-Patterns). For each step in the plan, ask whether it violates the Guidance. If it does and there's no strong reason for doing so, re-work the plan and keep self-auditing until no further issues found.
+Re-read the Guidance section (incl. Anti-Patterns). For each step in the plan, ask whether it violates the Guidance. If it does and there's no strong reason for doing so, re-work the plan once.
+
+<!-- Note: According to research, additional self-reflection loops without external signal degrades quality more often than it helps -->
 
 ## Step 5: Present
 
