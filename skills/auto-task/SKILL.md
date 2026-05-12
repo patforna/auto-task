@@ -102,7 +102,7 @@ If and only if something should be recorded for posterity, amend the tasks `## I
 
 In a new opus subagent:
 - Review the task is complete via `/review-task`
-- If... 
+- If findings: triage as in Step 6, spawn an impl subagent to apply accepted fixes, re-run `/review-task` once. If still failing, surface the unresolved findings in the wrap-up summary, leave the status as `in-dev`, and stop — do not proceed to Step 8.
 
 ## Step 8: Wrap up
 
