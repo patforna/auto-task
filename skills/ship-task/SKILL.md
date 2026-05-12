@@ -22,6 +22,7 @@ Closes the loop opened by `/create-task → /clarify-task → /plan-task → /im
 - Never force-push, never reset --hard the working tree.
 - `just commit` requires an upstream and will fail on local-only task branches — use plain `git add` + `git commit` for the done-flip.
 - Untracked files in the worktree are fine to ignore. Refuse only on modified-but-uncommitted tracked files.
+- `/ship-task` is typically invoked from a task worktree. `main` is checked out in the primary worktree, not in the task worktree — so all merge/push/branch operations must run via `git -C "$primary"`. Resolve once at start: `primary=$(git worktree list --porcelain | awk '/^worktree / {print $2; exit}')`.
 
 ## Prerequisite
 
@@ -51,8 +52,8 @@ If the task status is already `done`, skip this step.
 ## Step 3: Verify main hasn't diverged
 
 ```
-git fetch origin main
-git log --oneline main..origin/main
+git -C "$primary" fetch origin main
+git -C "$primary" log --oneline main..origin/main
 ```
 
 If `origin/main` is ahead of local `main`, stop and ask the user how to handle (likely: rebase the task branch onto the new main, then retry). Do not auto-rebase silently.
@@ -60,8 +61,8 @@ If `origin/main` is ahead of local `main`, stop and ask the user how to handle (
 ## Step 4: Fast-forward merge
 
 ```
-git checkout main
-git merge --ff-only task/NNN-<slug>
+git -C "$primary" checkout main  # usually a no-op — main is normally already checked out in the primary worktree
+git -C "$primary" merge --ff-only task/NNN-<slug>
 ```
 
 If `--ff-only` fails, stop and report — do not fall back to a merge commit.
@@ -73,14 +74,15 @@ Output:
 - The shortstat (`git diff --stat origin/main..HEAD`).
 
 Then ask the user one question via `AskUserQuestion` with three options:
-- "Push + delete branch" (recommended)
+- "Push + cleanup (remove worktree + delete branch)" (recommended)
 - "Push only"
 - "Hold off"
 
 ## Step 6: Apply the user's choice
 
-- Push: `git push origin main`.
-- Delete branch (only after a successful push, or if the user explicitly chose delete without push): `git branch -d task/NNN-<slug>` (use `-d`, not `-D` — refuse if the branch isn't fully merged into main).
+- Push: `git -C "$primary" push origin main`.
+- Remove worktree (only after a successful push, or if the user chose cleanup without push): `git -C "$primary" worktree remove "$task_worktree"`. Refuse if the worktree is dirty.
+- Delete branch: `git -C "$primary" branch -d task/NNN-<slug>` (use `-d`, not `-D` — refuse if the branch isn't fully merged into main).
 
 ## Step 7: Output
 
