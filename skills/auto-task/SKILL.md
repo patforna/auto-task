@@ -27,6 +27,7 @@ Internalise and follow these rules:
 
 - Aim to complete all the steps with high-autonomy - assume there is no human available to help you complete the task. It there are questions, flags or surprises, use your own best judgement, make a note of it to show to the user when you're done and proceed. Only stop if you truly can't make progress without human intervention.
 - Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be pro-active and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Keep checking at 1-min intervals that subprocesses and subagents make progress and don't hang. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
+- When subagents produce user output (e.g. implementation plan, code review findings, etc.), make sure to re-output it in the main agent, so the user can actually see it.
 
 ## Prerequisite
 
@@ -101,7 +102,7 @@ If and only if something should be recorded for posterity, amend the tasks `## I
 
 In a new opus subagent:
 - Review the task is complete via `/review-task`
-- If there are   # loop - feedback to impl-task agent
+- If... 
 
 ## Step 8: Wrap up
 
@@ -109,13 +110,12 @@ Make sure:
 - all findings have been addressed (or deliberately been rejected)
 - all changes have been committed
 
-Then, update the task status by running `just task-status <task-file> ready-for-signoff`.
+Then, update the task status by running `just task-status <task-file> ready-for-signoff` and commit.
 
 Output a summary of:
-- the branch name
 - what was achieved
 - any learnings or gotchas that should be integrated back into the harness - only if truly load bearing.
 
-## Step 9: Offer to ship
+## Step 9: Ship (requires human approval)
 
-After the summary, ask the user (via `AskUserQuestion`) whether to run `/ship-task <task-file>` now. Do not invoke it without explicit approval in the current turn. If the user declines, stop here — the task is already at `ready-for-signoff` and shipping can happen later.
+Offer the user to run `/ship-task`. Do not invoke without explicit approval in the current turn. If the user declines, stop here.
