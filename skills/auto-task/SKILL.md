@@ -16,7 +16,7 @@ description: TODO
 Workflow:
 
 ```
-/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task
+/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task → /ship-task
 ```
 
 ## Guidance (DO NOT IGNORE!)
@@ -115,3 +115,7 @@ Output a summary of:
 - the branch name
 - what was achieved
 - any learnings or gotchas that should be integrated back into the harness - only if truly load bearing.
+
+## Step 9: Offer to ship
+
+After the summary, ask the user (via `AskUserQuestion`) whether to run `/ship-task <task-file>` now. Do not invoke it without explicit approval in the current turn. If the user declines, stop here — the task is already at `ready-for-signoff` and shipping can happen later.
