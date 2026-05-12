@@ -30,8 +30,7 @@ Internalise and follow these rules:
 
 ## Prerequisite
 
-- A well-defined task (presumably created by a human) with status `ready-for-dev`.
-- /create-task -> /clarify-task
+- A well-defined task (typically created by a human) with status `ready-for-dev`.
 
 ## Protocol
 
@@ -39,7 +38,13 @@ Internalise and follow these rules:
 
 Find the task and output it's title and status.
 
-## Step 2: Plan
+## Step 2: Branch
+
+Create a new branch `task/NNN-<slug>` (e.g. `task/029.09-add-sector-med-1d-return`)
+
+Refuse to start if the working tree is dirty or the branch already exists.
+
+## Step 3: Plan
 
 Create an implementation plan using a mixture of (fresh) models:
 
@@ -47,20 +52,18 @@ Create an implementation plan using a mixture of (fresh) models:
 
 Unless there are major flags, write the plan to the task file.
 
-## Step 3: Implement
+## Step 4: Implement
 
 Spawn a new opus sub-agent and run:
 
     /impl-task <task-path>
 
-## Step 4: Review Code
-
-Identify the first commit the implementation step above made.
+## Step 5: Review Code
 
 In parallel:
-- Run `/codex:review --background --base <FIRST_COMMIT>^`
-- Run `/codex:adversarial-review --background --base <FIRST_COMMIT>^`
-- Spawn a new opus sub-agent and run `/code-review <FIRST_COMMIT>^..HEAD`
+- Run `/codex:review --background --base main`
+- Run `/codex:adversarial-review --background --base main`
+- Spawn a new opus sub-agent and run `/code-review main..HEAD`
 
 When all review complete, spawn a new opus agent to `/synthesise` the responses using the following arguments:
 - prompt: [derive from /code-review]
@@ -68,7 +71,7 @@ When all review complete, spawn a new opus agent to `/synthesise` the responses 
 - perspective 2: findings produced by codex:adversarial-review subagent
 - perspective 3: findings produced by opus `/code-review` subagent
 
-## Step 5: Address Review Feedback (If Applicable)
+## Step 6: Address Review Feedback (If Applicable)
 
 In a new opus subagent:
 
@@ -94,13 +97,13 @@ Apply accepted fixes, following `/impl-task`.
 **Record:**
 If and only if something should be recorded for posterity, amend the tasks `## Implementation notes` section accordingly.
 
-## Step 6: Review Task
+## Step 7: Review Task
 
 In a new opus subagent:
 - Review the task is complete via `/review-task`
 - If there are   # loop - feedback to impl-task agent
 
-## Step 5: Wrap up
+## Step 8: Wrap up
 
 Make sure:
 - all findings have been addressed (or deliberately been rejected)
@@ -109,5 +112,6 @@ Make sure:
 Then, update the task status by running `just task-status <task-file> ready-for-signoff`.
 
 Output a summary of:
+- the branch name
 - what was achieved
 - any learnings or gotchas that should be integrated back into the harness - only if truly load bearing.
