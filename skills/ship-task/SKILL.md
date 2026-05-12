@@ -1,6 +1,6 @@
 ---
 name: ship-task
-description: Close out a finished task — flip status to done, fast-forward merge into local main, ask before push.
+description: Use to wrap up a finished task - set status to done, merge, clean up.
 ---
 
 # Ship Task
@@ -11,23 +11,29 @@ description: Close out a finished task — flip status to done, fast-forward mer
 
 ## Goal
 
-Take a task whose work is on a `task/NNN-...` branch and merge it cleanly into local `main`, leaving the task in `done`. Push and branch deletion are gated on explicit user approval.
+Use to wrap up a finished task - set status to done, merge, clean up.
 
-Closes the loop opened by `/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task → /ship-task`.
+## Context
+
+This skill is typically run as part of a larger workflow:
+
+```
+/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task → /ship-task
+```
+
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.
 
 ## Guidance (DO NOT IGNORE!)
 
-- Preserve logical commits — do NOT squash. The only commit allowed to be rewritten is the trailing status-flip from `/auto-task` Step 8 (the `ready-for-signoff` one), so that `main` records the final `done` state in a single metadata commit rather than the intermediate `ready-for-signoff` blip.
+- Preserve logical commits — do NOT squash.
 - Never push without explicit approval in the current turn. Earlier approval does not carry over.
 - Never force-push, never reset --hard the working tree.
-- `just commit` requires an upstream and will fail on local-only task branches — use plain `git add` + `git commit` for the done-flip.
 - Untracked files in the worktree are fine to ignore. Refuse only on modified-but-uncommitted tracked files.
 - `/ship-task` is typically invoked from a task worktree. `main` is checked out in the primary worktree, not in the task worktree — so all merge/push/branch operations must run via `git -C "$primary"`. Resolve once at start: `primary=$(git worktree list --porcelain | awk '/^worktree / {print $2; exit}')`.
 
 ## Prerequisite
 
 - Current repo is on a `task/NNN-<slug>` branch with status `ready-for-signoff` or `done`.
-- `just check-all` was green at the end of `/review-task`. Do NOT re-run it here — trust the previous step.
 
 ## Protocol
 
@@ -40,14 +46,9 @@ Refuse and stop if any of:
 
 Untracked files are OK — leave them alone.
 
-## Step 2: Collapse the status flip
+## Step 2: Mark task as done
 
-If the task status is `ready-for-signoff`:
-1. `git reset HEAD~1` only if the last commit is the standalone status-flip (touches only the task file + parent epic file, frontmatter `status:` line). Otherwise leave commits alone.
-2. `just task-status <task-file> done` (updates the task frontmatter + parent epic table).
-3. `git add <task-file> <epic-file>` and commit with message: `Mark task NNN done (task/NNN)`.
-
-If the task status is already `done`, skip this step.
+Update the task status by running `just task-status <task-file> done` and commit.
 
 ## Step 3: Verify main hasn't diverged
 
