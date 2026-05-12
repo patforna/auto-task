@@ -1,6 +1,6 @@
 ---
 name: clarify-task
-description: Use this skill to resolve ambiguities, clarify vague criteria and make implicit assumptions explicit. Invoked at the end of /create-task and the start of /plan-task. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task → /ship-task.
+description: Use this skill to resolve ambiguities, clarify vague criteria and make implicit assumptions explicit. Invoked at the end of /create-task and the start of /plan-task. Typical workflow: create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task.
 ---
 
 # Clarify Task
@@ -18,7 +18,7 @@ Ensure the task is clear enough so that two reasonable agents - with access to t
 This skill is typically run as part of a larger workflow:
 
 ```
-/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task → /ship-task
+create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
 ```
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.

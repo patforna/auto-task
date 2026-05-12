@@ -1,6 +1,6 @@
 ---
 name: review-task
-description: Verify that a task has been completed according to its intent and criteria. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task → /ship-task.
+description: Verify that a task has been completed according to its intent and criteria. Typical workflow: create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task.
 ---
 
 # Review Task
@@ -18,7 +18,7 @@ Verify that a task has been completed according to its intent and criteria.
 This skill is typically run as part of a larger workflow:
 
 ```
-/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task → /ship-task
+create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
 ```
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.
