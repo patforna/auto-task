@@ -35,13 +35,20 @@ These rules govern what belongs in the plan and how to write it. Internalise and
 - If (and only if) load-bearing, add pointers to existing code (modules, classes, functions, utilities, etc. to consider), sequencing when ordering matters for correctness, constraints on approach when more than one is plausible.
 - Lock down details of cross-boundary contracts in the plan (e.g. API shapes, DB/parquet schemas, symbols reachable across package boundaries, etc.).
 - Leave decision on internal details to the implementer - no pseudocode, no names for new files/classes/functions, no exact line numbers, no details that will go stale quickly.
-- Do not restate universal truths ("write tests", "handle errors", "follow patterns").
+- Do not restate universal truths ("write tests", "handle errors", "follow patterns", "run the build").
 - Avoid placeholders, i.e. no "TBD"s, no "handle edge cases", no "similar to step 3". If it's worth writing down, be concrete.
 - Use plain English and write like a senior engineer briefing a teammate, not like an AI producing a spec. Avoid AI-slop language and padding.
 
+### Anti-Patterns
+
+Real failures observed in past plans. Don't repeat:
+
+- Don't add "write unit tests" or similar steps
+- Don't add "run just check-all before commit" or similar steps
+
 ## Step 1: Check task readiness
 
-If the task's status is not `ready-for-dev` (usually set at the end of `/clarify-task`), stop, flag it to the user and ask how to proceed.
+If the task's status is not `ready-for-dev` (usually set at the end of `/clarify-task`), flag it to the user and ask how to proceed.
 
 ## Step 2: Build context
 
@@ -49,7 +56,7 @@ Read the task and the code the plan will likely touch. If in doubt, err on the s
 
 ## Step 3: Write the plan
 
-Add an `## Implementation plan` section to the task file using the structure below (drop sections that aren't needed):
+Write a plan using the structure below (drop sections that aren't needed):
 
 ```markdown
 ## Implementation plan
@@ -69,6 +76,14 @@ Add an `## Implementation plan` section to the task file using the structure bel
 - Not yet captured insights, assumptions, flags, constraints, decisions, etc.
 - Anything worth capturing for posterity.]
 
-## Step 4: Summarise
+## Step 4: Self-audit
 
-Present a summary of the plan (i.e. TLDR and Notes).
+Re-read the Guidance section (incl. Anti-Patterns). For each step in the plan, ask whether it violates the Guidance. If it does and there's no strong reason for doing so, re-work the plan and keep self-auditing until no further issues found.
+
+## Step 5: Present
+
+Present the plan to the user.
+
+## Step 6: Write plan to task (Optional)
+
+If the user instructed you to do so, write the Implementation Plan section to the task file.
