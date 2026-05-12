@@ -7,7 +7,7 @@ description: Close out a finished task — flip status to done, fast-forward mer
 
 ## Usage
 
-`/ship-task <task-file>`
+`/ship-task <task-path>`
 
 ## Goal
 

@@ -1,6 +1,6 @@
 ---
 name: impl-task
-description: Implement a task by executing its implementation plan. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task.
+description: Implement a task by executing its implementation plan. Typical workflow: /create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task → /ship-task.
 ---
 
 # Implement Task
@@ -18,7 +18,7 @@ Implement a task by executing its implementation plan.
 This skill is typically run as part of a larger workflow:
 
 ```
-/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task
+/create-task → /clarify-task → /plan-task → /impl-task → /code-review → /review-task → /ship-task
 ```
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.
