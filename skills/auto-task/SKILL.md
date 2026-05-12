@@ -39,11 +39,17 @@ Internalise and follow these rules:
 
 Find the task and output it's title and status.
 
-## Step 2: Branch
+## Step 2: Worktree
 
-Create a new branch `task/NNN-<slug>` (e.g. `task/029.09-add-sector-med-1d-return`)
+Create a `task/NNN-<slug>` worktree under `~/github/.worktrees/tad/`:
 
-Refuse to start if the working tree is dirty or the branch already exists.
+    git worktree add -b task/NNN-<slug> ~/github/.worktrees/tad/NNN-<slug> main
+    cd ~/github/.worktrees/tad/NNN-<slug>
+    just worktree-init
+
+Refuse to start if the branch already exists or the target worktree path is non-empty.
+
+All subsequent steps run inside the worktree. Pass the absolute worktree path explicitly to every subagent — their Read/Edit/Write tools must root at the worktree path, not the primary worktree (see CLAUDE.md § Worktrees).
 
 ## Step 3: Plan
 
