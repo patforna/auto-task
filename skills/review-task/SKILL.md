@@ -51,3 +51,7 @@ In addition to checking ACs:
 ## Step 4: Summarise
 
 Say whether the review passed or, if not, present a summary of your findings and wait for user input.
+
+## Step 5: Wrap up
+
+Once there are no findings left, or the user has asked you to proceed, rembmer to update the task status by running `just task-status <task-file> ready-for-signoff`.
