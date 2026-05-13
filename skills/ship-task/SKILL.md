@@ -50,14 +50,17 @@ Untracked files are OK — leave them alone.
 
 Update the task status by running `just task-status <task-file> done` and commit.
 
-## Step 3: Verify main hasn't diverged
+## Step 3: Verify the task branch can fast-forward into main
 
 ```
 git -C "$primary" fetch origin main
 git -C "$primary" log --oneline main..origin/main
+git -C "$primary" merge-base --is-ancestor main task/NNN-<slug>
 ```
 
-If `origin/main` is ahead of local `main`, stop and ask the user how to handle (likely: rebase the task branch onto the new main, then retry). Do not auto-rebase silently.
+- If `origin/main` is ahead of local `main`, stop and ask the user how to handle (likely: rebase the task branch onto the new main, then retry).
+- If `merge-base --is-ancestor` exits non-zero, local `main` has moved on since the task branch was created (e.g. an unrelated commit landed on main meanwhile). Stop and ask the user — rebase the task branch onto current `main` is the usual fix.
+- Do not auto-rebase silently.
 
 ## Step 4: Fast-forward merge
 
@@ -82,7 +85,7 @@ Then ask the user one question via `AskUserQuestion` with three options:
 ## Step 6: Apply the user's choice
 
 - Push: `git -C "$primary" push origin main`.
-- Remove worktree (only after a successful push, or if the user chose cleanup without push): `git -C "$primary" worktree remove "$task_worktree"`. Refuse if the worktree is dirty.
+- Remove worktree (only after a successful push, or if the user chose cleanup without push): `git -C "$primary" worktree remove --force "$task_worktree"`. `--force` is needed because `just worktree-init` leaves untracked symlinks (`data`, `backend/.env`) that `git worktree remove` otherwise rejects — Step 1 already guarded against dirty tracked files, so this is safe.
 - Delete branch: `git -C "$primary" branch -d task/NNN-<slug>` (use `-d`, not `-D` — refuse if the branch isn't fully merged into main).
 
 ## Step 7: Output
