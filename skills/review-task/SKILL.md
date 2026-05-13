@@ -54,4 +54,4 @@ Say whether the review passed or, if not, present a summary of your findings and
 
 ## Step 5: Wrap up
 
-Once there are no findings left, or the user has asked you to proceed, rembmer to update the task status by running `just task-status <task-file> ready-for-signoff` and commit.
+Once there are no findings left, or the user has asked you to proceed, remember to update the task status by running `just task-status <task-file> ready-for-signoff` and commit.
