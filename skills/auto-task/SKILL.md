@@ -30,7 +30,7 @@ create-task → clarify-task → plan-task → impl-task → code-review → rev
 
 Internalise and follow these rules:
 
-- Aim to complete all the steps with high-autonomy - assume there is no human available to help you complete the task. If there are questions, flags or surprises, use your own best judgement, make a note of it to show to the user when you're done and proceed. Only stop if you truly can't make progress without human intervention.
+- Aim to complete all the steps with high-autonomy - assume there is no human available to help you complete the task. If there are questions, flags or surprises, use your own best judgement, make a note of it to show to the user when you're done and proceed. Only stop i) if the instructions in this file explicitly ask you to or ii) if you truly can't make progress without human intervention.
 - Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be pro-active and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Keep checking at 1-min intervals that subprocesses and subagents make progress and don't hang. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
 - When subagents produce user output (e.g. implementation plan, code review findings, etc.), make sure to re-output it in the main agent, so the user can actually see it.
 
@@ -111,29 +111,29 @@ If and only if something should be recorded for posterity, amend the tasks `## I
 
 ## Step 7: Review Task
 
-In a new opus subagent:
-- Review the task is complete via `/review-task`
-- If findings: triage as in Step 6, spawn an impl subagent to apply accepted fixes, re-run `/review-task` once. If still failing, surface the unresolved findings in the wrap-up summary, leave the status as `in-dev`, and stop — do not proceed to Step 8.
+1. Review: In a new opus subagent, review the task is complete via `/review-task`.
+2. Address Feedback: If the review returns and findings, triage and fix (if applicable) as in Step 6.
+3. Fix: If any issues left after triaging, In a new opus subagent impl subagent to apply accepted fixes
+4. Secod Review Again: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 8.
 
 ## Step 8: Wrap up
 
-### Wrap up loose ends
+### 8.1: Wrap up loose ends
 
 Make sure that:
 
 - all findings have been addressed (or have been rejected deliberately)
 - all changes have been committed
 
-### Capture session transcript
+### 8.2: Capture session transcript
 
     claude-replay --recurse-subagents "$CLAUDE_CODE_SESSION_ID" > .claude/skills/auto-task/_transcripts/<NNN-slug>.$CLAUDE_CODE_SESSION_ID.md
 
-### Update task and commit
+### 8.3: Update task and commit
 
 Run `just task-status <task-file> ready-for-signoff` and commit (incl. transcript file).
 
-
-### Summarise
+### 8.4: Summarise
 
 Output: 
 
@@ -141,6 +141,6 @@ Output:
 - any learnings or gotchas that should be integrated back into the harness - only if truly load bearing.
 - a pointer to the session transcript
 
-## Step 9: Ship (requires human approval)
+## Step 9: Offer to ship
 
-Offer the user to run `/ship-task`. Do not invoke without explicit approval in the current turn. If the user declines, stop here.
+Offer running `/ship-task` to the user. Do not invoke without explicit approval in the current turn. If the user declines, stop here.
