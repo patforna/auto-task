@@ -117,15 +117,29 @@ In a new opus subagent:
 
 ## Step 8: Wrap up
 
-Make sure:
-- all findings have been addressed (or deliberately been rejected)
+### Wrap up loose ends
+
+Make sure that:
+
+- all findings have been addressed (or have been rejected deliberately)
 - all changes have been committed
 
-Then, update the task status by running `just task-status <task-file> ready-for-signoff` and commit.
+### Capture session transcript
 
-Output a summary of:
+    claude-replay --recurse-subagents "$CLAUDE_CODE_SESSION_ID" > .claude/skills/auto-task/_transcripts/<NNN-slug>.$CLAUDE_CODE_SESSION_ID.md
+
+### Update task and commit
+
+Run `just task-status <task-file> ready-for-signoff` and commit (incl. transcript file).
+
+
+### Summarise
+
+Output: 
+
 - what was achieved
 - any learnings or gotchas that should be integrated back into the harness - only if truly load bearing.
+- a pointer to the session transcript
 
 ## Step 9: Ship (requires human approval)
 
