@@ -11,9 +11,9 @@ description: use to drive a well-defined task end-to-end with minimal human inpu
 
 ## Goal
 
-Drive a well-defined task end-to-end with minimal human input. 
+Drive a well-defined task end-to-end with minimal human input.
 
- `/plan-task` → `/impl-task` → `/code-review` → `/review-task` → `/ship-task`. Stop only when human input is genuinely required (ship gate, irreducible ambiguity, etc.).
+Stop only when human input is genuinely required (ship gate, irreducible ambiguity, etc.).
 
 ## Context
 
@@ -31,7 +31,7 @@ create-task → clarify-task → plan-task → impl-task → code-review → rev
 Internalise and follow these rules:
 
 - Aim to complete all the steps with high-autonomy - assume there is no human available to help you complete the task. If there are questions, flags or surprises, use your own best judgement, make a note of it to show to the user when you're done and proceed. Only stop i) if the instructions in this file explicitly ask you to or ii) if you truly can't make progress without human intervention.
-- Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be pro-active and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Keep checking at 1-min intervals that subprocesses and subagents make progress and don't hang. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
+- Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be proactive and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Keep checking at 1-min intervals that subprocesses and subagents make progress and don't hang. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
 - When subagents produce user output (e.g. implementation plan, code review findings, etc.), make sure to re-output it in the main agent, so the user can actually see it.
 
 ## Prerequisite
@@ -43,6 +43,8 @@ Internalise and follow these rules:
 ## Step 1: Confirm
 
 Find the task and output its title and status. Bonus points for using figlet =)
+
+Update the current session name: `/rename task/NNN-<slug>`.
 
 ## Step 2: Worktree
 
@@ -77,7 +79,7 @@ In parallel:
 - Run `/codex:adversarial-review --background --base main`
 - Spawn a new opus sub-agent and run `/code-review main..HEAD`
 
-When all review complete, spawn a new opus agent to `/synthesise` the responses using the following arguments:
+When all reviews are complete, spawn a new opus agent to `/synthesise` the responses using the following arguments:
 - prompt: [derive from /code-review]
 - perspective 1: findings produced by codex:review subagent
 - perspective 2: findings produced by codex:adversarial-review subagent
@@ -85,12 +87,13 @@ When all review complete, spawn a new opus agent to `/synthesise` the responses 
 
 ## Step 6: Address Review Feedback (If Applicable)
 
+### 6.1: Triage
+
 In a new opus subagent:
 
-**Triage:**
-- Read the task - this is the original intent of the change.
-- Read the synthesised code review findings from above
-- For each finding, decide one of:
+1. Read the task - this is the original intent of the change.
+2. Read the synthesised code review findings from above.
+3. For each finding, decide one of:
 
     - Would significantly change scope/goal -> Reject (cite the anchor)
     - False positive -> Reject (cite the specific code that disproves it and why)
@@ -98,23 +101,24 @@ In a new opus subagent:
     - Real issue but probably out of scope -> Reject (capture as follow up task)
     - Real issue that needs addressing -> Accept
 
+    Note: do not ignore small issues or nits (e.g. typos, inconsistencies, style) **IF** they are trivial to fix - consider batching them up.
+
     Render triage results as a table:
 
     | # | Finding (one line) | Disposition | Reason |
     |---|--------------------|-------------|--------|
 
-**Fix:**
-Apply accepted fixes, following `/impl-task`.
+### 6.2: Fix
 
-**Record:**
-If and only if something should be recorded for posterity, amend the tasks `## Implementation notes` section accordingly.
+If any accepted findings remain, spawn a new opus subagent that fixes the issues following `/impl-task`.
+
+If and only if something should be recorded for posterity, add it to the task's `## Implementation notes` section.
 
 ## Step 7: Review Task
 
-1. Review: In a new opus subagent, review the task is complete via `/review-task`.
-2. Address Feedback: If the review returns and findings, triage and fix (if applicable) as in Step 6.
-3. Fix: If any issues left after triaging, In a new opus subagent impl subagent to apply accepted fixes
-4. Secod Review Again: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 8.
+1. Review: In a new opus subagent, review that the task is complete via `/review-task`.
+2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 6.
+3. Second review: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 8.
 
 ## Step 8: Wrap up
 
@@ -135,10 +139,10 @@ Run `just task-status <task-file> ready-for-signoff` and commit (incl. transcrip
 
 ### 8.4: Summarise
 
-Output: 
+Output:
 
 - what was achieved
-- any learnings or gotchas that should be integrated back into the harness - only if truly load bearing.
+- any learnings or gotchas that should be integrated back into the harness - only if truly load-bearing.
 - a pointer to the session transcript
 
 ## Step 9: Offer to ship
