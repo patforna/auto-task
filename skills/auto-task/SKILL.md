@@ -60,7 +60,7 @@ All subsequent steps run inside the worktree. Pass the absolute worktree path ex
 
 ## Step 3: Plan
 
-Create an implementation plan using a mixture of (fresh) models:
+Create an implementation plan. Important: Invoke /sop inline / do not wrap it in a subagent.
 
     /sop /plan-task <task-path>
 
