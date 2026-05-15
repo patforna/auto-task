@@ -81,6 +81,8 @@ In parallel:
 
 Note: `/codex:review` and `/codex:adversarial-review` are plugin slash commands and cannot be model-invoked directly. To run one from inside auto-task, locate its definition under `~/.claude/plugins/cache/**/commands/<name>.md`, read the Bash invocation template inside, and run it via the Bash tool — substituting `${CLAUDE_PLUGIN_ROOT}` (a template placeholder, not a shell var!) with the resolved plugin root.
 
+If Codex is unavailable (e.g. usage limit), fail loudly — do not substitute or skip.
+
 When all reviews are complete, spawn a new opus agent to `/synthesise` the responses using the following arguments:
 - prompt: [derive from /code-review]
 - perspective 1: findings produced by codex:review subagent
