@@ -239,6 +239,10 @@ If clarifying an epic, make sure that the epic task and all sub-tasks are clarif
 
 Present the task(s) to the user for review. The user will provide feedback if applicable and initiate next steps.
 
+## Step 7: Offer a feedback snapshot
+
+Before the user revises the task in Step 6, **offer** (per task, never auto-create) to snapshot the post-clarify file to `.claude/skills/create-task/feedback/YYYY-MM-DD-<task-slug>-before.md`. Convention: `feedback/README.md`.
+
 ## Appendix: Creating epics
 
 An epic is simply a high-level task that aggregates a number of sub-tasks.
