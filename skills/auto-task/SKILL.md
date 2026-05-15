@@ -149,6 +149,13 @@ Output:
 - any learnings or gotchas that should be integrated back into the harness - only if truly load-bearing.
 - a pointer to the session transcript
 
-## Step 9: Offer to ship
+## Step 9: Ask user how to proceed
 
-Offer running `/ship-task` to the user. Do not invoke without explicit approval in the current turn. If the user declines, stop here.
+Offer the user the following options:
+
+- Open the worktree in VS code
+- Open the worktree in a new tmux pane
+- Both of the above
+- Run `/ship-task`
+
+Do not proceed without explicit user approval. If the user declines, stop here.
