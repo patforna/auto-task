@@ -60,9 +60,9 @@ All subsequent steps run inside the worktree. Pass the absolute worktree path ex
 
 ## Step 3: Plan
 
-Create an implementation plan. Important: Invoke /sop inline / do not wrap it in a subagent.
+Create an implementation plan. Important: Invoke /panel inline / do not wrap it in a subagent.
 
-    /sop /plan-task <task-path>
+    /synthesise /panel /plan-task <task-path>
 
 Unless there are major flags, write the plan to the task file.
 
