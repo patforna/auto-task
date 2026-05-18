@@ -97,15 +97,14 @@ In a new opus subagent:
 
 1. Read the task - this is the original intent of the change.
 2. Read the synthesised code review findings from above.
-3. For each finding, decide one of:
+3. Findings carrying an `Autofix:` line skip the triage table entirely and go straight to the Step 6.2 batch (scoped to changed files only) - they are mechanically certain by construction, so adjudicating them is wasted human-equivalent attention. If an autofix *class* recurs across reviews, flag it for codification (linter rule / architecture test / CLAUDE.md rule) instead of re-fixing it indefinitely.
+4. For each remaining finding, decide one of:
 
     - Would significantly change scope/goal -> Reject (cite the anchor)
     - False positive -> Reject (cite the specific code that disproves it and why)
     - Value of fix does not exceed cost (esp. complexity) of fix -> Reject (explain why)
     - Real issue but probably out of scope -> Reject (capture as follow up task)
     - Real issue that needs addressing -> Accept
-
-    Note: do not ignore small issues or nits (e.g. typos, inconsistencies, style) **IF** they are trivial to fix - consider batching them up.
 
     Render triage results as a table:
 
