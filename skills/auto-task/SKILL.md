@@ -97,7 +97,7 @@ In a new opus subagent:
 
 1. Read the task - this is the original intent of the change.
 2. Read the synthesised code review findings from above.
-3. Findings carrying an `Autofix:` line skip the triage table entirely and go straight to the Step 6.2 batch (scoped to changed files only) - they are mechanically certain by construction, so adjudicating them is wasted human-equivalent attention. If an autofix *class* recurs across reviews, flag it for codification (linter rule / architecture test / CLAUDE.md rule) instead of re-fixing it indefinitely.
+3. Findings carrying an `Autofix:` line **and severity Minor or Nit** skip the triage table entirely and go straight to the Step 6.2 batch (scoped to changed files only) - they are mechanically certain by construction, so adjudicating them is wasted human-equivalent attention. An `Autofix:` line on a Major/Critical finding is ignored for routing - it stays in triage and the human ship-gate (defence-in-depth: the bypass must not depend on every upstream reviewer honouring the Minor/Nit-only rule). If an autofix *class* recurs across reviews, flag it for codification (linter rule / architecture test / CLAUDE.md rule) instead of re-fixing it indefinitely.
 4. For each remaining finding, decide one of:
 
     - Would significantly change scope/goal -> Reject (cite the anchor)
