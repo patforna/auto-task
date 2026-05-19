@@ -62,7 +62,7 @@ All subsequent steps run inside the worktree. Pass the absolute worktree path ex
 
 Create an implementation plan. Important: Invoke /panel inline / do not wrap it in a subagent.
 
-    /synthesise /panel /plan-task <task-path>
+    /synthesize /panel /plan-task <task-path>
 
 Unless there are major flags, write the plan to the task file.
 
@@ -83,7 +83,7 @@ Note: `/codex:review` and `/codex:adversarial-review` are plugin slash commands 
 
 If Codex is unavailable (e.g. usage limit), fail loudly — do not substitute or skip.
 
-When all reviews are complete, spawn a new opus agent to `/synthesise` the responses using the following arguments:
+When all reviews are complete, spawn a new opus agent to `/synthesize` the responses using the following arguments:
 - prompt: [derive from /code-review]
 - perspective 1: findings produced by codex:review subagent
 - perspective 2: findings produced by codex:adversarial-review subagent
