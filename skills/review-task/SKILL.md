@@ -31,7 +31,7 @@ These rules govern how to perform the review. Internalise and follow them throug
 
 - Flag issues — do not attempt to fix them; let the user decide.
 
-## Step 1: Build context
+## Step 1: Build Context
 
 Read the task and the code that was implemented. Ensure you fully understand the task's intent, criteria and what was implemented.
 
@@ -41,7 +41,7 @@ For each acceptance criterion, determine: **pass**, **fail**, or **unclear**.
 
 A criterion passes when you can point to **specific evidence** — for example, a test that exercises it, observable behaviour in the code, or output from running it. "The code looks like it would work" is not evidence; a passing test is.
 
-## Step 3: Verify intent
+## Step 3: Verify Intent
 
 In addition to checking ACs:
 
@@ -52,6 +52,6 @@ In addition to checking ACs:
 
 Say whether the review passed or, if not, present a summary of your findings and wait for user input.
 
-## Step 5: Wrap up
+## Step 5: Wrap Up
 
 Once there are no findings left, or the user has asked you to proceed, remember to update the task status by running `just task-status <task-file> ready-for-signoff` and commit.

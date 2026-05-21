@@ -31,15 +31,15 @@ As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's 
 
 ## Protocol
 
-## Step 1: Pre-flight
+## Step 1: Pre-Flight
 
 Branch must be `task/NNN-...` with no uncommitted tracked changes.
 
-## Step 2: Mark done
+## Step 2: Mark Done
 
 `just task-status <task-file> done` and commit.
 
-## Step 3: Merge into main
+## Step 3: Merge into Main
 
 From the task worktree:
 

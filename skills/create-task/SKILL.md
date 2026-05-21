@@ -38,7 +38,7 @@ These rules govern both how you gather intent and write the task. Internalise an
 - Match scope exactly. For example: don't bundle "review X, then fix it". A review task ends at the review report; a fix task ends at the fix.
 - Avoid AI-slop at all costs - both verbosity and language like "categorised by theme and priority", "promote into guardrails", "earned their keep".
 
-## Step 1: Understand user intent
+## Step 1: Understand User Intent
 
 1. Review the current conversation to identify the user's main goal and, if applicable, the agreed approach, constraints, decisions made or important insights discovered during the conversation.
 
@@ -48,7 +48,7 @@ These rules govern both how you gather intent and write the task. Internalise an
 
 2. If you are unsure about the user's intent or find yourself making implicit assumptions, **stop and ask focused questions** - ideally with recommended options and one-line reasoning for the user to select from. Don't hallucinate or invent specificity.
 
-## Step 2: Create task file
+## Step 2: Create Task File
 
 Create the task file using `just create-task <title> [<type>]`. Use the table below to decide on type:
 
@@ -70,11 +70,11 @@ status: new
 type: {task_type}
 ---
 
-## {display_title}
+## {Display_title}
 
 TODO: Add description
 
-### Acceptance criteria
+### Acceptance Criteria
 
 TODO: Add ACs
 
@@ -83,7 +83,7 @@ TODO: Add ACs
 TODO: Add notes
 ```
 
-## Step 3: Write the task
+## Step 3: Write the Task
 
 **Crystallise** the information you gathered in Step 1 and fill it into the task file sections - "Description", "Acceptance criteria", "Notes".
 
@@ -112,7 +112,7 @@ Currently, earnings dates are only loaded up to "today".
 This task is about fetching upcoming earnings dates so that we, for example, can determine if we're close to an upcoming earnings date.
 ```
 
-### Acceptance criteria
+### Acceptance Criteria
 
 Add (just) enough ACs so that two reasonable agents would:
 
@@ -138,7 +138,7 @@ Ensure each AC has the following properties:
 ```markdown
 # Get Upcoming Earnings Dates
 
-## Acceptance criteria
+## Acceptance Criteria
 
 - After running `load`, the earnings-dates parquet contains existing past data + n weeks of future data.
 - If future data changes (move, add, delete) and we re-run `load`, the future data in parquet reflects the latest state correctly.
@@ -149,7 +149,7 @@ Ensure each AC has the following properties:
 ```markdown
 # Show Ticker Data in Frontend
 
-## Acceptance criteria
+## Acceptance Criteria
 
 - When navigating to the frontend, I see a table, with a header and content like below:
 
@@ -201,7 +201,7 @@ Use bullet points and short sentences - if possible. If in doubt, err on side of
 
 **Note:** If there are no notes, delete the section from the task file.
 
-## Step 4: Decompose (Only if required)
+## Step 4: Decompose (Only If Required)
 
 Consider splitting the task if any of these are true:
 
@@ -236,15 +236,15 @@ Run `/clarify-task <task-path>` in a subagent to validate whether the task would
 
 If clarifying an epic, make sure that the epic task and all sub-tasks are clarified.
 
-## Step 6: User review
+## Step 6: User Review
 
 Present the task(s) to the user for review. The user will provide feedback if applicable and initiate next steps.
 
-## Step 7: Offer a feedback snapshot
+## Step 7: Offer a Feedback Snapshot
 
 Before the user revises the task in Step 6, **offer** (per task, never auto-create) to snapshot the post-clarify file to `.claude/skills/create-task/feedback/YYYY-MM-DD-<task-slug>-before.md`. Convention: `feedback/README.md`.
 
-## Appendix: Creating epics
+## Appendix: Creating Epics
 
 An epic is simply a high-level task that aggregates a number of sub-tasks.
 
@@ -261,7 +261,7 @@ To create an epic, follow the instructions for creating a standalone task. Drop 
 | 04  | Multi-Day Holding         | 012.04-multi-day-hold.md | new    |
 ```
 
-### Epic sub-tasks
+### Epic Sub-Tasks
 
 Epic sub-tasks are like standalone tasks, except their file name is slightly different to keep them lexicographically close to the epic task.
 

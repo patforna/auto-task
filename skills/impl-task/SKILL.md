@@ -36,13 +36,13 @@ These rules govern how to execute the implementation. Internalise and follow the
 - Do not use I/O, randomness, or real date/time in unit tests.
 - Take small steps when uncertain, surprised, or in unfamiliar territory; bigger steps when confident. An unexpected red means shift down to smaller steps. An unexpected green means review your test with fresh eyes — there are probably gaps.
 
-## Step 1: Task readiness
+## Step 1: Task Readiness
 
 If the task does not contain an `Implementation plan` section (usually set by `/plan-task`), stop, flag it to the user and ask how to proceed.
 
 Otherwise, update the task status by running `just task-status <task-file> in-dev`.
 
-## Step 2: Build context
+## Step 2: Build Context
 
 Read the task and the code the implementation plan will touch. If in doubt, err on the side of reading too much. Ensure you fully understand the task, implementation plan and current state of the codebase before proceeding.
 
@@ -52,13 +52,13 @@ Work through the implementation plan step by step. Re-read the implementation pl
 
 Fully read, internalise and use `/tdd` to drive implementation. Do not write or modify production code without a failing test.
 
-### When things go wrong
+### When Things Go Wrong
 
 - If an implementation plan step seems wrong or missing, try to resolve the issue and note it down in `Implementation notes` (see below).
 - If tests keep failing after 3 implementation attempts, revert to the last green state and take a smaller step.
 - If the build fails on unrelated changes, flag it to the user. Don't fix silently — it may be someone else's work in progress.
 
-## Step 4: Self-review
+## Step 4: Self-Review
 
 After completing all planned steps, review `git diff` from your first commit to HEAD:
 
@@ -66,7 +66,7 @@ After completing all planned steps, review `git diff` from your first commit to 
 - Verify that each AC is demonstrably met. If not, resolve.
 - Ensure there are no unwanted leftovers that you introduced (e.g. debug prints, TODO comments, commented-out or obsolete code, etc.).
 
-## Step 5: Wrap up
+## Step 5: Wrap Up
 
 Add an `## Implementation notes` section to the end of the task file, noting anything worth flagging or preserving — in plain English. For example:
 
@@ -79,6 +79,6 @@ Add an `## Implementation notes` section to the end of the task file, noting any
 
 Commit the task update.
 
-## Step 6: Integrate feedback
+## Step 6: Integrate Feedback
 
 Wait for the user to provide feedback. Once provided, address it, commit, respond.

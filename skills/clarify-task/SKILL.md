@@ -23,12 +23,12 @@ create-task → clarify-task → plan-task → impl-task → code-review → rev
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `tasks/`) plus repo state carry everything the next agent needs.
 
-## Step 1: Understand the task
+## Step 1: Understand the Task
 
 - Read the task and explore the relevant parts of the codebase to make sure you fully understand what the task is about and ground your questions.
 - If you detect ambiguity, vagueness or implicit assumptions, do another round of deeper exploration and try to resolve.
 
-## Step 2: Identify issues
+## Step 2: Identify Issues
 
 If after completing Step 1 you conclude that two reasonable agents - with access to the task content and repo only - would either complete the task in a meaningfully different way or disagree on whether the task is done, flag it to the user.
 
@@ -41,7 +41,7 @@ Triggers (non-exhaustive):
 - Semantic ambiguity - same term, field, column, etc. meaning different things (e.g. "days" = calendar or trading?).
 - Implicit assumptions - things the implementer must assume that aren't stated.
 
-## Step 3: Surface and clarify issues with user
+## Step 3: Surface and Clarify Issues with User
 
 If anything from the previous step needs clarification, flag it to the user and wait for the user to answer.
 
@@ -53,7 +53,7 @@ Make sure that each feedback item:
 
 If there are no substantial issues to surface or none left, reply with a short one-liner saying that the task seems clear.
 
-## Step 4: Update the task
+## Step 4: Update the Task
 
 Integrate the feedback from Step 3 into the task file.
 
@@ -66,7 +66,7 @@ When editing the task file:
 
 Spawn a sub-agent to re-run Steps 1–2 on the updated task and report any remaining issues. If new issues surface, address them via Steps 3–4. Cap at 3 rounds.
 
-## Step 6: Mark ready
+## Step 6: Mark Ready
 
 Finally, update the task status by running `just task-status <task-file> ready-for-dev`.
 

@@ -46,20 +46,20 @@ Real failures observed in past plans. Don't repeat:
 - Don't add "write unit tests" or similar steps
 - Don't add "run just check-all before commit" or similar steps
 
-## Step 1: Check task readiness
+## Step 1: Check Task Readiness
 
 If the task's status is not `ready-for-dev` (usually set at the end of `/clarify-task`), flag it to the user and ask how to proceed.
 
-## Step 2: Build context
+## Step 2: Build Context
 
 Read the task and the code the plan will likely touch. If in doubt, err on the side of reading too much. Ensure you fully understand the task and current state of the codebase before proceeding.
 
-## Step 3: Write the plan
+## Step 3: Write the Plan
 
 Write a plan using the structure below (drop sections that aren't needed):
 
 ```markdown
-## Implementation plan
+## Implementation Plan
 
 ### TLDR
 
@@ -77,7 +77,7 @@ Write a plan using the structure below (drop sections that aren't needed):
 - Not yet captured insights, assumptions, flags, constraints, decisions, etc.
 - Anything worth capturing for posterity.]
 
-## Step 4: Self-audit
+## Step 4: Self-Audit
 
 Re-read the Guidance section (incl. Anti-Patterns). For each step in the plan, ask whether it violates the Guidance. If it does and there's no strong reason for doing so, re-work the plan once.
 
@@ -87,6 +87,6 @@ Re-read the Guidance section (incl. Anti-Patterns). For each step in the plan, a
 
 Present the plan to the user.
 
-## Step 6: Write plan to task (Optional)
+## Step 6: Write Plan to Task (Optional)
 
 If the user instructed you to do so, write the Implementation Plan section to the task file.

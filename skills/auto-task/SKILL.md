@@ -115,20 +115,20 @@ If and only if something should be recorded for posterity, add it to the task's 
 2. Address Feedback: If the review returns findings, triage via `/triage` as in Step 6.1, then address the AUTOFIX BATCH as in Step 6.2. Carry any T2 SHIP-GATE QUEUE items forward to the Step 9 ship-gate presentation — do not ratify them mid-loop.
 3. Second review: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 8.
 
-## Step 8: Wrap up
+## Step 8: Wrap Up
 
-### 8.1: Wrap up loose ends
+### 8.1: Wrap up Loose Ends
 
 Make sure that:
 
 - all findings have been addressed (or have been rejected deliberately)
 - all changes have been committed
 
-### 8.2: Capture session transcript
+### 8.2: Capture Session Transcript
 
     claude-replay --recurse-subagents "$CLAUDE_CODE_SESSION_ID" > .claude/skills/auto-task/_transcripts/<NNN-slug>.$CLAUDE_CODE_SESSION_ID.md
 
-### 8.3: Update task and commit
+### 8.3: Update Task and Commit
 
 Run `just task-status <task-file> ready-for-signoff` and commit (incl. transcript file).
 
@@ -140,7 +140,7 @@ Output:
 - any learnings or gotchas that should be integrated back into the harness - only if truly load-bearing.
 - a pointer to the session transcript
 
-## Step 9: Ask user how to proceed
+## Step 9: Ask User How to Proceed
 
 First, present the `/triage` T2 SHIP-GATE QUEUE (each item: finding, severity, recommendation, cited evidence — including any items carried forward from Step 7.2) and ask the user to ratify each item. R3 `accept-fix` items the user approves are fixed by re-entering Step 6.2 (a newly spawned opus fixer, scoped to the approved subset) before shipping; then re-run Step 7 review on the fixed subset.
 
