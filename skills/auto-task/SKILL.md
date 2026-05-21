@@ -117,9 +117,7 @@ Render triage results as a table:
 
 ### 6.2: Fix
 
-If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new opus subagent that fixes them following `/impl-task` (separately spawned — reviewer ≠ fixer; a subagent has no Agent tool).
-
-If and only if something should be recorded for posterity, add it to the task's `## Implementation notes` section.
+If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new opus subagent that fixes them following `/impl-task`. Review the fix (using a single codex reviewer only) and address feedback as outlined in Step 5 and 6, respectively.
 
 ## Step 7: Review Task
 
