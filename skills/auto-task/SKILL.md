@@ -42,8 +42,6 @@ Internalise and follow these rules:
 
 Find the task and output its title and status. Bonus points for using figlet =)
 
-Update the current session name: `/rename task/NNN-<slug>`.
-
 ## Step 2: Worktree
 
 Create a `task/NNN-<slug>` worktree under `~/github/.worktrees/tad/`:
