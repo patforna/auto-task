@@ -19,10 +19,8 @@ Stop only when human input is genuinely required (ship gate, irreducible ambigui
 
 Workflow:
 
-```
-create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
-                            └───────────────────────── auto-task ─────────────────────────┘
-```
+    create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
+                                └───────────────────────── auto-task ─────────────────────────┘
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -75,6 +73,7 @@ Spawn a new opus sub-agent and run:
 ## Step 5: Review Code
 
 In parallel:
+
 - Run `/codex:review --background --base main`
 - Run `/codex:adversarial-review --background --base main`
 - Spawn a new opus sub-agent and run `/code-review main..HEAD`
@@ -84,6 +83,7 @@ Note: `/codex:review` and `/codex:adversarial-review` are plugin slash commands 
 If Codex is unavailable (e.g. usage limit), fail loudly — do not substitute or skip.
 
 When all reviews are complete, spawn a new opus agent to `/synthesize` the responses using the following arguments:
+
 - prompt: [derive from /code-review]
 - perspective 1: findings produced by codex:review subagent
 - perspective 2: findings produced by codex:adversarial-review subagent
