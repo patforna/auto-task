@@ -17,7 +17,7 @@ Crystallise and scope an ongoing conversation into a well-defined task, capturin
 
 This skill is typically run as part of a larger workflow:
 
-```
+```text
 create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
 ```
 
@@ -52,13 +52,13 @@ These rules govern both how you gather intent and write the task. Internalise an
 
 Create the task file using `just create-task <title> [<type>]`. Use the table below to decide on type:
 
-| Type       | Meaning                                      |
-|------------|----------------------------------------------|
-| `feat`     | Product increment, new capability (Default)  |
-| `tech`     | Refactor, cleanup, architecture              |
-| `bug`      | Something broken                             |
-| `research` | Research a topic or issue                    |
-| `other`    | Anything else                                |
+| Type       | Meaning                                     |
+| ---------- | ------------------------------------------- |
+| `feat`     | Product increment, new capability (Default) |
+| `tech`     | Refactor, cleanup, architecture             |
+| `bug`      | Something broken                            |
+| `research` | Research a topic or issue                   |
+| `other`    | Anything else                               |
 
 This creates a file in `tasks/{NNN}-{slug}.md` similar to the one below:
 
@@ -70,15 +70,15 @@ status: new
 type: {task_type}
 ---
 
-# {display_title}
+## {display_title}
 
 TODO: Add description
 
-## Acceptance criteria
+### Acceptance criteria
 
 TODO: Add ACs
 
-## Notes
+### Notes
 
 TODO: Add notes
 ```
@@ -131,7 +131,7 @@ Ensure each AC has the following properties:
 **Two exceptions** to the behaviour-level default:
 
 - When structure IS the deliverable (e.g. refactoring), structural criteria are OK (e.g. "no references to compute() functions remain");
-- When a formula or algorithm defines correctness, include it as specification (e.g. "sigma2_t = (1 - lambda) * r_t^2 + lambda * sigma2_{t-1}").
+- When a formula or algorithm defines correctness, include it as specification (e.g. "sigma2_t = (1 - lambda) *r_t^2 + lambda* sigma2_{t-1}").
 
 #### Examples
 
@@ -153,10 +153,10 @@ Ensure each AC has the following properties:
 
 - When navigating to the frontend, I see a table, with a header and content like below:
 
-    | Ticker | Close | 5d Return |
-    |--------|-------|-----------|
-    | NVDA   | $180  |  6%       |
-    | TSLA   | $340  | −8%       |
+  | Ticker | Close | 5d Return |
+  | ------ | ----- | --------- |
+  | NVDA   | $180  | 6%        |
+  | TSLA   | $340  | −8%       |
 
 - Content is delivered from backend API (close from ohlvc data, 5d return from features data)
 - ...
@@ -221,6 +221,7 @@ When splitting, consider doing so along these seams:
 - etc.
 
 **Important:**
+
 - Don't "over-split" as decomposition incurs overhead.
 - Decide whether split tasks should be bundled into an epic (i.e. a high-level task that aggregates a number of closely related sub-tasks) or split into separate standalone tasks.
 - If you think a task should be split, **ALWAYS CHECK WITH THE USER FIRST** - present your rationale and proposal and **wait for approval**.
@@ -252,12 +253,12 @@ To create an epic, follow the instructions for creating a standalone task. Drop 
 ```markdown
 ## Tasks
 
-| #  | Task                      | File                    | Status |
-|----|---------------------------|-------------------------|--------|
-| 01 | Implement Reversal Signal | 012.01-signal.md        | new    |
-| 02 | Filters and Gates         | 012.02-filters-gates.md | new    |
-| 03 | Remove SL/TP              | 012.03-remove-sltp.md   | new    |
-| 04 | Multi-Day Holding         | 012.04-multi-day-hold.md| new    |
+| #   | Task                      | File                     | Status |
+| --- | ------------------------- | ------------------------ | ------ |
+| 01  | Implement Reversal Signal | 012.01-signal.md         | new    |
+| 02  | Filters and Gates         | 012.02-filters-gates.md  | new    |
+| 03  | Remove SL/TP              | 012.03-remove-sltp.md    | new    |
+| 04  | Multi-Day Holding         | 012.04-multi-day-hold.md | new    |
 ```
 
 ### Epic sub-tasks
@@ -266,7 +267,7 @@ Epic sub-tasks are like standalone tasks, except their file name is slightly dif
 
 To create an epic sub-task file, follow the instructions for creating a standalone task, but use the following file format: `<EpicNbr>.<NN><task slug>.md` (e.g. `012.03-remove-sltp.md`). The numbers of the tasks belonging to the epic are zero-padded (`01`, `02`, ... `10`, `11`). Example:
 
-```
+```text
 tasks/015-reversal-eval.md        ← epic
 tasks/015.01-cli-knobs.md         ← task 1
 tasks/015.02-pnl-concentration.md ← task 2

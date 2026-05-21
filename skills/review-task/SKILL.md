@@ -17,7 +17,7 @@ Verify that a task has been completed according to its intent and criteria.
 
 This skill is typically run as part of a larger workflow:
 
-```
+```text
 create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
 ```
 

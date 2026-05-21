@@ -17,7 +17,7 @@ Implement a task by executing its implementation plan.
 
 This skill is typically run as part of a larger workflow:
 
-```
+```text
 create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
 ```
 

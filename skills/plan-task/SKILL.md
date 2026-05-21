@@ -17,7 +17,7 @@ Given a well-defined task (the "why" and "what"), write an implementation plan (
 
 This skill is typically run as part of a larger workflow:
 
-```
+```text
 create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
 ```
 
@@ -72,6 +72,7 @@ Write a plan using the structure below (drop sections that aren't needed):
 ### Notes
 
 [Only add as short bullets when truly valuable:
+
 - Things you'd be nervous whether a new agent gets right if not written down.
 - Not yet captured insights, assumptions, flags, constraints, decisions, etc.
 - Anything worth capturing for posterity.]

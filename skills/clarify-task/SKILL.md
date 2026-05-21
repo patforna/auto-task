@@ -17,7 +17,7 @@ Ensure the task is clear enough so that two reasonable agents - with access to t
 
 This skill is typically run as part of a larger workflow:
 
-```
+```text
 create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
 ```
 
@@ -58,6 +58,7 @@ If there are no substantial issues to surface or none left, reply with a short o
 Integrate the feedback from Step 3 into the task file.
 
 When editing the task file:
+
 - Strictly follow the `/create-task` skill's "Guidance" section and "Step 3: Write the task".
 - Do not make any edits beyond what's strictly necessary to integrate the feedback (exception: fixing obvious typos - please do without asking).
 
@@ -68,4 +69,6 @@ Spawn a sub-agent to re-run Steps 1–2 on the updated task and report any remai
 ## Step 6: Mark ready
 
 Finally, update the task status by running `just task-status <task-file> ready-for-dev`.
+
+```text
 ```

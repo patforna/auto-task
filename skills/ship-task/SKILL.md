@@ -17,7 +17,7 @@ Use to wrap up a finished task - set status to done, merge, clean up.
 
 This skill is typically run as part of a larger workflow:
 
-```
+```text
 create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
 ```
 
@@ -43,7 +43,7 @@ Branch must be `task/NNN-...` with no uncommitted tracked changes.
 
 From the task worktree:
 
-```
+```text
 git pull --rebase origin main                          # rebase task branch onto origin/main
 git -C "$primary" merge --ff-only task/NNN-<slug>      # fast-forward main
 ```
@@ -67,7 +67,7 @@ A git repo can have multiple worktrees, each with a different branch checked out
 
 Resolve once:
 
-```
+```text
 primary=$(git worktree list --porcelain | awk '/^worktree / {print $2; exit}')
 ```
 
