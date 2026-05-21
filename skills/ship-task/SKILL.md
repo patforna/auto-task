@@ -44,11 +44,14 @@ Branch must be `task/NNN-...` with no uncommitted tracked changes.
 From the task worktree:
 
 ```text
-git pull --rebase origin main                          # rebase task branch onto origin/main
+git -C "$primary" pull --rebase origin main            # bring local main up to date with origin (keeps any unpushed local-main commits)
+git rebase main                                         # from the task worktree: rebase task branch onto the now-current local main
 git -C "$primary" merge --ff-only task/NNN-<slug>      # fast-forward main
 ```
 
 `$primary` resolves to the worktree where `main` is checked out — needed because `merge` only updates the branch checked out in the worktree it runs in. See § `$primary` below.
+
+Rebase the task branch onto **local `main`**, not `origin/main`: local `main` may be ahead of origin with unpushed commits, and rebasing onto a stale `origin/main` then leaves the `--ff-only` merge impossible (main has commits the rebased branch lacks). The `pull --rebase` first reconciles local `main` with origin (requires the primary worktree to be clean). If origin/main is merely behind local main, the pull is a no-op and the rebase onto local main still does the right thing.
 
 If rebase conflicts, stop and flag it to the user.
 
