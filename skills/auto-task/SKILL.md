@@ -89,30 +89,42 @@ When all reviews are complete, spawn a new opus agent to `/synthesize` the respo
 - perspective 2: findings produced by codex:adversarial-review subagent
 - perspective 3: findings produced by opus `/code-review` subagent
 
-Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's a routing token for `/triage`, not prose.
+Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's the routing token the Step 6.1 autofix fast-lane keys on, not prose.
 
 ## Step 6: Address Review Feedback (If Applicable)
 
 ### 6.1: Triage
 
-Spawn a new opus subagent and run:
+In a new opus subagent:
 
-    /triage <synthesised-findings-path> <task-path>
+1. Read the task — this is the original intent of the change.
+2. Read the synthesised code review findings from above.
+3. Findings carrying an `Autofix:` line **and severity Minor or Nit** skip the triage table entirely and go straight to the Step 6.2 fix (scoped to changed files only). If an autofix *class* recurs across reviews, flag it to be fixed at the root instead of re-fixing it.
+4. For each remaining finding, decide one of — every row carries a one-line cited reason (the evidence, not just the verdict):
 
-Pass the absolute worktree path explicitly (the subagent's Read/Edit/Write must root at the worktree, per CLAUDE.md § Worktrees). `/triage` is a deterministic router: it owns the `Autofix:` + Minor/Nit bypass, the cost-asymmetry veto, and the residual classification — auto-task no longer encodes any of that here. `/triage` emits batches and a table; it never spawns the fixer and never applies an edit (reviewer ≠ fixer; a subagent has no Agent tool).
+   - Real issue that needs addressing -> Accept (cite what it breaks / why it's worth fixing)
+   - Real issue but probably out of scope -> Reject (capture as a follow-up note in the task's `## Implementation notes`)
+   - Value of fix does not exceed cost (esp. complexity) of fix -> Reject (explain why)
+   - False positive -> Reject (cite the specific code that disproves it)
+   - Would significantly change scope/goal -> Reject (cite the anchor)
 
-Re-output the subagent's T2 SHIP-GATE QUEUE table and the machine tally in the main agent so the user can see them. Append `/triage`'s TASK-FILE NOTES to the task's `## Implementation notes` verbatim.
+Never auto-reject a Critical or Major finding. If the instinct is to reject one, surface it in the Step 9 decisions report instead and let the human decide.
+
+Render triage results as a table:
+
+| #   | Finding (one line) | Disposition | Reason |
+| --- | ------------------ | ----------- | ------ |
 
 ### 6.2: Fix
 
-If `/triage`'s AUTOFIX BATCH is non-empty, spawn a new opus subagent (separately spawned — reviewer ≠ fixer; a subagent has no Agent tool) that applies the AUTOFIX BATCH following `/impl-task`, scoped to changed files only. The ACCEPT BATCH is empty in the MVP — there is no autonomous accept→fix here. R3 `accept-fix` recommendations are ratified by the user at Step 9; on approval, re-enter this step with a newly spawned opus fixer scoped to the approved subset only.
+If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new opus subagent that fixes them following `/impl-task` (separately spawned — reviewer ≠ fixer; a subagent has no Agent tool).
 
 If and only if something should be recorded for posterity, add it to the task's `## Implementation notes` section.
 
 ## Step 7: Review Task
 
 1. Review: In a new opus subagent, review that the task is complete via `/review-task`.
-2. Address Feedback: If the review returns findings, triage via `/triage` as in Step 6.1, then address the AUTOFIX BATCH as in Step 6.2. Carry any T2 SHIP-GATE QUEUE items forward to the Step 9 ship-gate presentation — do not ratify them mid-loop.
+2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 6.
 3. Second review: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 8.
 
 ## Step 8: Wrap Up
@@ -142,9 +154,7 @@ Output:
 
 ## Step 9: Ask User How to Proceed
 
-First, present the `/triage` T2 SHIP-GATE QUEUE (each item: finding, severity, recommendation, cited evidence — including any items carried forward from Step 7.2) and ask the user to ratify each item. R3 `accept-fix` items the user approves are fixed by re-entering Step 6.2 (a newly spawned opus fixer, scoped to the approved subset) before shipping; then re-run Step 7 review on the fixed subset.
-
-If the tally has `"overflow": true`, the queue exceeds the cap: require explicit per-item acknowledgement. This acknowledgement cannot be cleared by the user selecting "Run `/ship-task`" — each over-cap item must be individually acknowledged first, or the cap is theatre. Surface the `OVERFLOW:` line and note it is an upstream signal (tighten `/code-review`, shrink the change, or lower N), not a cue to read faster.
+First, surface a short prose summary of the triage decisions so the human can review the critical bits before shipping — a report, not a gate: how many findings were fixed, which were rejected and why, which were deferred, and — called out explicitly — any Critical/Major findings surfaced for a human call rather than auto-actioned.
 
 Then offer the user the following options:
 
@@ -154,5 +164,3 @@ Then offer the user the following options:
 - Run `/ship-task`
 
 Do not proceed without explicit user approval. If the user declines, stop here.
-
-Append a one-line smoke detector, not a control: the count of T2 items shown this run and how many the user approved. If approval trends toward 100% with falling dwell time across runs, autonomy is mis-calibrated upstream — tighten `/code-review` or lower N; do not widen an autonomous lane.
