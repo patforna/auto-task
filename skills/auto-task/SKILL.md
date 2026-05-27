@@ -72,20 +72,18 @@ Spawn a new opus sub-agent and run:
 
 In parallel:
 
-- Run `/codex:review --background --base main`
-- Run `/codex:adversarial-review --background --base main`
 - Spawn a new opus sub-agent and run `/code-review main..HEAD`
+- Run `/codex:adversarial-review --background --base main`
 
-Note: `/codex:review` and `/codex:adversarial-review` are plugin slash commands and cannot be model-invoked directly. To run one from inside auto-task, locate its definition under `~/.claude/plugins/cache/**/commands/<name>.md`, read the Bash invocation template inside, and run it via the Bash tool — substituting `${CLAUDE_PLUGIN_ROOT}` (a template placeholder, not a shell var!) with the resolved plugin root.
+Note: `/codex:...` are plugin slash commands and cannot be model-invoked directly. To run one from inside auto-task, locate its definition under `~/.claude/plugins/cache/**/commands/<name>.md`, read the Bash invocation template inside, and run it via the Bash tool — substituting `${CLAUDE_PLUGIN_ROOT}` (a template placeholder, not a shell var!) with the resolved plugin root.
 
 If Codex is unavailable (e.g. usage limit), fail loudly — do not substitute or skip.
 
 When all reviews are complete, spawn a new opus agent to `/synthesize` the responses using the following arguments:
 
 - prompt: [derive from /code-review]
-- perspective 1: findings produced by codex:review subagent
+- perspective 1: findings produced by opus `/code-review` subagent
 - perspective 2: findings produced by codex:adversarial-review subagent
-- perspective 3: findings produced by opus `/code-review` subagent
 
 Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's the routing token the Step 6.1 autofix fast-lane keys on, not prose.
 
