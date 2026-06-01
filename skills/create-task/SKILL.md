@@ -83,6 +83,8 @@ TODO: Add ACs
 TODO: Add notes
 ```
 
+**Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `tasks/attachments/{NNN}/` and reference it from the task file — don't drop it as a top-level sibling. See `tasks/README.md` § Attachments.
+
 ## Step 3: Write the Task
 
 **Crystallise** the information you gathered in Step 1 and fill it into the task file sections - "Description", "Acceptance criteria", "Notes".
