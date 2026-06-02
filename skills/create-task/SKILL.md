@@ -55,6 +55,7 @@ Create the task file using `just create-task <title> [<type>]`. Use the table be
 | Type       | Meaning                                     |
 | ---------- | ------------------------------------------- |
 | `feat`     | Product increment, new capability (Default) |
+| `design`   | Visual/UI work from a design-system brief   |
 | `tech`     | Refactor, cleanup, architecture             |
 | `bug`      | Something broken                            |
 | `research` | Research a topic or issue                   |
