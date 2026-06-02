@@ -43,7 +43,7 @@ Triggers (non-exhaustive):
 
 ## Step 3: Surface and Clarify Issues with User
 
-If anything from the previous step needs clarification, flag it to the user and wait for the user to answer.
+If anything from the previous step needs clarification, flag it to the user using the AskUserQuestion tool - if necessary do multiple rounds.
 
 Make sure that each feedback item:
 
