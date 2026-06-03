@@ -31,6 +31,11 @@ Internalise and follow these rules:
 - Aim to complete all the steps with high-autonomy - assume there is no human available to help you complete the task. If there are questions, flags or surprises, use your own best judgement, make a note of it to show to the user when you're done and proceed. Only stop i) if the instructions in this file explicitly ask you to or ii) if you truly can't make progress without human intervention.
 - Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be proactive and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Keep checking at 1-min intervals that subprocesses and subagents make progress and don't hang. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
 - When subagents produce user output (e.g. implementation plan, code review findings, etc.), make sure to re-output it in the main agent, so the user can actually see it.
+- For design / UI tasks, validate the change against the design intent before calling it done — and don't trust eyeballing. Use the live app (drive it via the chrome-devtools MCP):
+  1. **Measure, don't eyeball.** Read DOM geometry / computed styles (`getBoundingClientRect`, colour, contrast) and compare to the spec — objective numbers beat impressions, and they're machine-independent.
+  2. **Confirm the gestalt** with a screenshot against the design reference.
+  3. **Reproduce interaction states** (hover / focus / open) with *real* input (real key/click events) — synthetic dispatch hides state-dependent bugs.
+  4. **Promote load-bearing invariants** (geometry, colour) to an e2e assertion so future drift fails loudly instead of silently.
 
 ## Prerequisite
 
