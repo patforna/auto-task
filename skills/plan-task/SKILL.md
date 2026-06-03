@@ -1,6 +1,6 @@
 ---
 name: plan-task
-description: Write an implementation plan for a well-defined task. Typical workflow: create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task.
+description: Write an implementation plan for a well-defined task. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task.
 ---
 
 # Plan Task
@@ -18,7 +18,7 @@ Given a well-defined task (the "why" and "what"), write an implementation plan (
 This skill is typically run as part of a larger workflow:
 
 ```text
-create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
+create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
 ```
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `tasks/`) plus repo state carry everything the next agent needs.

@@ -1,6 +1,6 @@
 ---
 name: create-task
-description: Use this skill to crystallise and scope an ongoing conversation into a well-defined task, capturing user intent at a high level. Typical workflow: create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task.
+description: Use this skill to crystallise and scope an ongoing conversation into a well-defined task, capturing user intent at a high level. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task.
 ---
 
 # Create Task
@@ -18,7 +18,7 @@ Crystallise and scope an ongoing conversation into a well-defined task, capturin
 This skill is typically run as part of a larger workflow:
 
 ```text
-create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
+create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
 ```
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.

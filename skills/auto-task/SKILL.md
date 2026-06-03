@@ -19,7 +19,7 @@ Stop only when human input is genuinely required (ship gate, irreducible ambigui
 
 Workflow:
 
-    create-task → clarify-task → plan-task → impl-task → code-review → review-task → ship-task
+    create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
                                 └───────────────────────── auto-task ─────────────────────────┘
 
 ## Guidance (DO NOT IGNORE!)
@@ -72,7 +72,7 @@ Spawn a new opus sub-agent and run:
 
 In parallel:
 
-- Spawn a new opus sub-agent and run `/code-review main..HEAD`
+- Spawn a new opus sub-agent and run `/review-code main..HEAD`
 - Run `/codex:adversarial-review --background --base main`
 
 Note: `/codex:...` are plugin slash commands and cannot be model-invoked directly. To run one from inside auto-task, locate its definition under `~/.claude/plugins/cache/**/commands/<name>.md`, read the Bash invocation template inside, and run it via the Bash tool — substituting `${CLAUDE_PLUGIN_ROOT}` (a template placeholder, not a shell var!) with the resolved plugin root.
@@ -81,8 +81,8 @@ If Codex is unavailable (e.g. usage limit), fail loudly — do not substitute or
 
 When all reviews are complete, spawn a new opus agent to `/synthesize` the responses using the following arguments:
 
-- prompt: [derive from /code-review]
-- perspective 1: findings produced by opus `/code-review` subagent
+- prompt: [derive from /review-code]
+- perspective 1: findings produced by opus `/review-code` subagent
 - perspective 2: findings produced by codex:adversarial-review subagent
 
 Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's the routing token the Step 7.1 autofix fast-lane keys on, not prose.
@@ -91,9 +91,9 @@ Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's th
 
 Skip unless the change alters rendered output (layout, spacing, colour, typography, interaction states).
 
-Run `/review-design <task-path>` **execute on the main thread** — do not wrap it in a subagent: it boots the app (`just serve test`) and drives the chrome-devtools MCP with real input, which a subagent can't do reliably. It is flag-only and emits findings in `/code-review`'s format.
+Run `/review-design <task-path>` **execute on the main thread** — do not wrap it in a subagent: it boots the app (`just serve test`) and drives the chrome-devtools MCP with real input, which a subagent can't do reliably. It is flag-only and emits findings in `/review-code`'s format.
 
-Re-output its findings in the main agent so the user can see them, and carry them into Step 7 alongside the code-review findings.
+Re-output its findings in the main agent so the user can see them, and carry them into Step 7 alongside the code review findings.
 
 ## Step 7: Address Review Feedback (If Applicable)
 

@@ -1,6 +1,6 @@
 ---
 name: review-design
-description: Use to review a design / UI change against its intent — measure the live app instead of eyeballing, and flag deviations. Read-only; produces findings, applies no fixes. Sibling of /code-review.
+description: Use to review a design / UI change against its intent — measure the live app instead of eyeballing, and flag deviations. Read-only; produces findings, applies no fixes. Sibling of /review-code.
 ---
 
 # Review Design
@@ -28,7 +28,7 @@ Fixed fixtures give stable, machine-independent measurements (real data drifts b
 
 ## Output
 
-Findings only — no edits. Match `/code-review`'s format so downstream triage consumes code and design findings uniformly:
+Findings only — no edits. Match `/review-code`'s format so downstream triage consumes code and design findings uniformly:
 
 - Severity: Critical / Major / Minor / Nit
 - One-line finding + cited evidence (the measured number vs the spec, or the screenshot deviation)
