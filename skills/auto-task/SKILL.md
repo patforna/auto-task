@@ -31,11 +31,6 @@ Internalise and follow these rules:
 - Aim to complete all the steps with high-autonomy - assume there is no human available to help you complete the task. If there are questions, flags or surprises, use your own best judgement, make a note of it to show to the user when you're done and proceed. Only stop i) if the instructions in this file explicitly ask you to or ii) if you truly can't make progress without human intervention.
 - Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be proactive and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Keep checking at 1-min intervals that subprocesses and subagents make progress and don't hang. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
 - When subagents produce user output (e.g. implementation plan, code review findings, etc.), make sure to re-output it in the main agent, so the user can actually see it.
-- For design / UI tasks, validate the change against the design intent before calling it done — and don't trust eyeballing. Use the live app (drive it via the chrome-devtools MCP):
-  1. **Measure, don't eyeball.** Read DOM geometry / computed styles (`getBoundingClientRect`, colour, contrast) and compare to the spec — objective numbers beat impressions, and they're machine-independent.
-  2. **Confirm the gestalt** with a screenshot against the design reference.
-  3. **Reproduce interaction states** (hover / focus / open) with *real* input (real key/click events) — synthetic dispatch hides state-dependent bugs.
-  4. **Promote load-bearing invariants** (geometry, colour) to an e2e assertion so future drift fails loudly instead of silently.
 
 ## Prerequisite
 
@@ -90,17 +85,25 @@ When all reviews are complete, spawn a new opus agent to `/synthesize` the respo
 - perspective 1: findings produced by opus `/code-review` subagent
 - perspective 2: findings produced by codex:adversarial-review subagent
 
-Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's the routing token the Step 6.1 autofix fast-lane keys on, not prose.
+Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's the routing token the Step 7.1 autofix fast-lane keys on, not prose.
 
-## Step 6: Address Review Feedback (If Applicable)
+## Step 6: Review Design (UI Changes Only)
 
-### 6.1: Triage
+Skip unless the change alters rendered output (layout, spacing, colour, typography, interaction states).
+
+Run `/review-design <task-path>` **execute on the main thread** — do not wrap it in a subagent: it boots the app (`just serve test`) and drives the chrome-devtools MCP with real input, which a subagent can't do reliably. It is flag-only and emits findings in `/code-review`'s format.
+
+Re-output its findings in the main agent so the user can see them, and carry them into Step 7 alongside the code-review findings.
+
+## Step 7: Address Review Feedback (If Applicable)
+
+### 7.1: Triage
 
 In a new opus subagent:
 
 1. Read the task — this is the original intent of the change.
-2. Read the synthesised code review findings from above.
-3. Findings carrying an `Autofix:` line **and severity Minor or Nit** skip the triage table entirely and go straight to the Step 6.2 fix (scoped to changed files only). If an autofix *class* recurs across reviews, flag it to be fixed at the root instead of re-fixing it.
+2. Read the synthesised code review findings from above, plus any design findings from Step 6.
+3. Findings carrying an `Autofix:` line **and severity Minor or Nit** skip the triage table entirely and go straight to the Step 7.2 fix (scoped to changed files only). If an autofix *class* recurs across reviews, flag it to be fixed at the root instead of re-fixing it.
 4. For each remaining finding, decide one of — every row carries a one-line cited reason (the evidence, not just the verdict):
 
    - Real issue that needs addressing -> Accept (cite what it breaks / why it's worth fixing)
@@ -109,41 +112,41 @@ In a new opus subagent:
    - False positive -> Reject (cite the specific code that disproves it)
    - Would significantly change scope/goal -> Reject (cite the anchor)
 
-Never auto-reject a Critical or Major finding. If the instinct is to reject one, surface it in the Step 9 decisions report instead and let the human decide.
+Never auto-reject a Critical or Major finding. If the instinct is to reject one, surface it in the Step 10 decisions report instead and let the human decide.
 
 Render triage results as a table:
 
 | #   | Finding (one line) | Disposition | Reason |
 | --- | ------------------ | ----------- | ------ |
 
-### 6.2: Fix
+### 7.2: Fix
 
-If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new opus subagent that fixes them following `/impl-task`. Review the fix (using a single codex reviewer only) and address feedback as outlined in Step 5 and 6, respectively.
+If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new opus subagent that fixes them following `/impl-task`. Review the fix (using a single codex reviewer only) and address feedback as outlined in Step 5 and 7, respectively.
 
-## Step 7: Review Task
+## Step 8: Review Task
 
 1. Review: In a new opus subagent, review that the task is complete via `/review-task`.
-2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 6.
-3. Second review: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 8.
+2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 7.
+3. Second review: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 9.
 
-## Step 8: Wrap Up
+## Step 9: Wrap Up
 
-### 8.1: Wrap up Loose Ends
+### 9.1: Wrap up Loose Ends
 
 Make sure that:
 
 - all findings have been addressed (or have been rejected deliberately)
 - all changes have been committed
 
-### 8.2: Capture Session Transcript
+### 9.2: Capture Session Transcript
 
     claude-replay --recurse-subagents "$CLAUDE_CODE_SESSION_ID" > .claude/skills/auto-task/_transcripts/<NNN-slug>.$CLAUDE_CODE_SESSION_ID.md
 
-### 8.3: Update Task and Commit
+### 9.3: Update Task and Commit
 
 Run `just task-status <task-file> ready-for-signoff` and commit (incl. transcript file).
 
-### 8.4: Summarise
+### 9.4: Summarise
 
 Output:
 
@@ -151,7 +154,7 @@ Output:
 - any learnings or gotchas that should be integrated back into the harness - only if truly load-bearing.
 - a pointer to the session transcript
 
-## Step 9: Ask User How to Proceed
+## Step 10: Ask User How to Proceed
 
 First, surface a short prose summary of the triage decisions so the human can review the critical bits before shipping — a report, not a gate: how many findings were fixed, which were rejected and why, which were deferred, and — called out explicitly — any Critical/Major findings surfaced for a human call rather than auto-actioned.
 
