@@ -132,6 +132,8 @@ Render triage results as a table:
 
 If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new opus subagent that fixes them following `/impl-task`. Review the fix (using a single codex reviewer only) and address feedback as outlined in Step 5 and 7, respectively.
 
+In `--lite` mode, review the fix with a single opus reviewer (not codex), consistent with Step 5. Skip the fix-review entirely when every accepted fix is trivial/mechanical (Minor/Nit, no logic change) — `just check-all` plus the Step 8 task review cover those.
+
 ## Step 8: Review Task
 
 1. Review: In a new opus subagent, review that the task is complete via `/review-task`.
