@@ -7,7 +7,12 @@ description: use to drive a well-defined task end-to-end with minimal human inpu
 
 ## Usage
 
-`/auto-task <task> [further user instructions]`
+`/auto-task <task> [--lite] [further user instructions]`
+
+## Modes
+
+- **Full** — default.
+- **Lite (`--lite`)** — only when the user explicitly passes the flag. Single-pass planning (Step 3), a single reviewer (Step 5), and a single task review (Step 8). Worktree, implementation, design review, and wrap-up are unchanged.
 
 ## Goal
 
@@ -60,6 +65,8 @@ Create an implementation plan. Important: Invoke /panel inline / do not wrap it 
 
     /synthesize /panel /plan-task <task-path>
 
+In `--lite` mode, skip the panel and synthesis — run `/plan-task <task-path>` directly (still inline, not in a subagent).
+
 Unless there are major flags, write the plan to the task file.
 
 ## Step 4: Implement
@@ -69,6 +76,8 @@ Spawn a new opus sub-agent and run:
     /impl-task <task-path>
 
 ## Step 5: Review Code
+
+In `--lite` mode: spawn a single opus sub-agent to run `/review-code main..HEAD`, skip the codex adversarial pass and the synthesis step, and carry its findings straight into Step 7. The rest of this step applies to full mode only.
 
 In parallel:
 
@@ -128,6 +137,8 @@ If any findings were accepted (step 4) or routed to the autofix fast-lane (step 
 1. Review: In a new opus subagent, review that the task is complete via `/review-task`.
 2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 7.
 3. Second review: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 9.
+
+In `--lite` mode, run steps 1–2 once and skip the second review (step 3).
 
 ## Step 9: Wrap Up
 
