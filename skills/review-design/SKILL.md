@@ -26,7 +26,9 @@ Verify a design / UI change matches the specified design.
 
 Start the app on deterministic fixture data and drive it via the chrome-devtools MCP:
 
-    just serve test   # api :8100 / vite :5273 on the test fixtures → http://localhost:5273
+    just serve test   # serves the test fixtures on random free ports
+
+It picks random ports so parallel sessions don't collide, then prints the app and api URLs. Read the printed `app: http://localhost:<port>/?theme=light` line and navigate the chrome-devtools MCP to that URL — don't assume a fixed port. (Port already taken is extremely rare; if startup fails on a port grab, just re-run.)
 
 ## Step 2: Verify
 

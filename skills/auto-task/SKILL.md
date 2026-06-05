@@ -100,7 +100,7 @@ Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's th
 
 Skip unless the change alters rendered output (layout, spacing, colour, typography, interaction states).
 
-Run `/review-design <task-path>` **execute on the main thread** — do not wrap it in a subagent: it boots the app (`just serve test`) and drives the chrome-devtools MCP with real input, which a subagent can't do reliably. It is flag-only and emits findings in `/review-code`'s format.
+Run `/review-design <task-path>` **execute on the main thread** — do not wrap it in a subagent: it boots the app (`just serve test`) and drives the chrome-devtools MCP with real input, which a subagent can't do reliably. It is flag-only and emits findings in `/review-code`'s format. `just serve test` binds random free ports and prints the app/api URLs, so it (and `just check-all`'s e2e suite) is safe to run from parallel auto-task worktrees without port collisions — navigate to the URL it prints, not a fixed port.
 
 Re-output its findings in the main agent so the user can see them, and carry them into Step 7 alongside the code review findings.
 
