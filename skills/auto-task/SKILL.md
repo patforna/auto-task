@@ -71,27 +71,27 @@ Unless there are major flags, write the plan to the task file.
 
 ## Step 4: Implement
 
-Spawn a new opus sub-agent and run:
+Spawn a new fable sub-agent and run:
 
     /impl-task <task-path>
 
 ## Step 5: Review Code
 
-In `--lite` mode: spawn a single opus sub-agent to run `/review-code main..HEAD`, skip the codex adversarial pass and the synthesis step, and carry its findings straight into Step 7. The rest of this step applies to full mode only.
+In `--lite` mode: spawn a single fable sub-agent to run `/review-code main..HEAD`, skip the codex adversarial pass and the synthesis step, and carry its findings straight into Step 7. The rest of this step applies to full mode only.
 
 In parallel:
 
-- Spawn a new opus sub-agent and run `/review-code main..HEAD`
+- Spawn a new fable sub-agent and run `/review-code main..HEAD`
 - Run `/codex:adversarial-review --background --base main`
 
 Note: `/codex:...` are plugin slash commands and cannot be model-invoked directly. To run one from inside auto-task, locate its definition under `~/.claude/plugins/cache/**/commands/<name>.md`, read the Bash invocation template inside, and run it via the Bash tool — substituting `${CLAUDE_PLUGIN_ROOT}` (a template placeholder, not a shell var!) with the resolved plugin root.
 
 If Codex is unavailable (e.g. usage limit), fail loudly — do not substitute or skip.
 
-When all reviews are complete, spawn a new opus agent to `/synthesize` the responses using the following arguments:
+When all reviews are complete, spawn a new fable agent to `/synthesize` the responses using the following arguments:
 
 - prompt: [derive from /review-code]
-- perspective 1: findings produced by opus `/review-code` subagent
+- perspective 1: findings produced by fable `/review-code` subagent
 - perspective 2: findings produced by codex:adversarial-review subagent
 
 Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's the routing token the Step 7.1 autofix fast-lane keys on, not prose.
@@ -108,7 +108,7 @@ Re-output its findings in the main agent so the user can see them, and carry the
 
 ### 7.1: Triage
 
-In a new opus subagent:
+In a new fable subagent:
 
 1. Read the task — this is the original intent of the change.
 2. Read the synthesised code review findings from above, plus any design findings from Step 6.
@@ -130,13 +130,13 @@ Render triage results as a table:
 
 ### 7.2: Fix
 
-If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new opus subagent that fixes them following `/impl-task`. Review the fix (using a single codex reviewer only) and address feedback as outlined in Step 5 and 7, respectively.
+If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new fable subagent that fixes them following `/impl-task`. Review the fix (using a single codex reviewer only) and address feedback as outlined in Step 5 and 7, respectively.
 
-In `--lite` mode, review the fix with a single opus reviewer (not codex), consistent with Step 5. Skip the fix-review entirely when every accepted fix is trivial/mechanical (Minor/Nit, no logic change) — `just check-all` plus the Step 8 task review cover those.
+In `--lite` mode, review the fix with a single fable reviewer (not codex), consistent with Step 5. Skip the fix-review entirely when every accepted fix is trivial/mechanical (Minor/Nit, no logic change) — `just check-all` plus the Step 8 task review cover those.
 
 ## Step 8: Review Task
 
-1. Review: In a new opus subagent, review that the task is complete via `/review-task`.
+1. Review: In a new fable subagent, review that the task is complete via `/review-task`.
 2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 7.
 3. Second review: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 9.
 
