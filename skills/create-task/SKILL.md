@@ -31,6 +31,8 @@ These rules govern both how you gather intent and write the task. Internalise an
 
 - Don't pattern match on existing task files created before May 2026.
 - Be maximally succinct. Capture the user's intent with the fewest words that remove ambiguity. Task content length obviously follows complexity but don't pad.
+- When a task has an authoritative attachment (design brief, spec, report), don't restate its content. The task body carries only scope plus the decisions the attachment doesn't make - point at the attachment for the rest. (Learned on task 079: a judge loop cut ~90% of the body as brief duplication.)
+- Don't spell out what a capable agent infers from the repo - established conventions (e.g. fail-fast), the single obvious mechanism for a change, enum values readable from a table. Test per line: would two reasonable agents build the same thing without it?
 - Use plain English. Write like a human agile BA/PM writing a user story, not like a technical writer or AI producing a spec.
 - Prefer short sentences and bullet points over paragraphs.
 - Minimise use of backticks, emphasis, file paths, symbol names, and code mechanics - exact names and details get resolved in later stages.
@@ -236,6 +238,8 @@ If the decision is to split into an epic and sub-tasks, follow the steps outline
 ## Step 5: Clarify
 
 Run `/clarify-task <task-path>` in a subagent to validate whether the task would be clear to a new agent. If not, address the feedback and keep repeating until no major gaps are left.
+
+Optionally - worth it when the task leans on an attachment or grew out of a long conversation - run ONE succinctness pass: a subagent that explores the repo as an implementing agent would and judges, per line, whether the content is easily inferable (cut it) and whether any cut would leave a decision undecidable (restore one line that pins it). One pass, two-sided; don't loop it - repeated rounds mostly fix their own over-cuts (task 079 took 4 rounds to learn this).
 
 If clarifying an epic, make sure that the epic task and all sub-tasks are clarified.
 
