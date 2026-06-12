@@ -130,12 +130,13 @@ Render triage results as a table:
 
 ### 7.2: Fix
 
-If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new fable subagent that fixes them following `/impl-task`. Review the fix (using a single codex reviewer only) and address feedback as outlined in Step 5 and 7, respectively.
+If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new fable subagent that fixes them following `/impl-task`. Review the fix (using a single codex reviewer only — `/codex:adversarial-review`, scoped to the fix commits via `--base`; plain `/codex:review` rejects custom focus text) and address feedback as outlined in Step 5 and 7, respectively.
 
 In `--lite` mode, review the fix with a single fable reviewer (not codex), consistent with Step 5. Skip the fix-review entirely when every accepted fix is trivial/mechanical (Minor/Nit, no logic change) — `just check-all` plus the Step 8 task review cover those.
 
 ## Step 8: Review Task
 
+0. Sync: rebase the worktree branch onto latest main (`git -C ~/github/tad pull --rebase origin main`, then `git rebase main` from the worktree; on conflicts resolve guided by the task/plan, then re-run `just check-all`) — surfaces integration drift here instead of at ship time.
 1. Review: In a new fable subagent, review that the task is complete via `/review-task`.
 2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 7.
 3. Second review: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 9.
