@@ -31,7 +31,7 @@ These rules govern both how you gather intent and write the task. Internalise an
 
 - Don't pattern match on existing task files created before May 2026.
 - Be maximally succinct. Capture the user's intent with the fewest words that remove ambiguity. Task content length obviously follows complexity but don't pad.
-- When a task has an authoritative attachment (design brief, spec, report), don't restate its content. The task body carries only scope plus the decisions the attachment doesn't make - point at the attachment for the rest. (Learned on task 079: a judge loop cut ~90% of the body as brief duplication.)
+- When a task has an authoritative attachment (design brief, spec, report), don't restate its content. Only capture decisions or information that's additional to the attachment.
 - Don't spell out what a capable agent infers from the repo - established conventions (e.g. fail-fast), the single obvious mechanism for a change, enum values readable from a table. Test per line: would two reasonable agents build the same thing without it?
 - Use plain English. Write like a human agile BA/PM writing a user story, not like a technical writer or AI producing a spec.
 - Prefer short sentences and bullet points over paragraphs.
@@ -235,21 +235,31 @@ If the decision is to split into standalone tasks, simply create the standalone 
 
 If the decision is to split into an epic and sub-tasks, follow the steps outlined in "Appendix: Creating Epics".
 
-## Step 5: Clarify
+## Step 5: Tighten
+
+Run one succinctness pass before clarifying. Spawn a subagent that reads the task - and any attachment - the way the implementing agent will, with full repo access. Ask it to flag every line a capable agent wouldn't need:
+
+- Inferable from the repo - established conventions, the single obvious mechanism, values readable from a table → cut.
+- Restating an attachment the task already points at → cut.
+- Load-bearing - a decision two reasonable agents would otherwise make differently → keep, or pin it with one line if it's currently only implied.
+
+The subagent returns the proposed cuts with a one-line reason each; you apply the clear ones and skip the rest. Run it once - don't loop.
+
+If you decomposed into multiple tasks, run the pass on each.
+
+## Step 6: Clarify
 
 Run `/clarify-task <task-path>` in a subagent to validate whether the task would be clear to a new agent. If not, address the feedback and keep repeating until no major gaps are left.
 
-Optionally - worth it when the task leans on an attachment or grew out of a long conversation - run ONE succinctness pass: a subagent that explores the repo as an implementing agent would and judges, per line, whether the content is easily inferable (cut it) and whether any cut would leave a decision undecidable (restore one line that pins it). One pass, two-sided; don't loop it - repeated rounds mostly fix their own over-cuts (task 079 took 4 rounds to learn this).
-
 If clarifying an epic, make sure that the epic task and all sub-tasks are clarified.
 
-## Step 6: User Review
+## Step 7: User Review
 
 Present the task(s) to the user for review. The user will provide feedback if applicable and initiate next steps.
 
-## Step 7: Offer a Feedback Snapshot
+## Step 8: Offer a Feedback Snapshot
 
-Before the user revises the task in Step 6, **offer** (per task, never auto-create) to snapshot the post-clarify file to `.claude/skills/create-task/feedback/YYYY-MM-DD-<task-slug>-before.md`. Convention: `feedback/README.md`.
+Before the user revises the task in Step 7, **offer** (per task, never auto-create) to snapshot the post-clarify file to `.claude/skills/create-task/feedback/YYYY-MM-DD-<task-slug>-before.md`. Convention: `feedback/README.md`.
 
 ## Appendix: Creating Epics
 
