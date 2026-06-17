@@ -28,6 +28,7 @@ As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's 
 - Preserve logical commits — do NOT squash.
 - Never push without explicit approval in the current turn. Earlier approval does not carry over.
 - Untracked files in the worktree are fine. Refuse only on uncommitted tracked changes.
+- After the `--ff-only` merge, re-install deps in the **primary** repo if the branch changed a dependency manifest — the primary's `node_modules`/`.venv` don't update on merge. Specifically: `bun install --frozen-lockfile` in `frontend/` when `package.json` or `bun.lock` changed; `uv sync` in `backend/` when backend deps changed; `just frontend-types` when `frontend/src/api/openapi.json` changed (`schema.d.ts` is gitignored and goes stale, breaking `just check-all`'s tsc).
 
 ## Protocol
 

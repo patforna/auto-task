@@ -36,6 +36,8 @@ Internalise and follow these rules:
 - Aim to complete all the steps with high-autonomy - assume there is no human available to help you complete the task. If there are questions, flags or surprises, use your own best judgement, make a note of it to show to the user when you're done and proceed. Only stop i) if the instructions in this file explicitly ask you to or ii) if you truly can't make progress without human intervention.
 - Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be proactive and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Keep checking at 1-min intervals that subprocesses and subagents make progress and don't hang. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
 - When subagents produce user output (e.g. implementation plan, code review findings, etc.), make sure to re-output it in the main agent, so the user can actually see it.
+- Use raw `git worktree add` + `just worktree-init` for worktrees — NOT the harness `EnterWorktree` tool. Reason: worktrees live at a persistent, predictable path (`~/github/.worktrees/tad/NNN-<slug>`) that Step 9/10 hands off to VS Code/tmux; an opaque harness temp path breaks that handoff. `just worktree-init` is also load-bearing (copies `backend/.env` + `data/`, installs frontend deps).
+- In unattended auto-task, a task at `status: new` that clearly went through `/create-task` (locked decisions + acceptance criteria present) may be treated as ready-for-dev — proceed and note the missed status bump in the final report. Don't stall on the status field alone.
 
 ## Prerequisite
 
