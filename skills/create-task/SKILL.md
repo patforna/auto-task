@@ -94,10 +94,7 @@ TODO: Add notes
 
 ### Description
 
-Describe what the task is about. Focus on the **why** and the **what**:
-
-- **Why:** what issue or opportunity motivates this change?
-- **What:** what will be different after this change?
+Describe **what** will be different after this change. Prefer a single sentence; use up to three only when genuinely justifiable. Add **why** only if it isn't obvious from the what — one clause, not a paragraph. Never narrate how the conversation arrived here ("two things came out of the discussion…", "we then realised…") — the next agent needs the decision, not the backstory.
 
 Save the rest for the "Acceptance criteria" or "Notes" sections.
 
@@ -180,7 +177,7 @@ This could include but is not limited to:
 - Alternatives considered;
 - etc.
 
-Use bullet points and short sentences - if possible. If in doubt, err on side of dumping too much than omitting important information.
+Use bullet points and short sentences. If in doubt whether a note is inferable from the repo, leave it out — only keep what a capable agent couldn't discover by exploring. Clarify will surface anything load-bearing that's actually missing.
 
 #### Examples
 
@@ -242,8 +239,9 @@ Run one succinctness pass before clarifying. Spawn a subagent that reads the tas
 - Inferable from the repo - established conventions, the single obvious mechanism, values readable from a table → cut.
 - Restating an attachment the task already points at → cut.
 - Load-bearing - a decision two reasonable agents would otherwise make differently → keep, or pin it with one line if it's currently only implied.
+- The Description's account of how the conversation evolved is never load-bearing → cut to the compressed why.
 
-The subagent returns the proposed cuts with a one-line reason each; you apply the clear ones and skip the rest. Run it once - don't loop.
+The subagent returns proposed cuts with a one-line reason each. Apply every cut unless you can state, in one line, the specific decision two reasonable agents would otherwise make differently. "Useful context" / "helps a human reader" is not such a reason — the audience is the implementing agent, with full repo access. Bias toward cutting; keeping is the exception you justify. Run it once - don't loop.
 
 If you decomposed into multiple tasks, run the pass on each.
 
