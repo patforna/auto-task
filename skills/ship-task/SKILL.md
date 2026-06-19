@@ -25,10 +25,10 @@ As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's 
 
 ## Guidance
 
-- Preserve logical commits — do NOT squash.
+- Squash-merge by default — the task's commits collapse into a single commit on `main`.
 - Push is automatic — invoking ship-task authorises the merge and push. No separate approval needed.
 - Untracked files in the worktree are fine. Refuse only on uncommitted tracked changes.
-- After the `--ff-only` merge, re-install deps in the **primary** repo if the branch changed a dependency manifest — the primary's `node_modules`/`.venv` don't update on merge. Specifically: `bun install --frozen-lockfile` in `frontend/` when `package.json` or `bun.lock` changed; `uv sync` in `backend/` when backend deps changed; `just frontend-types` when `frontend/src/api/openapi.json` changed (`schema.d.ts` is gitignored and goes stale, breaking `just check-all`'s tsc).
+- After the merge, re-install deps in the **primary** repo if the branch changed a dependency manifest — the primary's `node_modules`/`.venv` don't update on merge. Specifically: `bun install --frozen-lockfile` in `frontend/` when `package.json` or `bun.lock` changed; `uv sync` in `backend/` when backend deps changed; `just frontend-types` when `frontend/src/api/openapi.json` changed (`schema.d.ts` is gitignored and goes stale, breaking `just check-all`'s tsc).
 
 ## Protocol
 
@@ -42,24 +42,27 @@ Branch must be `task/NNN-...` with no uncommitted tracked changes.
 
 ## Step 3: Merge into Main
 
-From the task worktree:
+Squash the task branch into a single commit on `main`:
 
 ```text
 git -C "$primary" pull --rebase origin main            # bring local main up to date with origin (keeps any unpushed local-main commits)
-git rebase main                                         # from the task worktree: rebase task branch onto the now-current local main
-git -C "$primary" merge --ff-only task/NNN-<slug>      # fast-forward main
+git -C "$primary" merge --squash task/NNN-<slug>       # stage the task's combined diff onto main — no commit yet
+git -C "$primary" commit                               # write the squash commit (message below)
 ```
 
-`$primary` resolves to the worktree where `main` is checked out — needed because `merge` only updates the branch checked out in the worktree it runs in. See § `$primary` below.
+`$primary` resolves to the worktree where `main` is checked out — needed because `merge` only updates the branch checked out in the worktree it runs in. See § `$primary` below. The `pull --rebase` first reconciles local `main` with origin (requires the primary worktree to be clean); if origin/main is merely behind local main, it's a no-op.
 
-Rebase the task branch onto **local `main`**, not `origin/main`: local `main` may be ahead of origin with unpushed commits, and rebasing onto a stale `origin/main` then leaves the `--ff-only` merge impossible (main has commits the rebased branch lacks). The `pull --rebase` first reconciles local `main` with origin (requires the primary worktree to be clean). If origin/main is merely behind local main, the pull is a no-op and the rebase onto local main still does the right thing.
+Squash-commit message — **subject + bullet body**:
 
-If rebase conflicts, stop and flag it to the user.
+- Subject: `<imperative verb> <what the task delivered> (task/NNN)` — the `(task/NNN)` suffix is mandatory.
+- Body: one bullet per logical change the task made (derive from the squashed commits' subjects), so the single commit still records what happened.
+
+If `merge --squash` conflicts, stop and flag it to the user.
 
 ## Step 4: Push
 
 - Push: `git push origin main` (any worktree — push is repo-wide).
-- Cleanup (after push): `git -C "$primary" worktree remove --force <task_worktree>` and `git -C "$primary" branch -d task/NNN-<slug>`.
+- Cleanup (after push): `git -C "$primary" worktree remove --force <task_worktree>` and `git -C "$primary" branch -D task/NNN-<slug>` (`-D`, not `-d` — squash-merge leaves the branch tip a non-ancestor of `main`, so `-d` refuses it as "not merged").
 
 ## Step 5: Output
 
