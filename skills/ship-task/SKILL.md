@@ -59,12 +59,20 @@ Squash-commit message — **subject + bullet body**:
 
 If `merge --squash` conflicts, stop and flag it to the user.
 
-## Step 4: Push
+## Step 4: Verify the Integrated Tree
+
+Run `just check-all` from `$primary` on the post-squash commit, **before** pushing.
+
+A green task branch is not enough: the `pull --rebase` in Step 3 folds in whatever landed on `main` since the branch forked, and a parallel change can break the task's code or tests with **zero textual conflict** (e.g. a column added to a default preset silently invalidates an e2e assertion in an untouched test file). Git merges them cleanly; only re-running check-all on the combined tree catches it.
+
+If check-all fails, **stop and fix on `main`** before pushing — do not push a red tree. (CI is the backstop, not the gate.)
+
+## Step 5: Push
 
 - Push: `git push origin main` (any worktree — push is repo-wide).
 - Cleanup (after push): `git -C "$primary" worktree remove --force <task_worktree>` and `git -C "$primary" branch -D task/NNN-<slug>` (`-D`, not `-d` — squash-merge leaves the branch tip a non-ancestor of `main`, so `-d` refuses it as "not merged").
 
-## Step 5: Output
+## Step 6: Output
 
 One-sentence summary.
 
