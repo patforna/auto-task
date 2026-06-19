@@ -84,7 +84,9 @@ In `--lite` mode: spawn a single opus sub-agent to run `/review-code main..HEAD`
 In parallel:
 
 - Spawn a new opus sub-agent and run `/review-code main..HEAD`
-- Run `/codex:adversarial-review --background --base main`
+- Run `/codex:adversarial-review --background --base main` with the standing TAD-context focus appended verbatim (the command takes focus text after the flags):
+
+  > TAD context — treat as ground truth, not a code path to attack: solo-dev, local-only, never deployed, no live users, no multi-instance or rollout; frontend and backend ship atomically; recovery from any bad state is regenerate-data-from-scratch / reset-localStorage. Do NOT raise findings whose only harm requires a surface TAD lacks — version skew, stale or rolled-back clients, multi-instance races, or migrating existing persisted parquet / localStorage state (these are regenerate-from-scratch operations, not regressions). DO still raise anything that breaks the next local run on the real data dir, corrupts numbers, or is a present-tense correctness / UX / a11y bug. Verify any runtime-behaviour claim against the actual code before filing it.
 
 Note: `/codex:...` are plugin slash commands and cannot be model-invoked directly. To run one from inside auto-task, locate its definition under `~/.claude/plugins/cache/**/commands/<name>.md`, read the Bash invocation template inside, and run it via the Bash tool — substituting `${CLAUDE_PLUGIN_ROOT}` (a template placeholder, not a shell var!) with the resolved plugin root.
 
@@ -122,6 +124,10 @@ In a new opus subagent:
    - Value of fix does not exceed cost (esp. complexity) of fix -> Reject (explain why)
    - False positive -> Reject (cite the specific code that disproves it)
    - Would significantly change scope/goal -> Reject (cite the anchor)
+   - Deployment-model premise — harm requires a surface TAD lacks (version skew, stale/rolled-back client, multi-instance, or migrating existing persisted parquet/localStorage state) and the finding names no present-tense local bug -> Reject (cite "deployment-model premise doesn't hold; regenerate-not-migrate")
+   - Recommends restoring behaviour an Acceptance Criterion or locked decision deliberately removed -> Reject (cite the AC/decision)
+
+   Discriminator for the deployment-model bullet: gate on the impact *mechanism*, not keywords. "Schema"/"migration"/"parquet" also appear in real local-run blockers — keep any finding that breaks the next local run on the real data dir or corrupts numbers.
 
 Never auto-reject a Critical or Major finding. If the instinct is to reject one, surface it in the Step 10 decisions report instead and let the human decide.
 
