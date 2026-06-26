@@ -165,7 +165,7 @@ Make sure that:
     mkdir -p ~/Drive/code/tad/auto-task/transcripts
     claude-replay --recurse-subagents "$CLAUDE_CODE_SESSION_ID" > ~/Drive/code/tad/auto-task/transcripts/<NNN-slug>.$CLAUDE_CODE_SESSION_ID.md
 
-The transcript is written outside the repo (cloud-synced backup) and is not committed - see `_transcripts/README.md`.
+The transcript is written outside the repo to a cloud-synced backup, kept out of git to avoid diff and grep noise, and is not committed.
 
 ### 9.3: Update Task and Commit
 
