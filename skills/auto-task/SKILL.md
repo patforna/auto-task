@@ -162,11 +162,14 @@ Make sure that:
 
 ### 9.2: Capture Session Transcript
 
-    claude-replay --recurse-subagents "$CLAUDE_CODE_SESSION_ID" > .claude/skills/auto-task/_transcripts/<NNN-slug>.$CLAUDE_CODE_SESSION_ID.md
+    mkdir -p ~/Drive/code/tad/auto-task/transcripts
+    claude-replay --recurse-subagents "$CLAUDE_CODE_SESSION_ID" > ~/Drive/code/tad/auto-task/transcripts/<NNN-slug>.$CLAUDE_CODE_SESSION_ID.md
+
+The transcript is written outside the repo (cloud-synced backup) and is not committed - see `_transcripts/README.md`.
 
 ### 9.3: Update Task and Commit
 
-Run `just task-status <task-file> ready-for-signoff` and commit (incl. transcript file).
+Run `just task-status <task-file> ready-for-signoff` and commit.
 
 ### 9.4: Summarise
 
