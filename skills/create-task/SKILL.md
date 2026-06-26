@@ -63,7 +63,7 @@ Create the task file using `just create-task <title> [<type>]`. Use the table be
 | `research` | Research a topic or issue                   |
 | `other`    | Anything else                               |
 
-This creates a file in `tasks/{NNN}-{slug}.md` similar to the one below:
+This creates a file at `~/github/tad-tasks/{NNN}-{slug}.md` (the sibling tad-tasks repo) similar to the one below:
 
 ```markdown
 ---
@@ -86,7 +86,9 @@ TODO: Add ACs
 TODO: Add notes
 ```
 
-**Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `tasks/attachments/{NNN}/` and reference it from the task file — don't drop it as a top-level sibling. See `tasks/README.md` § Attachments.
+**Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `~/github/tad-tasks/attachments/{NNN}/` and reference it from the task file — don't drop it as a top-level sibling. See the tad-tasks README § Attachments.
+
+**Committing:** task files live in the tad-tasks repo, so commit them there, never in tad. `just task-status` and `just task-attach` auto-commit; for a content save (the filled task, before any status bump) use `just task-commit "<subject> (task/{NNN})" ~/github/tad-tasks/{NNN}-{slug}.md`. Once a task reaches `/clarify-task` (Step 6), its `ready-for-dev` bump commits the filled body for you.
 
 ## Step 3: Write the Task
 
@@ -283,9 +285,9 @@ Epic sub-tasks are like standalone tasks, except their file name is slightly dif
 To create an epic sub-task file, follow the instructions for creating a standalone task, but use the following file format: `<EpicNbr>.<NN><task slug>.md` (e.g. `012.03-remove-sltp.md`). The numbers of the tasks belonging to the epic are zero-padded (`01`, `02`, ... `10`, `11`). Example:
 
 ```text
-tasks/015-reversal-eval.md        ← epic
-tasks/015.01-cli-knobs.md         ← task 1
-tasks/015.02-pnl-concentration.md ← task 2
+015-reversal-eval.md        ← epic
+015.01-cli-knobs.md         ← task 1
+015.02-pnl-concentration.md ← task 2
 ```
 
 **Important**: When creating an epic sub-task, **update the epic's tasks table** so that it includes the new sub-task and status.

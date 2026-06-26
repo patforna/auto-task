@@ -61,6 +61,8 @@ Refuse to start if the branch already exists or the target worktree path is non-
 
 All subsequent steps run inside the worktree. Pass the absolute worktree path explicitly to every subagent — their Read/Edit/Write tools must root at the worktree path, not the primary worktree (see CLAUDE.md § Worktrees).
 
+The task file is **not** in the worktree — it lives in the sibling tad-tasks repo (`~/github/tad-tasks/`), a single shared checkout that every worktree sees. Pass `<task-path>` to subagents as the absolute tad-tasks path. Task-file edits (plan, status bumps) commit into tad-tasks via the `just task-*` recipes, independent of the worktree branch; the code squash-merged at ship never includes the task file.
+
 ## Step 3: Plan
 
 Create an implementation plan. Important: Invoke /panel inline / do not wrap it in a subagent.
@@ -169,7 +171,7 @@ The transcript is written outside the repo to a cloud-synced backup, kept out of
 
 ### 9.3: Update Task and Commit
 
-Run `just task-status <task-file> ready-for-signoff` and commit.
+Run `just task-status <task-file> ready-for-signoff` — it commits the bump (and any pending plan/impl edits to the task file) in the **tad-tasks** repo. No task-file commit lands in the worktree or tad.
 
 ### 9.4: Summarise
 

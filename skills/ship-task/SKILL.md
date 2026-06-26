@@ -21,7 +21,7 @@ This skill is typically run as part of a larger workflow:
 create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (in the sibling tad-tasks repo, `~/github/tad-tasks/`) plus repo state carry everything the next agent needs.
 
 ## Guidance
 
@@ -38,11 +38,11 @@ Branch must be `task/NNN-...` with no uncommitted tracked changes.
 
 ## Step 2: Mark Done
 
-`just task-status <task-file> done` and commit.
+`just task-status <task-file> done` — this commits the bump in the **tad-tasks** repo (the task file lives there, not in this repo). No commit in tad.
 
 ## Step 3: Merge into Main
 
-Squash the task branch into a single commit on `main`:
+Squash the task branch into a single commit on `main`. The squash carries code only — the task file lives in the tad-tasks repo and is committed there separately; the `(task/NNN)` subject suffix is the link between the two.
 
 ```text
 git -C "$primary" pull --rebase origin main            # bring local main up to date with origin (keeps any unpushed local-main commits)

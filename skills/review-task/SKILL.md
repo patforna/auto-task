@@ -21,7 +21,7 @@ This skill is typically run as part of a larger workflow:
 create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `tasks/`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (in the sibling tad-tasks repo, `~/github/tad-tasks/`) plus repo state carry everything the next agent needs.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -54,4 +54,4 @@ Say whether the review passed or, if not, present a summary of your findings and
 
 ## Step 5: Wrap Up
 
-Once there are no findings left, or the user has asked you to proceed, remember to update the task status by running `just task-status <task-file> ready-for-signoff` and commit.
+Once there are no findings left, or the user has asked you to proceed, remember to update the task status by running `just task-status <task-file> ready-for-signoff` (it commits the bump in the tad-tasks repo).

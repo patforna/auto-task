@@ -145,4 +145,4 @@ No findings — including no autofix and no below-threshold — is a complete, v
 Portable core above. In the TAD repo also:
 
 - Look for **silent corruption**: unguarded division and `NaN`-leaking paths (they produce wrong numbers, not errors). Guarded division must yield `None`, not `NaN` (`pl.when(x > 0)` in Polars; `numerator / denom if denom > 0 else None` in plain Python). Flag these Critical/Major — this overrides the default severity calibration.
-- Stay in the code review lane: review code quality and change risk only. Do not re-check acceptance criteria or task completion — that is `/review-task`. Intent lives in the `tasks/` file, never a PR description.
+- Stay in the code review lane: review code quality and change risk only. Do not re-check acceptance criteria or task completion — that is `/review-task`. Intent lives in the task file (in the `tad-tasks` repo at `~/github/tad-tasks/`), never a PR description.
