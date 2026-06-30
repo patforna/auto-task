@@ -259,7 +259,7 @@ Present the task(s) to the user for review. The user will provide feedback if ap
 
 ## Step 8: Offer a Feedback Snapshot
 
-Before the user revises the task in Step 7, **offer** (per task, never auto-create) to snapshot the post-clarify file to `.claude/skills/create-task/feedback/YYYY-MM-DD-<task-slug>-before.md`. Convention: `feedback/README.md`.
+Before the user revises the task in Step 7, **offer** (per task, never auto-create) to snapshot the post-clarify file to `~/Drive/code/tad/create-task/feedback/YYYY-MM-DD-<task-slug>-before.md` (kept out of the repo so it doesn't travel with the skill). Convention: `~/Drive/code/tad/create-task/feedback/README.md`.
 
 ## Appendix: Creating Epics
 
