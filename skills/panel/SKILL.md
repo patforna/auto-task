@@ -1,6 +1,6 @@
 ---
 name: panel
-description: Use to get independent perspectives on a topic from multiple models (opus + codex). Use with /synthesize to merge.
+description: Use to get independent perspectives on a topic from multiple models (opus + codex). Use with /auto-task:synthesize to merge.
 ---
 
 # Panel
@@ -11,7 +11,7 @@ Must be run from main thread (reason: subagents can't spawn other subagents)
 
 ## Usage
 
-`/panel <prompt>`
+`/auto-task:panel <prompt>`
 
 Prompt is mandatory — if missing, fail loudly; don't infer.
 
@@ -23,11 +23,11 @@ Get independent perspectives on a topic from multiple models (opus + codex).
 
 If the prompt invokes a skill (explicit `/name` only — not bare names in prose/diagrams), inline its `SKILL.md`, clearly fenced, after the instruction. Recurse into `/name` invocations found inside, but inline each skill at most once — never re-expand one already present (terminates; prevents cycles and bloat).
 
-Example: `/panel please /plan-task 054 but don't write to the task file.`
+Example: `/auto-task:panel please /auto-task:plan-task 054 but don't write to the task file.`
 
 Expanded prompt:
 
-""" Please /plan-task 054 but don't write to the task file.
+""" Please /auto-task:plan-task 054 but don't write to the task file.
 
 Skill references: === BEGIN plan-task SKILL.md === [full content of ~/github/tad/.claude/skills/plan-task/SKILL.md] === END plan-task SKILL.md === """
 

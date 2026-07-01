@@ -1,13 +1,13 @@
 ---
 name: clarify-task
-description: Use this skill to resolve ambiguities, clarify vague criteria and make implicit assumptions explicit. Invoked at the end of /create-task and the start of /plan-task. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task.
+description: Use this skill to resolve ambiguities, clarify vague criteria and make implicit assumptions explicit. Invoked at the end of /auto-task:create-task and the start of /auto-task:plan-task. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task.
 ---
 
 # Clarify Task
 
 ## Usage
 
-`/clarify-task <task-path> [further user instructions]`
+`/auto-task:clarify-task <task-path> [further user instructions]`
 
 ## Goal
 
@@ -36,7 +36,7 @@ Triggers (non-exhaustive):
 
 - Motivation missing - task says *what* but not *why*.
 - Incomplete content - trailing-off sentences, TODOs, TBDs, "should we...?", etc.
-- Acceptance criteria weak - vague, untestable, or missing boundary/edge cases (see `/create-task` § Acceptance criteria).
+- Acceptance criteria weak - vague, untestable, or missing boundary/edge cases (see `/auto-task:create-task` § Acceptance criteria).
 - Unclear scope - a criterion two reasonable agents would read differently.
 - Semantic ambiguity - same term, field, column, etc. meaning different things (e.g. "days" = calendar or trading?).
 - Implicit assumptions - things the implementer must assume that aren't stated.
@@ -59,7 +59,7 @@ Integrate the feedback from Step 3 into the task file.
 
 When editing the task file:
 
-- Strictly follow the `/create-task` skill's "Guidance" section and "Step 3: Write the task".
+- Strictly follow the `/auto-task:create-task` skill's "Guidance" section and "Step 3: Write the task".
 - Do not make any edits beyond what's strictly necessary to integrate the feedback (exception: fixing obvious typos - please do without asking).
 
 ## Step 5: Verify

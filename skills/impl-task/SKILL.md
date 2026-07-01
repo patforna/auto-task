@@ -7,7 +7,7 @@ description: Implement a task by executing its implementation plan. Typical work
 
 ## Usage
 
-`/impl-task <task-path> [further user instructions]`
+`/auto-task:impl-task <task-path> [further user instructions]`
 
 ## Goal
 
@@ -38,7 +38,7 @@ These rules govern how to execute the implementation. Internalise and follow the
 
 ## Step 1: Task Readiness
 
-If the task does not contain an `Implementation plan` section (usually set by `/plan-task`), stop, flag it to the user and ask how to proceed.
+If the task does not contain an `Implementation plan` section (usually set by `/auto-task:plan-task`), stop, flag it to the user and ask how to proceed.
 
 Otherwise, update the task status by running `just task-status <task-file> in-dev`.
 
@@ -50,7 +50,7 @@ Read the task and the code the implementation plan will touch. If in doubt, err 
 
 Work through the implementation plan step by step. Re-read the implementation plan so it's fresh in your context before proceeding to the next step.
 
-Fully read, internalise and use `/tdd` to drive implementation. Do not write or modify production code without a failing test.
+Fully read, internalise and use `/auto-task:tdd` to drive implementation. Do not write or modify production code without a failing test.
 
 ### When Things Go Wrong
 

@@ -1,6 +1,6 @@
 ---
 name: review-code
-description: Use to review a diff for correctness, design, security, and convention conformance. High-signal, read-only, severity-gated, with an autofix lane for mechanically-certain trivia. Default review step in /auto-task.
+description: Use to review a diff for correctness, design, security, and convention conformance. High-signal, read-only, severity-gated, with an autofix lane for mechanically-certain trivia. Default review step in /auto-task:auto-task.
 ---
 
 <!-- Based on: docs/research/2026-05-16-code-review-literature-and-sota.md. This file is the distilled instruction, not the bibliography. -->
@@ -9,7 +9,7 @@ description: Use to review a diff for correctness, design, security, and convent
 
 ## Usage
 
-`/review-code [diff target] [further instructions]`
+`/auto-task:review-code [diff target] [further instructions]`
 
 Diff target: a commit, a commit range, a base branch, PR ref, etc.
 
@@ -105,7 +105,7 @@ Gate: block on any Critical/Major in correctness, security, or data-safety. Ever
 
 Eligible: typos in comments/docstrings/strings, CLAUDE.md spelling (British vs American), a symbol name left stale in a comment after a rename, a duplicated import that is provably unused. Not eligible: argument reordering or any behaviour-changing edit; a missing null guard (where/whether to guard is judgement); clarity renames; any design change; a dead-import or dead-code claim justified only from the diff — a re-export, `__all__`, or string reference defeats diff-local certainty.
 
-**`Autofix:` is the routing token.** Step 6.1 keys on the exact per-finding `Autofix:` line — it is per-finding, not a section header, so it survives `/synthesize` merging multiple reviewers' outputs. The bypass applies to **Minor/Nit only**. A Major or Critical finding may carry the exact fix on its `Fix:` line, but it stays in the triage table and gates the human ship-gate — it never bypasses it.
+**`Autofix:` is the routing token.** Step 6.1 keys on the exact per-finding `Autofix:` line — it is per-finding, not a section header, so it survives `/auto-task:synthesize` merging multiple reviewers' outputs. The bypass applies to **Minor/Nit only**. A Major or Critical finding may carry the exact fix on its `Fix:` line, but it stays in the triage table and gates the human ship-gate — it never bypasses it.
 
 ## Output
 
@@ -145,4 +145,4 @@ No findings — including no autofix and no below-threshold — is a complete, v
 Portable core above. In the TAD repo also:
 
 - Look for **silent corruption**: unguarded division and `NaN`-leaking paths (they produce wrong numbers, not errors). Guarded division must yield `None`, not `NaN` (`pl.when(x > 0)` in Polars; `numerator / denom if denom > 0 else None` in plain Python). Flag these Critical/Major — this overrides the default severity calibration.
-- Stay in the code review lane: review code quality and change risk only. Do not re-check acceptance criteria or task completion — that is `/review-task`. Intent lives in the task file (in the `tad-tasks` repo at `~/github/tad-tasks/`), never a PR description.
+- Stay in the code review lane: review code quality and change risk only. Do not re-check acceptance criteria or task completion — that is `/auto-task:review-task`. Intent lives in the task file (in the `tad-tasks` repo at `~/github/tad-tasks/`), never a PR description.

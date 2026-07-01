@@ -7,7 +7,7 @@ description: Use to review a design / UI change against its specification. Read-
 
 ## Usage
 
-`/review-design [the change + its design intent]`
+`/auto-task:review-design [the change + its design intent]`
 
 ## Prerequisite
 
@@ -40,7 +40,7 @@ It picks random ports so parallel sessions don't collide, then prints the app an
 
 ## Step 3: Output
 
-Findings only — no edits. Match `/review-code`'s format so downstream triage consumes code and design findings uniformly:
+Findings only — no edits. Match `/auto-task:review-code`'s format so downstream triage consumes code and design findings uniformly:
 
 - Severity: Critical / Major / Minor / Nit
 - One-line finding + cited evidence (the measured number vs the spec, or the screenshot deviation)

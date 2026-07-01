@@ -7,7 +7,7 @@ description: Write an implementation plan for a well-defined task. Typical workf
 
 ## Usage
 
-`/plan-task <task-path> [further user instructions]`
+`/auto-task:plan-task <task-path> [further user instructions]`
 
 ## Goal
 
@@ -48,7 +48,7 @@ Real failures observed in past plans. Don't repeat:
 
 ## Step 1: Check Task Readiness
 
-If the task's status is not `ready-for-dev` (usually set at the end of `/clarify-task`), flag it to the user and ask how to proceed.
+If the task's status is not `ready-for-dev` (usually set at the end of `/auto-task:clarify-task`), flag it to the user and ask how to proceed.
 
 ## Step 2: Build Context
 
