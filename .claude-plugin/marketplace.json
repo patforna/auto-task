@@ -1,0 +1,17 @@
+{
+  "name": "auto-task",
+  "owner": {
+    "name": "Patric Fornasier"
+  },
+  "metadata": {
+    "description": "Patric's auto-task workflow",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "auto-task",
+      "source": "./",
+      "description": "Opinionated end-to-end agentic task workflow."
+    }
+  ]
+}

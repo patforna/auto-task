@@ -1,0 +1,8 @@
+{
+  "name": "auto-task",
+  "description": "Opinionated end-to-end agentic task workflow (plan, implement, review, ship) with vendored panel/synthesize/tdd. Self-contained.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Patric Fornasier"
+  }
+}
