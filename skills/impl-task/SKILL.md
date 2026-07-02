@@ -23,7 +23,7 @@ create-task → clarify-task → plan-task → impl-task → review-code → rev
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
 
-Task files live in the project's task store — `tasks/` in the repo by default; `.claude/auto-task.md` (project bindings, see `/at:create-task`) can override this and other defaults. Read the bindings file if it exists.
+Task files live in the project's task store — `tasks/` in the repo by default. Project bindings can override this and other defaults: read `.claude/auto-task.md` (project, committed) and `.claude/auto-task.local.md` (personal overrides — win on conflict) if they exist. See `/at:create-task` § Task Store and Project Bindings.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -32,7 +32,7 @@ Task files live in the project's task store — `tasks/` in the repo by default;
 These rules govern how to execute the implementation. Internalise and follow them throughout.
 
 - Commit early and often.
-- Include `(task/NNN)` in the commit.
+- Follow the repo's existing commit conventions. Append the task-link suffix to subjects (default `(task/NNN)`; bindings can change or drop it) so commits trace back to the task.
 - Look for and internalise existing style, patterns, conventions. Don't deviate unless the plan explicitly asks for it.
 - Maintain the testing pyramid. Test at the lowest possible level. Few, mostly happy-path tests at the top of the pyramid (e2e, component).
 - Do not use I/O, randomness, or real date/time in unit tests.

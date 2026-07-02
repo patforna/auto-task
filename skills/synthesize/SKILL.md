@@ -19,4 +19,9 @@ Combine N independent perspectives on a prompt into a single synthesis without f
 - Do not force consensus - unresolved disagreements are signals.
 - Apply the merge rubric below point by point:
 
-  | Pattern                            | Treatment                                                           | | :--------------------------------- | :------------------------------------------------------------------ | | Agreement (≥2 perspectives concur) | High confidence, take directly                                      | | Unique to one perspective          | Re-examine against source; keep if valid, discard if speculative    | | Contradiction                      | Assess evidence quality each side; decide on substance, do not vote | | Gap (none caught)                  | Flag as a panel limitation                                          |
+  | Pattern                            | Treatment                                                            |
+  | :--------------------------------- | :------------------------------------------------------------------- |
+  | Agreement (≥2 perspectives concur) | High confidence, take directly                                       |
+  | Unique to one perspective          | Re-examine against source; keep if valid, discard if speculative     |
+  | Contradiction                      | Assess evidence quality each side; decide on substance, do not vote  |
+  | Gap (none caught)                  | Flag as a panel limitation                                           |

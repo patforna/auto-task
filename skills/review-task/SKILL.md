@@ -23,7 +23,7 @@ create-task → clarify-task → plan-task → impl-task → review-code → rev
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
 
-Task files live in the project's task store — `tasks/` in the repo by default; `.claude/auto-task.md` (project bindings, see `/at:create-task`) can override this and other defaults. Read the bindings file if it exists.
+Task files live in the project's task store — `tasks/` in the repo by default. Project bindings can override this and other defaults: read `.claude/auto-task.md` (project, committed) and `.claude/auto-task.local.md` (personal overrides — win on conflict) if they exist. See `/at:create-task` § Task Store and Project Bindings.
 
 ## Guidance (DO NOT IGNORE!)
 

@@ -23,10 +23,11 @@ create-task → clarify-task → plan-task → impl-task → review-code → rev
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
 
-Task files live in the project's task store — `tasks/` in the repo by default; `.claude/auto-task.md` (project bindings, see `/at:create-task`) can override this and other defaults. Read the bindings file if it exists.
+Task files live in the project's task store — `tasks/` in the repo by default. Project bindings can override this and other defaults: read `.claude/auto-task.md` (project, committed) and `.claude/auto-task.local.md` (personal overrides — win on conflict) if they exist. See `/at:create-task` § Task Store and Project Bindings.
 
 ## Guidance
 
+- `main` throughout this skill means the repo's default branch — substitute yours (e.g. `master`) if it differs.
 - Squash-merge by default — the task's commits collapse into a single commit on `main`.
 - Push is automatic — invoking ship-task authorises the merge and push. No separate approval needed.
 - Untracked files in the worktree are fine. Refuse only on uncommitted tracked changes.
@@ -54,9 +55,9 @@ git -C "$primary" commit                               # write the squash commit
 
 `$primary` resolves to the worktree where `main` is checked out — needed because `merge` only updates the branch checked out in the worktree it runs in. See § `$primary` below. The `pull --rebase` first reconciles local `main` with origin (requires the primary worktree to be clean); if origin/main is merely behind local main, it's a no-op. (No remote configured? Skip the pull and the Step 5 push.)
 
-Squash-commit message — **subject + bullet body**:
+Squash-commit message — follow the repo's own commit conventions first (style, tense, prefixes). Defaults where the repo has none:
 
-- Subject: `<imperative verb> <what the task delivered> (task/NNN)` — the `(task/NNN)` suffix is mandatory.
+- Subject: a concise summary of what the task delivered, ending with the task-link suffix (default `(task/NNN)`; bindings can change or drop it — it's what ties the commit back to the task).
 - Body: one bullet per logical change the task made (derive from the squashed commits' subjects), so the single commit still records what happened.
 
 If `merge --squash` conflicts, stop and flag it to the user.

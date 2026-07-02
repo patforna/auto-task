@@ -27,7 +27,9 @@ Workflow:
     create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
                                 └───────────────────────── auto-task ─────────────────────────┘
 
-Task files live in the project's task store — `tasks/` in the repo by default. `.claude/auto-task.md` at the repo root (project bindings, see `/at:create-task`) can override this and other defaults: verification command, worktree location and init, standing review context, design-review serve command, transcript capture. **Read the bindings file first if it exists — it wins over the defaults below.** Pass its path to every subagent you spawn so they read it too.
+Task files live in the project's task store — `tasks/` in the repo by default. Project bindings can override this and every other default below: verification command, worktree location and init, standing review context, design-review serve command, model choices, commit conventions, transcript capture. Bindings live in `.claude/auto-task.md` (project, committed) and `.claude/auto-task.local.md` (personal overrides — win on conflict); see `/at:create-task` § Task Store and Project Bindings. **Read them first if they exist.** Pass their paths to every subagent you spawn so they read them too.
+
+`main` throughout this skill means the repo's default branch — substitute yours (e.g. `master`) if it differs.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -68,7 +70,7 @@ With the default in-repo task store, the task file is inside the worktree — pa
 
 ## Step 3: Plan
 
-Create an implementation plan. Important: Invoke /at:panel inline / do not wrap it in a subagent.
+Create an implementation plan. Important: Invoke /at:panel inline / do not wrap it in a subagent. Panel line-up per bindings § Models (default: strongest available Claude model + Codex).
 
     /at:synthesize /at:panel /at:plan-task <task-path>
 
@@ -78,7 +80,7 @@ Unless there are major flags, write the plan to the task file.
 
 ## Step 4: Implement
 
-Spawn a new sub-agent (strongest available model) and run:
+Spawn a new sub-agent (implementer model per bindings § Models; default: the strongest available model) and run:
 
     /at:impl-task <task-path>
 
@@ -89,7 +91,7 @@ In `--lite` mode: spawn a single sub-agent to run `/at:review-code main..HEAD`, 
 In parallel:
 
 - Spawn a new sub-agent and run `/at:review-code main..HEAD`
-- Run an **independent adversarial review** of the same range. If the `codex` plugin is installed, use `/codex:adversarial-review --background --base main`; if it is not installed, spawn a second independent review subagent (fresh context, adversarial framing) and note the degradation in the final report. If the bindings define standing review context, append it verbatim to the reviewer's focus text.
+- Run an **independent adversarial review** of the same range. Reviewer per bindings § Models; default: if the `codex` plugin is installed, use `/codex:adversarial-review --background --base main`; if it is not installed, spawn a second independent review subagent (fresh context, adversarial framing) and note the degradation in the final report. If the bindings define standing review context, append it verbatim to the reviewer's focus text.
 
 Note: `/codex:...` are plugin slash commands and cannot be model-invoked directly. To run one from inside auto-task, locate its definition under `~/.claude/plugins/cache/**/commands/<name>.md`, read the Bash invocation template inside, and run it via the Bash tool — substituting `${CLAUDE_PLUGIN_ROOT}` (a template placeholder, not a shell var!) with the resolved plugin root.
 

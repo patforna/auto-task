@@ -27,7 +27,12 @@ As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's 
 
 This plugin ships an opinionated default task convention: markdown task files in a `tasks/` directory at the repo root, managed by the agent with plain file I/O — no extra tooling required.
 
-A project can override the defaults in `.claude/auto-task.md` at the repo root ("project bindings") — e.g. a different task location (even a separate repo), helper recipes for creating/committing tasks, a verification command, worktree setup, standing review context. **If the bindings file exists, read it first; it wins over the defaults in this plugin's skills.**
+Projects override the defaults via **bindings** — plain-markdown files the agent reads, not machine-parsed config:
+
+- `.claude/auto-task.md` — project bindings, committed, shared by everyone working in the repo.
+- `.claude/auto-task.local.md` — personal overrides, gitignored; wins over the project file on conflict.
+
+Precedence: plugin defaults ← project bindings ← local bindings. **If either file exists, read it before proceeding.** Recognised sections (all optional): Task Store, Verification, Worktrees, Review, Design Review, Models, Conventions, Transcript Capture, Feedback Snapshots — the plugin's `examples/auto-task.md` is a copy-paste template with each section's default spelled out.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -95,7 +100,7 @@ TODO: Add notes
 
 **Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `tasks/attachments/{NNN}/` (next to the task files) and reference it from the task file — don't drop it as a top-level sibling.
 
-**Committing:** commit task-file changes with a `(task/{NNN})` subject suffix. If the bindings route tasks to a separate repo or provide commit recipes, follow those — task-file commits then land there, never in the code repo.
+**Committing:** commit task-file changes following the repo's commit conventions, with the task-link suffix appended to the subject (default `(task/{NNN})`; bindings § Conventions can change or drop it). If the bindings route tasks to a separate repo or provide commit recipes, follow those — task-file commits then land there, never in the code repo.
 
 ## Step 3: Write the Task
 

@@ -1,6 +1,6 @@
 ---
 name: panel
-description: Use to get independent perspectives on a topic from multiple models (fable + codex). Use with /at:synthesize to merge.
+description: Use to get independent perspectives on a topic from multiple models (a strong Claude model + Codex by default). Use with /at:synthesize to merge.
 ---
 
 # Panel
@@ -17,7 +17,7 @@ Prompt is mandatory — if missing, fail loudly; don't infer.
 
 ## Goal
 
-Get independent perspectives on a topic from multiple models (fable + codex).
+Get independent perspectives on a topic from multiple models. Default line-up: the strongest available Claude model + Codex. Callers (or project config, e.g. auto-task's bindings) may specify different panelists.
 
 ## Step 1: Expand Skill References
 
@@ -39,14 +39,14 @@ Append the block below to the prompt:
 
 ## Step 3: Dispatch
 
-Spawn a Codex (via `codex:codex-rescue`) and a Fable subagent in parallel and pass through the prompt.
+Spawn one subagent per panelist in parallel and pass through the prompt — by default a Codex panelist (via `codex:codex-rescue`) and a Claude panelist (strongest available model).
 
-If Codex is unavailable (e.g. usage limit), fail loudly — do not substitute or skip.
+If a requested panelist is unavailable (e.g. usage limit), fail loudly — do not substitute or skip.
 
 Write the responses to `/tmp/panel-<timestamp>-<slot>.md`.
 
 ## Step 4: Deliver
 
-Present both responses verbatim, each directly attributed to its model (Codex / Fable), including the paths to the raw responses.
+Present all responses verbatim, each directly attributed to its model (e.g. Codex / Claude), including the paths to the raw responses.
 
 Do not synthesise, reconcile, or edit.
