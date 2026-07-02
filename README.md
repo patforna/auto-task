@@ -8,7 +8,7 @@ A Claude Code plugin providing an opinionated, end-to-end agentic task workflow:
 /plugin marketplace add patforna/auto-task
 ```
 
-Then install `auto-task@auto-task` from the marketplace.
+Then install `at@auto-task` from the marketplace.
 
 ## Self-Contained
 

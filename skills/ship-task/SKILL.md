@@ -7,7 +7,7 @@ description: Use to wrap up a finished task - set status to done, merge, clean u
 
 ## Usage
 
-`/auto-task:ship-task <task-path>`
+`/at:ship-task <task-path>`
 
 ## Goal
 

@@ -7,7 +7,7 @@ description: use to drive a well-defined task end-to-end with minimal human inpu
 
 ## Usage
 
-`/auto-task:auto-task <task> [--lite] [further user instructions]`
+`/at:auto-task <task> [--lite] [further user instructions]`
 
 ## Modes
 
@@ -37,7 +37,7 @@ Internalise and follow these rules:
 - Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be proactive and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Keep checking at 1-min intervals that subprocesses and subagents make progress and don't hang. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
 - When subagents produce user output (e.g. implementation plan, code review findings, etc.), make sure to re-output it in the main agent, so the user can actually see it.
 - Use raw `git worktree add` + `just worktree-init` for worktrees — NOT the harness `EnterWorktree` tool. Reason: worktrees live at a persistent, predictable path (`~/github/.worktrees/tad/NNN-<slug>`) that Step 9/10 hands off to VS Code/tmux; an opaque harness temp path breaks that handoff. `just worktree-init` is also load-bearing (copies `backend/.env` + `data/`, installs frontend deps).
-- In unattended auto-task, a task at `status: new` that clearly went through `/auto-task:create-task` (locked decisions + acceptance criteria present) may be treated as ready-for-dev — proceed and note the missed status bump in the final report. Don't stall on the status field alone.
+- In unattended auto-task, a task at `status: new` that clearly went through `/at:create-task` (locked decisions + acceptance criteria present) may be treated as ready-for-dev — proceed and note the missed status bump in the final report. Don't stall on the status field alone.
 
 ## Prerequisite
 
@@ -65,11 +65,11 @@ The task file is **not** in the worktree — it lives in the sibling tad-tasks r
 
 ## Step 3: Plan
 
-Create an implementation plan. Important: Invoke /auto-task:panel inline / do not wrap it in a subagent.
+Create an implementation plan. Important: Invoke /at:panel inline / do not wrap it in a subagent.
 
-    /auto-task:synthesize /auto-task:panel /auto-task:plan-task <task-path>
+    /at:synthesize /at:panel /at:plan-task <task-path>
 
-In `--lite` mode, skip the panel and synthesis — run `/auto-task:plan-task <task-path>` directly (still inline, not in a subagent).
+In `--lite` mode, skip the panel and synthesis — run `/at:plan-task <task-path>` directly (still inline, not in a subagent).
 
 Unless there are major flags, write the plan to the task file.
 
@@ -77,15 +77,15 @@ Unless there are major flags, write the plan to the task file.
 
 Spawn a new opus sub-agent and run:
 
-    /auto-task:impl-task <task-path>
+    /at:impl-task <task-path>
 
 ## Step 5: Review Code
 
-In `--lite` mode: spawn a single opus sub-agent to run `/auto-task:review-code main..HEAD`, skip the codex adversarial pass and the synthesis step, and carry its findings straight into Step 7. The rest of this step applies to full mode only.
+In `--lite` mode: spawn a single opus sub-agent to run `/at:review-code main..HEAD`, skip the codex adversarial pass and the synthesis step, and carry its findings straight into Step 7. The rest of this step applies to full mode only.
 
 In parallel:
 
-- Spawn a new opus sub-agent and run `/auto-task:review-code main..HEAD`
+- Spawn a new opus sub-agent and run `/at:review-code main..HEAD`
 - Run `/codex:adversarial-review --background --base main` with the standing TAD-context focus appended verbatim (the command takes focus text after the flags):
 
   > TAD context — treat as ground truth, not a code path to attack: solo-dev, local-only, never deployed, no live users, no multi-instance or rollout; frontend and backend ship atomically; recovery from any bad state is regenerate-data-from-scratch / reset-localStorage. Do NOT raise findings whose only harm requires a surface TAD lacks — version skew, stale or rolled-back clients, multi-instance races, or migrating existing persisted parquet / localStorage state (these are regenerate-from-scratch operations, not regressions). DO still raise anything that breaks the next local run on the real data dir, corrupts numbers, or is a present-tense correctness / UX / a11y bug. Verify any runtime-behaviour claim against the actual code before filing it.
@@ -94,10 +94,10 @@ Note: `/codex:...` are plugin slash commands and cannot be model-invoked directl
 
 If Codex is unavailable (e.g. usage limit), fail loudly — do not substitute or skip.
 
-When all reviews are complete, spawn a new opus agent to `/auto-task:synthesize` the responses using the following arguments:
+When all reviews are complete, spawn a new opus agent to `/at:synthesize` the responses using the following arguments:
 
-- prompt: [derive from /auto-task:review-code]
-- perspective 1: findings produced by opus `/auto-task:review-code` subagent
+- prompt: [derive from /at:review-code]
+- perspective 1: findings produced by opus `/at:review-code` subagent
 - perspective 2: findings produced by codex:adversarial-review subagent
 
 Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's the routing token the Step 7.1 autofix fast-lane keys on, not prose.
@@ -106,7 +106,7 @@ Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's th
 
 Skip unless the change alters rendered output (layout, spacing, colour, typography, interaction states).
 
-Run `/auto-task:review-design <task-path>` **execute on the main thread** — do not wrap it in a subagent: it boots the app (`just serve test`) and drives the chrome-devtools MCP with real input, which a subagent can't do reliably. It is flag-only and emits findings in `/auto-task:review-code`'s format. `just serve test` binds random free ports and prints the app/api URLs, so it (and `just check-all`'s e2e suite) is safe to run from parallel auto-task worktrees without port collisions — navigate to the URL it prints, not a fixed port.
+Run `/at:review-design <task-path>` **execute on the main thread** — do not wrap it in a subagent: it boots the app (`just serve test`) and drives the chrome-devtools MCP with real input, which a subagent can't do reliably. It is flag-only and emits findings in `/at:review-code`'s format. `just serve test` binds random free ports and prints the app/api URLs, so it (and `just check-all`'s e2e suite) is safe to run from parallel auto-task worktrees without port collisions — navigate to the URL it prints, not a fixed port.
 
 Re-output its findings in the main agent so the user can see them, and carry them into Step 7 alongside the code review findings.
 
@@ -140,14 +140,14 @@ Render triage results as a table:
 
 ### 7.2: Fix
 
-If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new opus subagent that fixes them following `/auto-task:impl-task`. Review the fix (using a single codex reviewer only — `/codex:adversarial-review`, scoped to the fix commits via `--base`; plain `/codex:review` rejects custom focus text) and address feedback as outlined in Step 5 and 7, respectively.
+If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new opus subagent that fixes them following `/at:impl-task`. Review the fix (using a single codex reviewer only — `/codex:adversarial-review`, scoped to the fix commits via `--base`; plain `/codex:review` rejects custom focus text) and address feedback as outlined in Step 5 and 7, respectively.
 
 In `--lite` mode, review the fix with a single opus reviewer (not codex), consistent with Step 5. Skip the fix-review entirely when every accepted fix is trivial/mechanical (Minor/Nit, no logic change) — `just check-all` plus the Step 8 task review cover those.
 
 ## Step 8: Review Task
 
 0. Sync: rebase the worktree branch onto latest main (`git -C ~/github/tad pull --rebase origin main`, then `git rebase main` from the worktree; on conflicts resolve guided by the task/plan, then re-run `just check-all`) — surfaces integration drift here instead of at ship time.
-1. Review: In a new opus subagent, review that the task is complete via `/auto-task:review-task`.
+1. Review: In a new opus subagent, review that the task is complete via `/at:review-task`.
 2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 7.
 3. Second review: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 9.
 
@@ -190,6 +190,6 @@ Then offer the user the following options:
 - Open the worktree in VS code
 - Open the worktree in a new tmux pane
 - Both of the above
-- Run `/auto-task:ship-task`
+- Run `/at:ship-task`
 
 Do not proceed without explicit user approval. If the user declines, stop here.

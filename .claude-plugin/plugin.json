@@ -1,7 +1,7 @@
 {
-  "name": "auto-task",
-  "description": "A set of AI-agent skills that automate a large slice of the software development lifecycle — planning, implementation, review, and shipping.",
-  "version": "0.1.1",
+  "name": "at",
+  "description": "A set of AI-agent skills to automate a large slice of the software development lifecycle including planning, implementation, review, and shipping.",
+  "version": "0.1.2",
   "author": {
     "name": "Patric Fornasier"
   }

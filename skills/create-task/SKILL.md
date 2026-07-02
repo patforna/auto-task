@@ -7,7 +7,7 @@ description: Use this skill to crystallise and scope an ongoing conversation int
 
 ## Usage
 
-`/auto-task:create-task [further user instructions]`
+`/at:create-task [further user instructions]`
 
 ## Goal
 
@@ -88,7 +88,7 @@ TODO: Add notes
 
 **Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `~/github/tad-tasks/attachments/{NNN}/` and reference it from the task file — don't drop it as a top-level sibling. See the tad-tasks README § Attachments.
 
-**Committing:** task files live in the tad-tasks repo, so commit them there, never in tad. `just task-status` and `just task-attach` auto-commit; for a content save (the filled task, before any status bump) use `just task-commit "<subject> (task/{NNN})" ~/github/tad-tasks/{NNN}-{slug}.md`. Once a task reaches `/auto-task:clarify-task` (Step 6), its `ready-for-dev` bump commits the filled body for you.
+**Committing:** task files live in the tad-tasks repo, so commit them there, never in tad. `just task-status` and `just task-attach` auto-commit; for a content save (the filled task, before any status bump) use `just task-commit "<subject> (task/{NNN})" ~/github/tad-tasks/{NNN}-{slug}.md`. Once a task reaches `/at:clarify-task` (Step 6), its `ready-for-dev` bump commits the filled body for you.
 
 ## Step 3: Write the Task
 
@@ -249,7 +249,7 @@ If you decomposed into multiple tasks, run the pass on each.
 
 ## Step 6: Clarify
 
-Run `/auto-task:clarify-task <task-path>` in a subagent to validate whether the task would be clear to a new agent. If not, address the feedback and keep repeating until no major gaps are left.
+Run `/at:clarify-task <task-path>` in a subagent to validate whether the task would be clear to a new agent. If not, address the feedback and keep repeating until no major gaps are left.
 
 If clarifying an epic, make sure that the epic task and all sub-tasks are clarified.
 

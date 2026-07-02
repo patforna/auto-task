@@ -11,7 +11,7 @@ Combine N independent perspectives on a prompt into a single synthesis without f
 
 ## Usage
 
-`/auto-task:synthesize <prompt> <perspective-1> <p-2> [p-...]`
+`/at:synthesize <prompt> <perspective-1> <p-2> [p-...]`
 
 ## Instructions for the Merger
 

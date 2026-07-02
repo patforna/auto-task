@@ -7,7 +7,7 @@ description: Verify that a task has been completed according to its intent and c
 
 ## Usage
 
-`/auto-task:review-task <task-path> [further user instructions]`
+`/at:review-task <task-path> [further user instructions]`
 
 ## Goal
 

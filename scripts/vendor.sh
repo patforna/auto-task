@@ -4,7 +4,7 @@
 # These three skills live canonically in core-skills and are vendored here so the
 # auto-task plugin stays self-contained. Run this after editing any of them in
 # core-skills. The vendored copies differ from the originals ONLY in that
-# `/core-skills:` refs are rewritten to `/auto-task:`. See CLAUDE.md for the invariant.
+# `/core-skills:` refs are rewritten to `/at:`. See CLAUDE.md for the invariant.
 #
 # Usage: scripts/vendor.sh [path-to-core-skills]   (default: ~/github/core-skills)
 set -euo pipefail
@@ -21,7 +21,7 @@ for s in "${SKILLS[@]}"; do
   rm -rf "$HERE/skills/$s"
   cp -R "$src" "$HERE/skills/$s"
   # vendored copies namespace their internal refs to this plugin:
-  find "$HERE/skills/$s" -name '*.md' -exec sed -i '' 's|/core-skills:|/auto-task:|g' {} +
+  find "$HERE/skills/$s" -name '*.md' -exec sed -i '' 's|/core-skills:|/at:|g' {} +
   echo "vendored $s"
 done
 
@@ -31,5 +31,5 @@ Re-vendored from core-skills. To make it take effect:
   1. Bump the version in .claude-plugin/plugin.json and .claude-plugin/marketplace.json
   2. git commit + push
   3. Refresh the installed plugin:
-     claude plugin marketplace update auto-task && claude plugin update auto-task@auto-task
+     claude plugin marketplace update auto-task && claude plugin update at@auto-task
 EOF
