@@ -21,7 +21,9 @@ This skill is typically run as part of a larger workflow:
 create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (in the sibling tad-tasks repo, `~/github/tad-tasks/`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
+
+Task files live in the project's task store — `tasks/` in the repo by default; `.claude/auto-task.md` (project bindings, see `/at:create-task`) can override this and other defaults. Read the bindings file if it exists.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -54,4 +56,4 @@ Say whether the review passed or, if not, present a summary of your findings and
 
 ## Step 5: Wrap Up
 
-Once there are no findings left, or the user has asked you to proceed, remember to update the task status by running `just task-status <task-file> ready-for-signoff` (it commits the bump in the tad-tasks repo).
+Once there are no findings left, or the user has asked you to proceed, remember to set the task status to `ready-for-signoff` — by default, edit the frontmatter `status:` field and commit with a `(task/NNN)` subject suffix; if the project bindings define a task-status command, use that instead.

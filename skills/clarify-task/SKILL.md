@@ -21,7 +21,9 @@ This skill is typically run as part of a larger workflow:
 create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in the `tad-tasks` repo at `~/github/tad-tasks/`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
+
+Task files live in the project's task store — `tasks/` in the repo by default; `.claude/auto-task.md` (project bindings, see `/at:create-task`) can override this and other defaults. Read the bindings file if it exists.
 
 ## Step 1: Understand the Task
 
@@ -68,7 +70,4 @@ Spawn a sub-agent to re-run Steps 1–2 on the updated task and report any remai
 
 ## Step 6: Mark Ready
 
-Finally, update the task status by running `just task-status <task-file> ready-for-dev`.
-
-```text
-```
+Finally, set the task status to `ready-for-dev` — by default, edit the frontmatter `status:` field and commit with a `(task/NNN)` subject suffix; if the project bindings define a task-status command, use that instead.

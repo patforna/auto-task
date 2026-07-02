@@ -29,7 +29,7 @@ Expanded prompt:
 
 """ Please /at:plan-task 054 but don't write to the task file.
 
-Skill references: === BEGIN plan-task SKILL.md === [full content of ~/github/tad/.claude/skills/plan-task/SKILL.md] === END plan-task SKILL.md === """
+Skill references: === BEGIN plan-task SKILL.md === [full content of the plan-task skill's SKILL.md — resolve the skill wherever it is installed, e.g. the plugin cache under `~/.claude/plugins/cache/` or the project's `.claude/skills/`] === END plan-task SKILL.md === """
 
 ## Step 2: Append Anti-Sycophancy Block
 

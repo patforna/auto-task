@@ -21,7 +21,13 @@ This skill is typically run as part of a larger workflow:
 create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in `/tasks`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
+
+## Task Store and Project Bindings
+
+This plugin ships an opinionated default task convention: markdown task files in a `tasks/` directory at the repo root, managed by the agent with plain file I/O — no extra tooling required.
+
+A project can override the defaults in `.claude/auto-task.md` at the repo root ("project bindings") — e.g. a different task location (even a separate repo), helper recipes for creating/committing tasks, a verification command, worktree setup, standing review context. **If the bindings file exists, read it first; it wins over the defaults in this plugin's skills.**
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -29,7 +35,6 @@ As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's 
 
 These rules govern both how you gather intent and write the task. Internalise and follow them throughout.
 
-- Don't pattern match on existing task files created before May 2026.
 - Be maximally succinct. Capture the user's intent with the fewest words that remove ambiguity. Task content length obviously follows complexity but don't pad.
 - When a task has an authoritative attachment (design brief, spec, report), don't restate its content. Only capture decisions or information that's additional to the attachment.
 - Don't spell out what a capable agent infers from the repo - established conventions (e.g. fail-fast), the single obvious mechanism for a change, enum values readable from a table. Test per line: would two reasonable agents build the same thing without it?
@@ -52,7 +57,7 @@ These rules govern both how you gather intent and write the task. Internalise an
 
 ## Step 2: Create Task File
 
-Create the task file using `just create-task <title> [<type>]`. Use the table below to decide on type:
+Create the task file — by default at `tasks/{NNN}-{slug}.md` in the repo, where `{NNN}` is the next task number (max existing + 1, zero-padded to 3 digits) and `{slug}` is a short kebab-case form of the title. If the project bindings define a create-task command, use that instead. Use the table below to decide on type:
 
 | Type       | Meaning                                     |
 | ---------- | ------------------------------------------- |
@@ -63,7 +68,7 @@ Create the task file using `just create-task <title> [<type>]`. Use the table be
 | `research` | Research a topic or issue                   |
 | `other`    | Anything else                               |
 
-This creates a file at `~/github/tad-tasks/{NNN}-{slug}.md` (the sibling tad-tasks repo) similar to the one below:
+The file looks like this:
 
 ```markdown
 ---
@@ -86,9 +91,11 @@ TODO: Add ACs
 TODO: Add notes
 ```
 
-**Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `~/github/tad-tasks/attachments/{NNN}/` and reference it from the task file — don't drop it as a top-level sibling. See the tad-tasks README § Attachments.
+**Task states:** the frontmatter `status` progresses `new` → `ready-for-dev` (end of clarify) → `in-dev` (start of impl) → `ready-for-signoff` (end of task review) → `done` (ship). Off-ramp states: `rejected` (investigated and declined), `later` (consciously postponed).
 
-**Committing:** task files live in the tad-tasks repo, so commit them there, never in tad. `just task-status` and `just task-attach` auto-commit; for a content save (the filled task, before any status bump) use `just task-commit "<subject> (task/{NNN})" ~/github/tad-tasks/{NNN}-{slug}.md`. Once a task reaches `/at:clarify-task` (Step 6), its `ready-for-dev` bump commits the filled body for you.
+**Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `tasks/attachments/{NNN}/` (next to the task files) and reference it from the task file — don't drop it as a top-level sibling.
+
+**Committing:** commit task-file changes with a `(task/{NNN})` subject suffix. If the bindings route tasks to a separate repo or provide commit recipes, follow those — task-file commits then land there, never in the code repo.
 
 ## Step 3: Write the Task
 
@@ -257,9 +264,9 @@ If clarifying an epic, make sure that the epic task and all sub-tasks are clarif
 
 Present the task(s) to the user for review. The user will provide feedback if applicable and initiate next steps.
 
-## Step 8: Offer a Feedback Snapshot
+## Step 8: Offer a Feedback Snapshot (Only If Bound)
 
-Before the user revises the task in Step 7, **offer** (per task, never auto-create) to snapshot the post-clarify file to `~/Drive/code/tad/create-task/feedback/YYYY-MM-DD-<task-slug>-before.md` (kept out of the repo so it doesn't travel with the skill). Convention: `~/Drive/code/tad/create-task/feedback/README.md`.
+Skip this step unless the project bindings define a feedback-snapshot location. If they do, **offer** (per task, never auto-create) to snapshot the post-clarify file there as `YYYY-MM-DD-<task-slug>-before.md` — kept out of the repo so it doesn't travel with the skill.
 
 ## Appendix: Creating Epics
 

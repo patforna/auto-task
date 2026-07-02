@@ -18,4 +18,12 @@ self-contained). Then bump the version in `.claude-plugin/plugin.json` +
 
 This plugin is self-contained: its skills invoke each other via the `/at:<skill>`
 namespace (never bare `/<skill>`), so they resolve regardless of what else is installed. The
-only external dependency is the `codex` plugin (`/codex:*`).
+only external reference is the `codex` plugin (`/codex:*`), which is **optional** — skills
+must degrade gracefully (documented fallback) when it is not installed.
+
+## Portability
+
+Skills must stay project-agnostic: generic instructions with sensible defaults, and any
+project-specific behaviour sourced from the consuming repo's `.claude/auto-task.md`
+("project bindings" — see README). Never hardcode a specific project's paths, recipes, or
+context into a skill body.

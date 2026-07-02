@@ -21,7 +21,9 @@ This skill is typically run as part of a larger workflow:
 create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in the `tad-tasks` repo at `~/github/tad-tasks/`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
+
+Task files live in the project's task store — `tasks/` in the repo by default; `.claude/auto-task.md` (project bindings, see `/at:create-task`) can override this and other defaults. Read the bindings file if it exists.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -40,7 +42,7 @@ These rules govern how to execute the implementation. Internalise and follow the
 
 If the task does not contain an `Implementation plan` section (usually set by `/at:plan-task`), stop, flag it to the user and ask how to proceed.
 
-Otherwise, update the task status by running `just task-status <task-file> in-dev`.
+Otherwise, set the task status to `in-dev` — by default, edit the frontmatter `status:` field and commit with a `(task/NNN)` subject suffix; if the project bindings define a task-status command, use that instead.
 
 ## Step 2: Build Context
 

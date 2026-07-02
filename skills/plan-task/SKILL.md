@@ -21,7 +21,9 @@ This skill is typically run as part of a larger workflow:
 create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
 ```
 
-As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file (stored in the `tad-tasks` repo at `~/github/tad-tasks/`) plus repo state carry everything the next agent needs.
+As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
+
+Task files live in the project's task store — `tasks/` in the repo by default; `.claude/auto-task.md` (project bindings, see `/at:create-task`) can override this and other defaults. Read the bindings file if it exists.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -44,7 +46,7 @@ These rules govern what belongs in the plan and how to write it. Internalise and
 Real failures observed in past plans. Don't repeat:
 
 - Don't add "write unit tests" or similar steps
-- Don't add "run just check-all before commit" or similar steps
+- Don't add "run the verification command before commit" or similar steps
 
 ## Step 1: Check Task Readiness
 

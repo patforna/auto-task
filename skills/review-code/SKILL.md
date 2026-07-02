@@ -140,9 +140,10 @@ End with a machine-readable tally for the caller:
 
 No findings — including no autofix and no below-threshold — is a complete, valid review. Say so in one line. Never invent findings to look thorough.
 
-## TAD Appendix
+## Lane Discipline
 
-Portable core above. In the TAD repo also:
+Stay in the code review lane: review code quality and change risk only. Do not re-check acceptance criteria or task completion — that is `/at:review-task`. Intent lives in the task file (in the project's task store — `tasks/` by default), never a PR description.
 
-- Look for **silent corruption**: unguarded division and `NaN`-leaking paths (they produce wrong numbers, not errors). Guarded division must yield `None`, not `NaN` (`pl.when(x > 0)` in Polars; `numerator / denom if denom > 0 else None` in plain Python). Flag these Critical/Major — this overrides the default severity calibration.
-- Stay in the code review lane: review code quality and change risk only. Do not re-check acceptance criteria or task completion — that is `/at:review-task`. Intent lives in the task file (in the `tad-tasks` repo at `~/github/tad-tasks/`), never a PR description.
+## Project Appendix
+
+Portable core above. If the consuming repo has a `.claude/auto-task.md` (project bindings) with a review section, read it and apply its repo-specific rules on top — standing review context, domain-specific corruption traps, severity overrides. Bindings rules extend the core; they never relax the do-not-flag list or the autofix bar.
