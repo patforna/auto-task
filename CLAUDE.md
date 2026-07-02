@@ -7,19 +7,11 @@
 edit them in this repo — edits here will be overwritten on the next re-vendor and silently
 diverge from core-skills.
 
-To change one of them: edit it in `core-skills`, then re-vendor here. The vendored copies
-differ from the core-skills originals **only** in that `/core-skills:` refs are rewritten to
-`/auto-task:` (keeping this plugin self-contained), so re-vendoring is:
-
-```sh
-for s in panel synthesize tdd; do
-  rm -rf skills/$s && cp -R ~/github/core-skills/skills/$s skills/$s
-  find skills/$s -name '*.md' -exec sed -i '' 's|/core-skills:|/auto-task:|g' {} +
-done
-```
-
-Then bump the version in `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json`
-and refresh the installed plugin:
+To change one of them: edit it in `core-skills`, then re-vendor here by running
+`scripts/vendor.sh`. It copies the three dirs and rewrites `/core-skills:` → `/auto-task:` —
+the **only** way the vendored copies differ from the originals (keeping this plugin
+self-contained). Then bump the version in `.claude-plugin/plugin.json` +
+`.claude-plugin/marketplace.json` and refresh the installed plugin:
 `claude plugin marketplace update auto-task && claude plugin update auto-task@auto-task`.
 
 ## Internal Skill References
