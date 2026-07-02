@@ -21,14 +21,16 @@ Then, in any git repo:
 
 No server, no UI, no lock-in: tasks are plain markdown in your repo.
 
+Expect a full `/at:auto-task` run to take 20–60 minutes and spend real tokens — it spawns a planning panel, an implementer, parallel reviewers, and re-reviews across two model families. `--lite` mode (single-pass plan, single reviewer, single task review) roughly halves that.
+
 ## The Workflow
 
 ```text
 create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
-                            └───────────────────── auto-task ─────────────────────────────┘
+                            └────────────────── auto-task ───────────────────┘
 ```
 
-Each skill also runs standalone; `/at:auto-task` orchestrates the middle of the pipeline:
+Each skill also runs standalone; `/at:auto-task` orchestrates the middle of the pipeline and ends at a human ship gate (shipping is one of the options it offers you):
 
 | Step            | What happens                                                                                                                                                                     |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -42,6 +44,8 @@ Each skill also runs standalone; `/at:auto-task` orchestrates the middle of the 
 | **Ship gate**   | The workflow stops and reports what was found, fixed, rejected and why. You decide whether it ships.                                                                             |
 
 Why multiple models? Different model families have different blind spots. In practice the adversarial pass regularly catches real bugs the first reviewer missed — and the fix-review catches bugs in the fixes.
+
+See [`examples/sample-run.md`](examples/sample-run.md) for the verbatim report of a real run on defaults — including the triage decisions and the ship gate.
 
 ## Tasks
 
@@ -86,7 +90,7 @@ Precedence: plugin defaults ← project bindings ← local overrides. Copy [`exa
 | Verification       | Auto-discover (a `just`/`make` check recipe, CI, tests)    | `npm run check`                                          |
 | Worktrees          | `../<repo>.worktrees/NNN-<slug>` + dependency install      | A pinned path + a `worktree-init` script                 |
 | Review             | No standing context                                        | Focus text appended to adversarial reviews; domain rules |
-| Design review      | None (fails loudly on UI changes without one)              | A fixture-backed serve command                           |
+| Design review      | Auto-discover a fixture-backed server, else fail loudly    | A fixture-backed serve command                           |
 | Models             | Claude (strongest) + Codex panel; Codex adversarial review | Different panelists, implementer, or reviewer            |
 | Conventions        | Repo's own commit style + `(task/NNN)` subject suffix      | Conventional Commits; merge commits instead of squash    |
 | Transcript capture | Skipped                                                    | A capture command + out-of-repo destination              |
@@ -95,7 +99,7 @@ Precedence: plugin defaults ← project bindings ← local overrides. Copy [`exa
 ## Requirements and Integrations
 
 - **Claude Code** — the only hard requirement. Skills are namespaced `/at:` and invoked explicitly; nothing auto-triggers.
-- **Codex plugin (optional)** — if [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) is installed, planning and adversarial review use Codex as the second model family. Without it, a second fresh-context Claude subagent takes that role (weaker: same family, same blind spots).
+- **Codex plugin (optional)** — if [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) is installed (`/plugin marketplace add openai/codex-plugin-cc`, then install `codex`), planning and adversarial review use Codex as the second model family. Without it, a second fresh-context Claude subagent takes that role (weaker: same family, same blind spots).
 - **chrome-devtools MCP (optional)** — used by `/at:review-design` to verify UI changes against a spec with real browser input.
 
 This plugin is self-contained: it vendors its generic dependencies (`panel`, `synthesize`, `tdd`) from [core-skills](https://github.com/patforna/core-skills), so nothing else needs to be installed.
@@ -114,7 +118,11 @@ Workflow: `auto-task`, `create-task`, `clarify-task`, `plan-task`, `impl-task`, 
 
 **Can I use just parts of it?** Yes. Every skill runs standalone — `/at:review-code` on any diff, `/at:create-task` without ever running the orchestrator.
 
-**Where did this come from?** Six months of full-time agentic development on a real production codebase, shaped by XP (small tasks, TDD, continuous integration) and a review protocol grounded in the code-review research literature.
+**Where did this come from?** Six months of full-time agentic development on a real quant-research codebase, shaped by XP (small tasks, TDD, continuous integration) and a review protocol distilled from the code-review research literature.
+
+## Status
+
+Early and opinionated (pre-1.0), extracted from daily personal use. Shared as-is; issues and feedback welcome. See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

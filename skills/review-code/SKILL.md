@@ -3,7 +3,7 @@ name: review-code
 description: Use to review a diff for correctness, design, security, and convention conformance. High-signal, read-only, severity-gated, with an autofix lane for mechanically-certain trivia. Default review step in /at:auto-task.
 ---
 
-<!-- Based on: docs/research/2026-05-16-code-review-literature-and-sota.md. This file is the distilled instruction, not the bibliography. -->
+<!-- Distilled from a review of the code-review research literature (May 2026). This file is the distilled instruction, not the bibliography. -->
 
 # Code Review
 
@@ -105,7 +105,7 @@ Gate: block on any Critical/Major in correctness, security, or data-safety. Ever
 
 Eligible: typos in comments/docstrings/strings, spelling fixes per the repo's documented language convention (e.g. British vs American), a symbol name left stale in a comment after a rename, a duplicated import that is provably unused. Not eligible: argument reordering or any behaviour-changing edit; a missing null guard (where/whether to guard is judgement); clarity renames; any design change; a dead-import or dead-code claim justified only from the diff — a re-export, `__all__`, or string reference defeats diff-local certainty.
 
-**`Autofix:` is the routing token.** Step 6.1 keys on the exact per-finding `Autofix:` line — it is per-finding, not a section header, so it survives `/at:synthesize` merging multiple reviewers' outputs. The bypass applies to **Minor/Nit only**. A Major or Critical finding may carry the exact fix on its `Fix:` line, but it stays in the triage table and gates the human ship-gate — it never bypasses it.
+**`Autofix:` is the routing token.** The triage step in `/at:auto-task` keys on the exact per-finding `Autofix:` line — it is per-finding, not a section header, so it survives `/at:synthesize` merging multiple reviewers' outputs. The bypass applies to **Minor/Nit only**. A Major or Critical finding may carry the exact fix on its `Fix:` line, but it stays in the triage table and gates the human ship-gate — it never bypasses it.
 
 ## Output
 
