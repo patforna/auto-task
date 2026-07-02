@@ -4,14 +4,14 @@
     "name": "Patric Fornasier"
   },
   "metadata": {
-    "description": "AI-agent skills to automate a large slice of the software development lifecycle.",
+    "description": "An opinionated set of AI-agent skills to automate a large slice of the software development lifecycle including planning, implementation, review, and shipping.",
     "version": "0.1.2"
   },
   "plugins": [
     {
       "name": "at",
       "source": "./",
-      "description": "A set of AI-agent skills to automate a large slice of the software development lifecycle including planning, implementation, review, and shipping."
+      "description": "An opinionated set of AI-agent skills to automate a large slice of the software development lifecycle including planning, implementation, review, and shipping."
     }
   ]
 }
