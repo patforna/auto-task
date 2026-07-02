@@ -1,6 +1,6 @@
 {
   "name": "auto-task",
-  "description": "Opinionated end-to-end agentic task workflow (plan, implement, review, ship) with vendored panel/synthesize/tdd. Self-contained.",
+  "description": "A set of AI-agent skills that automate a large slice of the software development lifecycle — planning, implementation, review, and shipping.",
   "version": "0.1.1",
   "author": {
     "name": "Patric Fornasier"

@@ -4,14 +4,14 @@
     "name": "Patric Fornasier"
   },
   "metadata": {
-    "description": "Patric's auto-task workflow",
+    "description": "AI-agent skills that automate a large slice of the software development lifecycle.",
     "version": "0.1.1"
   },
   "plugins": [
     {
       "name": "auto-task",
       "source": "./",
-      "description": "Opinionated end-to-end agentic task workflow."
+      "description": "A set of AI-agent skills that automate a large slice of the software development lifecycle — planning, implementation, review, and shipping."
     }
   ]
 }
