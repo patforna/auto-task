@@ -1,6 +1,6 @@
 ---
 name: panel
-description: Use to get independent perspectives on a topic from multiple models (opus + codex). Use with /at:synthesize to merge.
+description: Use to get independent perspectives on a topic from multiple models (fable + codex). Use with /at:synthesize to merge.
 ---
 
 # Panel
@@ -17,7 +17,7 @@ Prompt is mandatory — if missing, fail loudly; don't infer.
 
 ## Goal
 
-Get independent perspectives on a topic from multiple models (opus + codex).
+Get independent perspectives on a topic from multiple models (fable + codex).
 
 ## Step 1: Expand Skill References
 
@@ -39,7 +39,7 @@ Append the block below to the prompt:
 
 ## Step 3: Dispatch
 
-Spawn a Codex (via `codex:codex-rescue`) and an Opus subagent in parallel and pass through the prompt.
+Spawn a Codex (via `codex:codex-rescue`) and a Fable subagent in parallel and pass through the prompt.
 
 If Codex is unavailable (e.g. usage limit), fail loudly — do not substitute or skip.
 
@@ -47,6 +47,6 @@ Write the responses to `/tmp/panel-<timestamp>-<slot>.md`.
 
 ## Step 4: Deliver
 
-Present both responses verbatim, each directly attributed to its model (Codex / Opus), including the paths to the raw responses.
+Present both responses verbatim, each directly attributed to its model (Codex / Fable), including the paths to the raw responses.
 
 Do not synthesise, reconcile, or edit.
