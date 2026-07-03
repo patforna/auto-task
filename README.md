@@ -6,6 +6,10 @@ Auto-task drives a well-defined task from intent to squash-merged commit with mi
 
 Think cruise control, not Full Self-Driving: you own what to build and whether it ships; the workflow owns the distance in between.
 
+![A real /at:auto-task run at 14x speed](docs/wordwise-demo.gif)
+
+*A real, unedited run at 14× speed — plan panel, TDD implementation, adversarial review, triage, ship gate. Full recording: [`docs/wordwise-demo.cast`](docs/wordwise-demo.cast); final report: [`examples/sample-run.md`](examples/sample-run.md).*
+
 ## Quick Start
 
 ```text
@@ -79,10 +83,10 @@ Add a stats command that reads a file of newline-separated numbers and prints su
 
 Every default above can be overridden per project — in markdown, not config syntax, because bindings are instructions the agent reads (several are prose, like standing review context), not values code parses.
 
-- **`.claude/auto-task.md`** — project bindings. Committed, shared by everyone in the repo.
-- **`.claude/auto-task.local.md`** — personal overrides. Gitignored; wins over the project file on conflict.
+- **`.claude/auto-task.config.md`** — project bindings. Committed, shared by everyone in the repo.
+- **`.claude/auto-task.config.local.md`** — personal overrides. Gitignored; wins over the project file on conflict.
 
-Precedence: plugin defaults ← project bindings ← local overrides. Copy [`examples/auto-task.md`](examples/auto-task.md) into your repo and edit — it lists every recognised section with its default:
+Precedence: plugin defaults ← project bindings ← local overrides. Copy [`examples/auto-task.config.md`](examples/auto-task.config.md) into your repo and edit — it lists every recognised section with its default:
 
 | Binding            | Default                                                    | Override examples                                        |
 | ------------------ | ---------------------------------------------------------- | -------------------------------------------------------- |

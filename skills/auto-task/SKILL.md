@@ -27,7 +27,7 @@ Workflow:
     create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
                                 └───────────────────────── auto-task ─────────────────────────┘
 
-Task files live in the project's task store — `tasks/` in the repo by default. Project bindings can override this and every other default below: verification command, worktree location and init, standing review context, design-review serve command, model choices, commit conventions, transcript capture. Bindings live in `.claude/auto-task.md` (project, committed) and `.claude/auto-task.local.md` (personal overrides — win on conflict); see `/at:create-task` § Task Store and Project Bindings. **Read them first if they exist.** Pass their paths to every subagent you spawn so they read them too.
+Task files live in the project's task store — `tasks/` in the repo by default. Project bindings can override this and every other default below: verification command, worktree location and init, standing review context, design-review serve command, model choices, commit conventions, transcript capture. Bindings live in `.claude/auto-task.config.md` (project, committed) and `.claude/auto-task.config.local.md` (personal overrides — win on conflict); see `/at:create-task` § Task Store and Project Bindings. **Read them first if they exist.** Pass their paths to every subagent you spawn so they read them too.
 
 `main` throughout this skill means the repo's default branch — substitute yours (e.g. `master`) if it differs.
 

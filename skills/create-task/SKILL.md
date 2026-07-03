@@ -29,10 +29,10 @@ This plugin ships an opinionated default task convention: markdown task files in
 
 Projects override the defaults via **bindings** — plain-markdown files the agent reads, not machine-parsed config:
 
-- `.claude/auto-task.md` — project bindings, committed, shared by everyone working in the repo.
-- `.claude/auto-task.local.md` — personal overrides, gitignored; wins over the project file on conflict.
+- `.claude/auto-task.config.md` — project bindings, committed, shared by everyone working in the repo.
+- `.claude/auto-task.config.local.md` — personal overrides, gitignored; wins over the project file on conflict.
 
-Precedence: plugin defaults ← project bindings ← local bindings. **If either file exists, read it before proceeding.** Recognised sections (all optional): Task Store, Verification, Worktrees, Review, Design Review, Models, Conventions, Transcript Capture, Feedback Snapshots — the plugin's `examples/auto-task.md` is a copy-paste template with each section's default spelled out.
+Precedence: plugin defaults ← project bindings ← local bindings. **If either file exists, read it before proceeding.** Recognised sections (all optional): Task Store, Verification, Worktrees, Review, Design Review, Models, Conventions, Transcript Capture, Feedback Snapshots — the plugin's `examples/auto-task.config.md` is a copy-paste template with each section's default spelled out.
 
 ## Guidance (DO NOT IGNORE!)
 

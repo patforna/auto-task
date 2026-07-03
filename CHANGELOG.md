@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 — 2026-07-03
+
+- Renamed the bindings files to make their role obvious: `.claude/auto-task.config.md` (project) and `.claude/auto-task.config.local.md` (personal); template is now `examples/auto-task.config.md`.
+- Demo GIF + full asciinema cast of a real run embedded in the README.
+
 ## 0.3.0 — 2026-07-02
 
 - Bindings now layer: plugin defaults ← `.claude/auto-task.md` (project, committed) ← `.claude/auto-task.local.md` (personal, gitignored).
