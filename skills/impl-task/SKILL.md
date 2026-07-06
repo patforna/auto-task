@@ -23,7 +23,7 @@ create-task → clarify-task → plan-task → impl-task → review-code → rev
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
 
-Task files live in the project's task store — `tasks/` in the repo by default. Project bindings can override this and other defaults: read `.claude/auto-task.config.md` (project, committed) and `.claude/auto-task.config.local.md` (personal overrides — win on conflict) if they exist. See `/at:create-task` § Task Store and Project Bindings.
+Task files live in the project's task store — `tasks/` in the repo by default. Project config can override this and other defaults: read `.claude/auto-task.config.md` (project, committed) and `.claude/auto-task.config.local.md` (personal overrides — win on conflict) if they exist. See `/at:create-task` § Task Store and Project Config.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -32,7 +32,7 @@ Task files live in the project's task store — `tasks/` in the repo by default.
 These rules govern how to execute the implementation. Internalise and follow them throughout.
 
 - Commit early and often.
-- Follow the repo's existing commit conventions. Append the task-link suffix to subjects (default `(task/NNN)`; bindings can change or drop it) so commits trace back to the task.
+- Follow the repo's existing commit conventions. Append the task-link suffix to subjects (default `(task/NNN)`; config can change or drop it) so commits trace back to the task.
 - Look for and internalise existing style, patterns, conventions. Don't deviate unless the plan explicitly asks for it.
 - Maintain the testing pyramid. Test at the lowest possible level. Few, mostly happy-path tests at the top of the pyramid (e2e, component).
 - Do not use I/O, randomness, or real date/time in unit tests.
@@ -42,7 +42,7 @@ These rules govern how to execute the implementation. Internalise and follow the
 
 If the task does not contain an `Implementation plan` section (usually set by `/at:plan-task`), stop, flag it to the user and ask how to proceed.
 
-Otherwise, set the task status to `in-dev` — by default, edit the frontmatter `status:` field and commit with a `(task/NNN)` subject suffix; if the project bindings define a task-status command, use that instead.
+Otherwise, set the task status to `in-dev` — by default, edit the frontmatter `status:` field and commit with a `(task/NNN)` subject suffix; if the project config defines a task-status command, use that instead.
 
 ## Step 2: Build Context
 

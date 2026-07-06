@@ -1,6 +1,6 @@
 # Sample Run
 
-The verbatim final report of a real `/at:auto-task` run (full mode, no bindings — pure defaults) on a small TypeScript library the workflow had never seen. The task: add a stats CLI (`count`/`median`/`p90`) with behavioural acceptance criteria.
+The verbatim final report of a real `/at:auto-task` run (full mode, no config — pure defaults) on a small TypeScript library the workflow had never seen. The task: add a stats CLI (`count`/`median`/`p90`) with behavioural acceptance criteria.
 
 Worth noticing:
 

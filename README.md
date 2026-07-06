@@ -30,11 +30,15 @@ Expect a full `/at:auto-task` run to take 20–60 minutes and spend real tokens 
 ## The Workflow
 
 ```text
-create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
-                            └────────────────── auto-task ───────────────────┘
+      SCOPE — human                  BUILD — agents, autonomous                 SHIP — human
+┌───────────────────────┐   ┌───────────────────────────────────────────┐   ┌──────────────────┐
+│ /at:create-task       │ → │ /at:auto-task                             │ → │ ship gate:       │
+│ capture intent;       │   │ plan (two-model panel) → implement (TDD)  │   │ review report,   │
+│ clarify runs inside   │   │ → dual review → triage/fix → verify ACs   │   │ /at:ship-task    │
+└───────────────────────┘   └───────────────────────────────────────────┘   └──────────────────┘
 ```
 
-Each skill also runs standalone; `/at:auto-task` orchestrates the middle of the pipeline and ends at a human ship gate (shipping is one of the options it offers you):
+Two human touchpoints bookend an autonomous middle. Seven skills underlie the pipeline (`create-task`, `clarify-task`, `plan-task`, `impl-task`, `review-code`, `review-task`, `ship-task`) — you rarely invoke the inner ones directly, but each runs standalone. Inside the build phase:
 
 | Step            | What happens                                                                                                                                                                     |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -79,16 +83,16 @@ Add a stats command that reads a file of newline-separated numbers and prints su
 - Types: `feat`, `design`, `tech`, `bug`, `research`, `other`.
 - Acceptance criteria are behavioural, specific, and testable — `/at:create-task` documents the full discipline, including epics.
 
-## Project Bindings
+## Project Config
 
-Every default above can be overridden per project — in markdown, not config syntax, because bindings are instructions the agent reads (several are prose, like standing review context), not values code parses.
+Every default above can be overridden per project — in markdown, not config syntax, because config entries are instructions the agent reads (several are prose, like standing review context), not values code parses.
 
-- **`.claude/auto-task.config.md`** — project bindings. Committed, shared by everyone in the repo.
+- **`.claude/auto-task.config.md`** — project config. Committed, shared by everyone in the repo.
 - **`.claude/auto-task.config.local.md`** — personal overrides. Gitignored; wins over the project file on conflict.
 
-Precedence: plugin defaults ← project bindings ← local overrides. Copy [`examples/auto-task.config.md`](examples/auto-task.config.md) into your repo and edit — it lists every recognised section with its default:
+Precedence: plugin defaults ← project config ← local overrides. Copy [`examples/auto-task.config.md`](examples/auto-task.config.md) into your repo and edit — it lists every recognised section with its default:
 
-| Binding            | Default                                                    | Override examples                                        |
+| Setting            | Default                                                    | Override examples                                        |
 | ------------------ | ---------------------------------------------------------- | -------------------------------------------------------- |
 | Task store         | `tasks/` in the repo, agent-managed                        | A separate sibling repo + helper recipes                 |
 | Verification       | Auto-discover (a `just`/`make` check recipe, CI, tests)    | `npm run check`                                          |
@@ -116,9 +120,9 @@ Workflow: `auto-task`, `create-task`, `clarify-task`, `plan-task`, `impl-task`, 
 
 **Why tasks and not specs?** A spec describes a system; a task describes a change — sized like 1–3 old-fashioned human-days, small enough to review honestly, big enough to matter. The task also outlives the chat: it's the only state that survives across sessions, so everything load-bearing must land in it.
 
-**Why markdown bindings and not TOML/JSON?** Nothing parses the bindings — an agent reads them. Several bindings are irreducibly prose (standing review context, domain review rules); the rest read better as one-line instructions than as string values quoted inside config syntax.
+**Why markdown config and not TOML/JSON?** Nothing parses the config — an agent reads it. Several entries are irreducibly prose (standing review context, domain review rules); the rest read better as one-line instructions than as string values quoted inside config syntax.
 
-**Do I need Codex?** No, but the multi-model review is materially better than single-family review — it's the part of this workflow that has most reliably caught real bugs. Any second model family can fill the role via the Models binding.
+**Do I need Codex?** No, but the multi-model review is materially better than single-family review — it's the part of this workflow that has most reliably caught real bugs. Any second model family can fill the role via the Models setting.
 
 **Can I use just parts of it?** Yes. Every skill runs standalone — `/at:review-code` on any diff, `/at:create-task` without ever running the orchestrator.
 

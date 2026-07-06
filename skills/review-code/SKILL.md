@@ -146,4 +146,4 @@ Stay in the code review lane: review code quality and change risk only. Do not r
 
 ## Project Appendix
 
-Portable core above. If the consuming repo has a `.claude/auto-task.config.md` (project bindings) with a review section, read it and apply its repo-specific rules on top — standing review context, domain-specific corruption traps, severity overrides. Bindings rules extend the core; they never relax the do-not-flag list or the autofix bar.
+Portable core above. If the consuming repo has a `.claude/auto-task.config.md` (project config) with a review section, read it and apply its repo-specific rules on top — standing review context, domain-specific corruption traps, severity overrides. Config rules extend the core; they never relax the do-not-flag list or the autofix bar.

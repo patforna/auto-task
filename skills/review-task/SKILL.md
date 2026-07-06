@@ -23,7 +23,7 @@ create-task → clarify-task → plan-task → impl-task → review-code → rev
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
 
-Task files live in the project's task store — `tasks/` in the repo by default. Project bindings can override this and other defaults: read `.claude/auto-task.config.md` (project, committed) and `.claude/auto-task.config.local.md` (personal overrides — win on conflict) if they exist. See `/at:create-task` § Task Store and Project Bindings.
+Task files live in the project's task store — `tasks/` in the repo by default. Project config can override this and other defaults: read `.claude/auto-task.config.md` (project, committed) and `.claude/auto-task.config.local.md` (personal overrides — win on conflict) if they exist. See `/at:create-task` § Task Store and Project Config.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -56,4 +56,4 @@ Say whether the review passed or, if not, present a summary of your findings and
 
 ## Step 5: Wrap Up
 
-Once there are no findings left, or the user has asked you to proceed, remember to set the task status to `ready-for-signoff` — by default, edit the frontmatter `status:` field and commit with a `(task/NNN)` subject suffix; if the project bindings define a task-status command, use that instead.
+Once there are no findings left, or the user has asked you to proceed, remember to set the task status to `ready-for-signoff` — by default, edit the frontmatter `status:` field and commit with a `(task/NNN)` subject suffix; if the project config defines a task-status command, use that instead.

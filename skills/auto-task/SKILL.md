@@ -27,7 +27,7 @@ Workflow:
     create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
                                 └───────────────────────── auto-task ─────────────────────────┘
 
-Task files live in the project's task store — `tasks/` in the repo by default. Project bindings can override this and every other default below: verification command, worktree location and init, standing review context, design-review serve command, model choices, commit conventions, transcript capture. Bindings live in `.claude/auto-task.config.md` (project, committed) and `.claude/auto-task.config.local.md` (personal overrides — win on conflict); see `/at:create-task` § Task Store and Project Bindings. **Read them first if they exist.** Pass their paths to every subagent you spawn so they read them too.
+Task files live in the project's task store — `tasks/` in the repo by default. Project config can override this and every other default below: verification command, worktree location and init, standing review context, design-review serve command, model choices, commit conventions, transcript capture. Config lives in `.claude/auto-task.config.md` (project, committed) and `.claude/auto-task.config.local.md` (personal overrides — win on conflict); see `/at:create-task` § Task Store and Project Config. **Read them first if they exist.** Pass their paths to every subagent you spawn so they read them too.
 
 `main` throughout this skill means the repo's default branch — substitute yours (e.g. `master`) if it differs.
 
@@ -55,22 +55,22 @@ Find the task and output its title and status. Bonus points for using figlet =)
 
 ## Step 2: Worktree
 
-Create a `task/NNN-<slug>` worktree. Default location is a sibling of the repo, `../<repo>.worktrees/NNN-<slug>`; the bindings may pin a different path:
+Create a `task/NNN-<slug>` worktree. Default location is a sibling of the repo, `../<repo>.worktrees/NNN-<slug>`; the config may pin a different path:
 
     git worktree add -b task/NNN-<slug> <worktree-path> main
     cd <worktree-path>
 
-Then initialise it: run the bindings' worktree-init command if defined; otherwise install the project's dependencies (a fresh worktree shares no installed deps with the primary) and copy over any gitignored files the app needs to run locally (e.g. `.env` — check `.env.example` and similar templates against the primary checkout).
+Then initialise it: run the config's worktree-init command if defined; otherwise install the project's dependencies (a fresh worktree shares no installed deps with the primary) and copy over any gitignored files the app needs to run locally (e.g. `.env` — check `.env.example` and similar templates against the primary checkout).
 
 Refuse to start if the branch already exists or the target worktree path is non-empty.
 
 All subsequent steps run inside the worktree. Pass the absolute worktree path explicitly to every subagent — their Read/Edit/Write tools must root at the worktree path, not the primary worktree.
 
-With the default in-repo task store, the task file is inside the worktree — pass `<task-path>` to subagents rooted at the worktree, and task-file edits (plan, status bumps) ride the task branch. If the bindings route tasks to a separate repo, the task file is **not** in the worktree: pass its absolute external path, and task-file edits commit there, independent of the worktree branch.
+With the default in-repo task store, the task file is inside the worktree — pass `<task-path>` to subagents rooted at the worktree, and task-file edits (plan, status bumps) ride the task branch. If the config routes tasks to a separate repo, the task file is **not** in the worktree: pass its absolute external path, and task-file edits commit there, independent of the worktree branch.
 
 ## Step 3: Plan
 
-Create an implementation plan. Important: Invoke /at:panel inline / do not wrap it in a subagent. Panel line-up per bindings § Models (default: strongest available Claude model + Codex).
+Create an implementation plan. Important: Invoke /at:panel inline / do not wrap it in a subagent. Panel line-up per config § Models (default: strongest available Claude model + Codex).
 
     /at:synthesize /at:panel /at:plan-task <task-path>
 
@@ -80,7 +80,7 @@ Unless there are major flags, write the plan to the task file.
 
 ## Step 4: Implement
 
-Spawn a new sub-agent (implementer model per bindings § Models; default: the strongest available model) and run:
+Spawn a new sub-agent (implementer model per config § Models; default: the strongest available model) and run:
 
     /at:impl-task <task-path>
 
@@ -91,7 +91,7 @@ In `--lite` mode: spawn a single sub-agent to run `/at:review-code main..HEAD`, 
 In parallel:
 
 - Spawn a new sub-agent and run `/at:review-code main..HEAD`
-- Run an **independent adversarial review** of the same range. Reviewer per bindings § Models; default: if the `codex` plugin is installed, use `/codex:adversarial-review --background --base main`; if it is not installed, spawn a second independent review subagent (fresh context, adversarial framing) and note the degradation in the final report. If the bindings define standing review context, append it verbatim to the reviewer's focus text.
+- Run an **independent adversarial review** of the same range. Reviewer per config § Models; default: if the `codex` plugin is installed, use `/codex:adversarial-review --background --base main`; if it is not installed, spawn a second independent review subagent (fresh context, adversarial framing) and note the degradation in the final report. If the config defines standing review context, append it verbatim to the reviewer's focus text.
 
 Note: `/codex:...` are plugin slash commands and cannot be model-invoked directly. To run one from inside auto-task, locate its definition under `~/.claude/plugins/cache/**/commands/<name>.md`, read the Bash invocation template inside, and run it via the Bash tool — substituting `${CLAUDE_PLUGIN_ROOT}` (a template placeholder, not a shell var!) with the resolved plugin root.
 
@@ -109,7 +109,7 @@ Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's th
 
 Skip unless the change alters rendered output (layout, spacing, colour, typography, interaction states).
 
-Run `/at:review-design <task-path>` **execute on the main thread** — do not wrap it in a subagent: it boots the app (per the bindings' design-review serve command) and drives the chrome-devtools MCP with real input, which a subagent can't do reliably. It is flag-only and emits findings in `/at:review-code`'s format. Navigate to the URL the serve command prints — don't assume a fixed port.
+Run `/at:review-design <task-path>` **execute on the main thread** — do not wrap it in a subagent: it boots the app (per the config's design-review serve command) and drives the chrome-devtools MCP with real input, which a subagent can't do reliably. It is flag-only and emits findings in `/at:review-code`'s format. Navigate to the URL the serve command prints — don't assume a fixed port.
 
 Re-output its findings in the main agent so the user can see them, and carry them into Step 7 alongside the code review findings.
 
@@ -129,7 +129,7 @@ In a new subagent:
    - Value of fix does not exceed cost (esp. complexity) of fix -> Reject (explain why)
    - False positive -> Reject (cite the specific code that disproves it)
    - Would significantly change scope/goal -> Reject (cite the anchor)
-   - Premise excluded by the project's standing review context (bindings) — e.g. harm requires a deployment surface the project explicitly lacks — and the finding names no present-tense local bug -> Reject (cite the context)
+   - Premise excluded by the project's standing review context (config) — e.g. harm requires a deployment surface the project explicitly lacks — and the finding names no present-tense local bug -> Reject (cite the context)
    - Recommends restoring behaviour an Acceptance Criterion or locked decision deliberately removed -> Reject (cite the AC/decision)
 
    Discriminator for the standing-context bullet: gate on the impact *mechanism*, not keywords — keep any finding whose harm mechanism the project actually has.
@@ -167,11 +167,11 @@ Make sure that:
 
 ### 9.2: Capture Session Transcript (Only If Bound)
 
-Skip unless the project bindings define a transcript-capture command and destination. If they do, run it and keep the transcript out of the repo (diff and grep noise).
+Skip unless the project config defines a transcript-capture command and destination. If it does, run it and keep the transcript out of the repo (diff and grep noise).
 
 ### 9.3: Update Task and Commit
 
-Set the task status to `ready-for-signoff` and commit it (frontmatter edit with a `(task/NNN)` subject by default; the bindings' task-status command if defined — with an external task store the bump commits there, not in the worktree).
+Set the task status to `ready-for-signoff` and commit it (frontmatter edit with a `(task/NNN)` subject by default; the config's task-status command if defined — with an external task store the bump commits there, not in the worktree).
 
 ### 9.4: Summarise
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2 — 2026-07-06
+
+- README workflow diagram now shows ownership lanes (human → agents → human) instead of a skill bracket.
+- Terminology: "bindings" → "config" throughout the docs and skills.
+
 ## 0.3.1 — 2026-07-03
 
 - Renamed the bindings files to make their role obvious: `.claude/auto-task.config.md` (project) and `.claude/auto-task.config.local.md` (personal); template is now `examples/auto-task.config.md`.

@@ -6,7 +6,7 @@ Reading rule for the whole corpus: **mechanisms are live, numbers are dead.** Ev
 
 ## Task Creation / Sizing
 
-*(task-sizing, bdd-for-agentic-task-specs, agile-samurai)*
+## (Task-Sizing, Bdd-for-Agentic-Task-Specs, Agile-Samurai)
 
 - Size tasks for cheap verification, not worker capacity; never encode time anchors — they stale as models improve. **Validated 2026-07: the "3+ files = coherence cliff" and "~30-min sweet spot" numbers are stale (Opus 4.5/4.8-class models handle far larger scopes); the mechanism holds.**
 - Files-touched is the strongest difficulty predictor; AC-count is a split smell test, not a hard rule.
@@ -17,7 +17,7 @@ Reading rule for the whole corpus: **mechanisms are live, numbers are dead.** Ev
 
 ## Planning
 
-*(implementation-planning, dialectic-planning, dialectic-convergence)*
+## (Implementation-Planning, Dialectic-Planning, Dialectic-Convergence)
 
 - Plan = behaviour-verification list; every step pairs a behaviour with a verify check.
 - Nervousness Heuristic: include only what you'd worry about; name existing code to reuse; never pre-commit new class/file names.
@@ -27,7 +27,7 @@ Reading rule for the whole corpus: **mechanisms are live, numbers are dead.** Ev
 
 ## Implementation / TDD
 
-*(impl-task-skill-research, tdd-in-the-agentic-engineering-era, kent-beck, tdd-by-example, testing-tools, architecture-testing-tools)*
+## (Impl-Task-Skill-Research, Tdd-in-the-Agentic-Engineering-Era, Kent-Beck, Tdd-by-Example, Testing-Tools, Architecture-Testing-Tools)
 
 - TDD is the control mechanism, non-negotiable where silent corruption is possible (wrong numbers, not errors); red→green→refactor inline with Fake-It/Triangulate/Obvious.
 - Commit at green per plan step; force a refactor checkpoint after every green — AI only inhales complexity, it never exhales unprompted. **Alignment gap: the tdd skill has refactor-at-green only as optional cadence, not a mandatory logged step.**
@@ -38,7 +38,7 @@ Reading rule for the whole corpus: **mechanisms are live, numbers are dead.** Ev
 
 ## Code Review / Triage
 
-*(code-review-literature-and-sota, triage-findings-literature-and-sota, codex-review-internals; supersedes the 2026-03-13 code-review doc)*
+## (Code-Review-Literature-and-Sota, Triage-Findings-Literature-and-Sota, Codex-Review-Internals; Supersedes the 2026-03-13 Code-Review Doc)
 
 - Reviewer ≠ generator is the most robust finding. **Validated 2026-07 and sharpened: context isolation is the core mechanism (same-model critique in a fresh context recovers most of the benefit — arXiv 2603.12123); cross-model is a secondary diversity lever.** Same-context self-review degrades to convention-checking.
 - Defects are only ~15% of review value; priority runs contract/design → correctness/security → tests → perf → docs → style (style fully automated, never a comment).
@@ -49,25 +49,25 @@ Reading rule for the whole corpus: **mechanisms are live, numbers are dead.** Ev
 
 ## Design Review
 
-*(agentic-design-review-sota)*
+## (Agentic-Design-Review-Sota)
 
 - Deterministic assertions gate; AI/vision output is triage, not pass/fail. Measure, don't eyeball; check token fidelity at the source; drive real inputs; name the e2e assertion for any unguarded invariant. Skip pixel-VRT and Figma integration for a solo token-based stack.
 
 ## Repo Health
 
-*(repo-health-skill-research)*
+## (Repo-Health-Skill-Research)
 
 - Health output is a report, not an alert; hard-cap 3–5 findings; cross-check against real code (hallucination risk is material); prioritise hotspot = complexity × change-frequency; start with ~3 fitness functions, "three strikes → encode a rule".
 
 ## Memory / Knowledge
 
-*(agentic-memory-knowledge-mgmt, agentic-memory-final-proposal — both concluded "don't build it")*
+## (Agentic-Memory-Knowledge-Mgmt, Agentic-Memory-Final-Proposal — Both Concluded "Don't Build It")
 
 - Files-first memory, human approves every write, provenance and decay as first-class, tiered context loading; vector search only past ~500–1000 items. **Validated 2026-07 and vendor-vindicated: Claude Code's memory and Anthropic's Managed-Agents Memory + "Dreams" consolidation implement exactly this shape (never auto-commit).**
 
 ## Skills Design / Meta
 
-*(reusable-claude-skills, skill-improvements-proposal, sdlc-tools-landscape, practitioner surveys)*
+## (Reusable-Claude-Skills, Skill-Improvements-Proposal, Sdlc-Tools-Landscape, Practitioner Surveys)
 
 - Two-tier placement: methodology skills global, tooling-coupled skills project-local; project-specific behaviour lives in consuming-repo bindings, never in skill bodies.
 - The three load-bearing SDLC ideas from the tool survey: fresh context per task, scoped context injection, multi-model plan diversity. ACI principle: "no output = success".
@@ -75,7 +75,7 @@ Reading rule for the whole corpus: **mechanisms are live, numbers are dead.** Ev
 
 ## Research Methodology
 
-*(agentic-research-design, aris-deep-dive, autonomous-literature-research, karpathy-autoresearch)*
+## (Agentic-Research-Design, Aris-Deep-Dive, Autonomous-Literature-Research, Karpathy-Autoresearch)
 
 - Pre-retrieval diversity is the lever: orthogonal sub-questions, 3–7 agents, domain-native vocabulary; pre-commit resolution criteria before searching; external signal every review round, hard cap ~3.
 - Freeze the problem anchor verbatim; cross-model adversarial review + crash-resilient state enable long unattended runs.

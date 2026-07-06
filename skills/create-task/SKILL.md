@@ -23,16 +23,16 @@ create-task → clarify-task → plan-task → impl-task → review-code → rev
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
 
-## Task Store and Project Bindings
+## Task Store and Project Config
 
 This plugin ships an opinionated default task convention: markdown task files in a `tasks/` directory at the repo root, managed by the agent with plain file I/O — no extra tooling required.
 
-Projects override the defaults via **bindings** — plain-markdown files the agent reads, not machine-parsed config:
+Projects override the defaults via **config files** — plain markdown the agent reads, not machine-parsed values:
 
-- `.claude/auto-task.config.md` — project bindings, committed, shared by everyone working in the repo.
+- `.claude/auto-task.config.md` — project config, committed, shared by everyone working in the repo.
 - `.claude/auto-task.config.local.md` — personal overrides, gitignored; wins over the project file on conflict.
 
-Precedence: plugin defaults ← project bindings ← local bindings. **If either file exists, read it before proceeding.** Recognised sections (all optional): Task Store, Verification, Worktrees, Review, Design Review, Models, Conventions, Transcript Capture, Feedback Snapshots — the plugin's `examples/auto-task.config.md` is a copy-paste template with each section's default spelled out.
+Precedence: plugin defaults ← project config ← local config. **If either file exists, read it before proceeding.** Recognised sections (all optional): Task Store, Verification, Worktrees, Review, Design Review, Models, Conventions, Transcript Capture, Feedback Snapshots — the plugin's `examples/auto-task.config.md` is a copy-paste template with each section's default spelled out.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -62,7 +62,7 @@ These rules govern both how you gather intent and write the task. Internalise an
 
 ## Step 2: Create Task File
 
-Create the task file — by default at `tasks/{NNN}-{slug}.md` in the repo, where `{NNN}` is the next task number (max existing + 1, zero-padded to 3 digits) and `{slug}` is a short kebab-case form of the title. If the project bindings define a create-task command, use that instead. Use the table below to decide on type:
+Create the task file — by default at `tasks/{NNN}-{slug}.md` in the repo, where `{NNN}` is the next task number (max existing + 1, zero-padded to 3 digits) and `{slug}` is a short kebab-case form of the title. If the project config defines a create-task command, use that instead. Use the table below to decide on type:
 
 | Type       | Meaning                                     |
 | ---------- | ------------------------------------------- |
@@ -100,7 +100,7 @@ TODO: Add notes
 
 **Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `tasks/attachments/{NNN}/` (next to the task files) and reference it from the task file — don't drop it as a top-level sibling.
 
-**Committing:** commit task-file changes following the repo's commit conventions, with the task-link suffix appended to the subject (default `(task/{NNN})`; bindings § Conventions can change or drop it). If the bindings route tasks to a separate repo or provide commit recipes, follow those — task-file commits then land there, never in the code repo.
+**Committing:** commit task-file changes following the repo's commit conventions, with the task-link suffix appended to the subject (default `(task/{NNN})`; config § Conventions can change or drop it). If the config routes tasks to a separate repo or provide commit recipes, follow those — task-file commits then land there, never in the code repo.
 
 ## Step 3: Write the Task
 
@@ -271,7 +271,7 @@ Present the task(s) to the user for review. The user will provide feedback if ap
 
 ## Step 8: Offer a Feedback Snapshot (Only If Bound)
 
-Skip this step unless the project bindings define a feedback-snapshot location. If they do, **offer** (per task, never auto-create) to snapshot the post-clarify file there as `YYYY-MM-DD-<task-slug>-before.md` — kept out of the repo so it doesn't travel with the skill.
+Skip this step unless the project config defines a feedback-snapshot location. If it does, **offer** (per task, never auto-create) to snapshot the post-clarify file there as `YYYY-MM-DD-<task-slug>-before.md` — kept out of the repo so it doesn't travel with the skill.
 
 ## Appendix: Creating Epics
 

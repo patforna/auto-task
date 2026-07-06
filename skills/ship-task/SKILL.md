@@ -23,7 +23,7 @@ create-task → clarify-task → plan-task → impl-task → review-code → rev
 
 As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's imperative that the task file plus repo state carry everything the next agent needs.
 
-Task files live in the project's task store — `tasks/` in the repo by default. Project bindings can override this and other defaults: read `.claude/auto-task.config.md` (project, committed) and `.claude/auto-task.config.local.md` (personal overrides — win on conflict) if they exist. See `/at:create-task` § Task Store and Project Bindings.
+Task files live in the project's task store — `tasks/` in the repo by default. Project config can override this and other defaults: read `.claude/auto-task.config.md` (project, committed) and `.claude/auto-task.config.local.md` (personal overrides — win on conflict) if they exist. See `/at:create-task` § Task Store and Project Config.
 
 ## Guidance
 
@@ -31,7 +31,7 @@ Task files live in the project's task store — `tasks/` in the repo by default.
 - Squash-merge by default — the task's commits collapse into a single commit on `main`.
 - Push is automatic — invoking ship-task authorises the merge and push. No separate approval needed.
 - Untracked files in the worktree are fine. Refuse only on uncommitted tracked changes.
-- After the merge, re-install dependencies in the **primary** repo if the branch changed a dependency manifest — the primary's installed deps (`node_modules/`, a virtualenv, etc.) don't update on merge. Run the ecosystem's install for each changed manifest (e.g. lockfile → package-manager install; regenerate any gitignored generated artefacts that depend on changed sources). The project bindings may list the exact commands.
+- After the merge, re-install dependencies in the **primary** repo if the branch changed a dependency manifest — the primary's installed deps (`node_modules/`, a virtualenv, etc.) don't update on merge. Run the ecosystem's install for each changed manifest (e.g. lockfile → package-manager install; regenerate any gitignored generated artefacts that depend on changed sources). The project config may list the exact commands.
 
 ## Protocol
 
@@ -41,7 +41,7 @@ Branch must be `task/NNN-...` with no uncommitted tracked changes.
 
 ## Step 2: Mark Done
 
-Set the task status to `done`. By default (in-repo task store), edit the frontmatter `status:` field and commit on the task branch with a `(task/NNN)` subject suffix — the squash in Step 3 carries it to `main`. If the bindings route tasks to a separate repo, use their task-status command; the bump then commits there and the squash carries code only.
+Set the task status to `done`. By default (in-repo task store), edit the frontmatter `status:` field and commit on the task branch with a `(task/NNN)` subject suffix — the squash in Step 3 carries it to `main`. If the config routes tasks to a separate repo, use its task-status command; the bump then commits there and the squash carries code only.
 
 ## Step 3: Merge into Main
 
@@ -57,14 +57,14 @@ git -C "$primary" commit                               # write the squash commit
 
 Squash-commit message — follow the repo's own commit conventions first (style, tense, prefixes). Defaults where the repo has none:
 
-- Subject: a concise summary of what the task delivered, ending with the task-link suffix (default `(task/NNN)`; bindings can change or drop it — it's what ties the commit back to the task).
+- Subject: a concise summary of what the task delivered, ending with the task-link suffix (default `(task/NNN)`; config can change or drop it — it's what ties the commit back to the task).
 - Body: one bullet per logical change the task made (derive from the squashed commits' subjects), so the single commit still records what happened.
 
 If `merge --squash` conflicts, stop and flag it to the user.
 
 ## Step 4: Verify the Integrated Tree
 
-Run the project's verification command from `$primary` on the post-squash commit, **before** pushing. The command comes from the bindings; absent that, use the project's canonical check (a `just`/`make` check recipe, the CI workflow's steps, or at minimum the full test suite).
+Run the project's verification command from `$primary` on the post-squash commit, **before** pushing. The command comes from the config; absent that, use the project's canonical check (a `just`/`make` check recipe, the CI workflow's steps, or at minimum the full test suite).
 
 A green task branch is not enough: the `pull --rebase` in Step 3 folds in whatever landed on `main` since the branch forked, and a parallel change can break the task's code or tests with **zero textual conflict** (e.g. a renamed helper silently invalidates an assertion in an untouched test file). Git merges them cleanly; only re-running the verification on the combined tree catches it.
 

@@ -17,7 +17,7 @@ Prompt is mandatory — if missing, fail loudly; don't infer.
 
 ## Goal
 
-Get independent perspectives on a topic from multiple models. Default line-up: the strongest available Claude model + Codex. Callers (or project config, e.g. auto-task's bindings) may specify different panelists.
+Get independent perspectives on a topic from multiple models. Default line-up: the strongest available Claude model + Codex. Callers (or project config, e.g. auto-task's config) may specify different panelists.
 
 ## Step 1: Expand Skill References
 

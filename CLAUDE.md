@@ -12,6 +12,6 @@ This plugin is self-contained: its skills invoke each other via the `/at:<skill>
 
 ## Portability
 
-Skills must stay project-agnostic: generic instructions with sensible defaults, and any project-specific behaviour sourced from the consuming repo's bindings — `.claude/auto-task.config.md` (project) and `.claude/auto-task.config.local.md` (personal overrides, win on conflict). Never hardcode a specific project's paths, recipes, conventions, or context into a skill body.
+Skills must stay project-agnostic: generic instructions with sensible defaults, and any project-specific behaviour sourced from the consuming repo's config — `.claude/auto-task.config.md` (project) and `.claude/auto-task.config.local.md` (personal overrides, win on conflict). Never hardcode a specific project's paths, recipes, conventions, or context into a skill body.
 
-When adding or renaming a binding, update all three places in the same change: the skill(s) that consume it, `examples/auto-task.config.md` (the copy-paste template), and the README's bindings table.
+When adding or renaming a config setting, update all three places in the same change: the skill(s) that consume it, `examples/auto-task.config.md` (the copy-paste template), and the README's config table.

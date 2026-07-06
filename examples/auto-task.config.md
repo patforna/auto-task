@@ -1,8 +1,8 @@
-# Auto-Task Project Bindings
+# Auto-Task Project Config
 
 Copy this file to `.claude/auto-task.config.md` in your repo, delete the sections where the default suits you, and edit the rest. Every section is optional — the plugin's skills fall back to the defaults noted below.
 
-Bindings are plain markdown read by the agent, not machine-parsed config: write instructions the way you'd brief a colleague. For personal (non-committed) overrides, put the same sections in `.claude/auto-task.config.local.md` and gitignore it — it wins over this file on conflict.
+Config here is plain markdown read by the agent, not machine-parsed values: write instructions the way you'd brief a colleague. For personal (non-committed) overrides, put the same sections in `.claude/auto-task.config.local.md` and gitignore it — it wins over this file on conflict.
 
 ## Task Store
 
@@ -28,9 +28,7 @@ Standing context appended verbatim to adversarial reviews, plus any repo-specifi
 
 Default: none.
 
-Override example:
-
-> This service is internal-only behind SSO; do not raise public-exposure findings. Flag any unguarded division as Major — silent NaN corruption is our top defect class.
+Override example: This service is internal-only behind SSO; do not raise public-exposure findings. Flag any unguarded division as Major — silent NaN corruption is our top defect class.
 
 ## Design Review
 

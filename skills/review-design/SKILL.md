@@ -26,7 +26,7 @@ Verify a design / UI change matches the specified design.
 
 Start the app on deterministic fixture data and drive it via the chrome-devtools MCP.
 
-The serve command comes from the project bindings (`.claude/auto-task.config.md`, design-review section) — e.g. a recipe that serves test fixtures. If no binding exists, look for an obvious fixture-backed dev-server; if none, fail loudly — do not review against live/non-deterministic data.
+The serve command comes from the project config (`.claude/auto-task.config.md`, design-review section) — e.g. a recipe that serves test fixtures. If no such entry exists, look for an obvious fixture-backed dev-server; if none, fail loudly — do not review against live/non-deterministic data.
 
 Prefer a serve command that binds free ports (so parallel sessions don't collide) and navigate to the URL it prints — don't assume a fixed port.
 
