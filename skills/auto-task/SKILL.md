@@ -152,7 +152,7 @@ In `--lite` mode, review the fix with a single subagent reviewer, consistent wit
 0. Sync: rebase the worktree branch onto latest main (`git -C "$primary" pull --rebase origin main` — resolve `$primary` as in `/at:ship-task`; skip if no remote — then `git rebase main` from the worktree; on conflicts resolve guided by the task/plan, then re-run the verification command) — surfaces integration drift here instead of at ship time.
 1. Review: In a new subagent, review that the task is complete via `/at:review-task`.
 2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 7.
-3. Second review: Repeat "1. Review". If still failing, stop here and flag it to the user. Do not proceed to Step 9.
+3. Second review: Repeat "1. Review". Skip when the first review passed with nothing to address and the branch hasn't changed since — re-reviewing identical state adds nothing; note the skip in the final report. If still failing, stop here and flag it to the user. Do not proceed to Step 9.
 
 In `--lite` mode, run steps 1–2 once and skip the second review (step 3).
 
