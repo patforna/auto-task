@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0 — 2026-07-06
+
+Integrates systemic learnings mined from 55 real auto-task run transcripts and a before/after task-file feedback corpus.
+
+- auto-task: lite mode can now auto-downshift on strictly-trivial tasks (announced, reported); parallel-session hygiene (no bare-name `pkill`, scope kills to worktree/port, expect e2e CPU contention); provably-empty stale worktrees are auto-cleaned instead of hard-stopping; rebase at the next green checkpoint when main moves mid-run; the second task review is an independent adversarial gap-check, not a re-run; subagent monitoring relies on completion notifications, not sleep-timer polling; non-Claude panelists get a one-line repo orientation; transcripts re-captured when commits land after capture; long subagent artifacts re-output by reference.
+- create-task: audience named explicitly (implementing agent with repo access); example-anchoring qualified (only when intent is non-obvious); epics gain a `Locked Decisions` section so sub-tasks stop re-deriving shared calls; optional calibration exemplar via config § Feedback Snapshots.
+- plan-task: epic sub-task planning reads the epic's locked decisions + done siblings' implementation notes.
+- impl-task: stage explicitly by path (never `-A`); run the formatter before final verification; `Implementation Notes` heading title-cased.
+- ship-task: refreshes the captured transcript after the merge (the wrap-up capture goes stale once ship commits land).
+- Step 5 reviews the merge-base range when main has advanced since branching, so review diffs contain only the task's commits.
+
 ## 0.3.2 — 2026-07-06
 
 - README workflow diagram now shows ownership lanes (human → agents → human) instead of a skill bracket.

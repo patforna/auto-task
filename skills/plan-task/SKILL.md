@@ -56,6 +56,8 @@ If the task's status is not `ready-for-dev` (usually set at the end of `/at:clar
 
 Read the task and the code the plan will likely touch. If in doubt, err on the side of reading too much. Ensure you fully understand the task and current state of the codebase before proceeding.
 
+For an epic sub-task, also read the epic file's `Locked Decisions` section and the `Implementation Notes` of already-done sibling sub-tasks. Treat locked decisions as settled — don't re-derive or re-litigate them in the plan.
+
 ## Step 3: Write the Plan
 
 Write a plan using the structure below (drop sections that aren't needed):

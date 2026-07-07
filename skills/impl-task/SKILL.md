@@ -32,6 +32,8 @@ Task files live in the project's task store — `tasks/` in the repo by default.
 These rules govern how to execute the implementation. Internalise and follow them throughout.
 
 - Commit early and often.
+- Stage files explicitly by path (`git add <paths>`), never `-A`/`.` — it guards against sweeping in unrelated changes (e.g. from parallel sessions sharing a checkout).
+- Run the project's formatter over your changes before the final verification run — formatting must never surface as a verification failure or a mop-up commit.
 - Follow the repo's existing commit conventions. Append the task-link suffix to subjects (default `(task/NNN)`; config can change or drop it) so commits trace back to the task.
 - Look for and internalise existing style, patterns, conventions. Don't deviate unless the plan explicitly asks for it.
 - Maintain the testing pyramid. Test at the lowest possible level. Few, mostly happy-path tests at the top of the pyramid (e2e, component).
@@ -56,7 +58,7 @@ Fully read, internalise and use `/at:tdd` to drive implementation. Do not write 
 
 ### When Things Go Wrong
 
-- If an implementation plan step seems wrong or missing, try to resolve the issue and note it down in `Implementation notes` (see below).
+- If an implementation plan step seems wrong or missing, try to resolve the issue and note it down in `Implementation Notes` (see below).
 - If tests keep failing after 3 implementation attempts, revert to the last green state and take a smaller step.
 - If the build fails on unrelated changes, flag it to the user. Don't fix silently — it may be someone else's work in progress.
 
@@ -70,7 +72,7 @@ After completing all planned steps, review `git diff` from your first commit to 
 
 ## Step 5: Wrap Up
 
-Add an `## Implementation notes` section to the end of the task file, noting anything worth flagging or preserving — in plain English. For example:
+Add an `## Implementation Notes` section to the end of the task file, noting anything worth flagging or preserving — in plain English. For example:
 
 - Any deviations from the plan.
 - Any surprises encountered during implementation.

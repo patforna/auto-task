@@ -40,6 +40,7 @@ Precedence: plugin defaults ← project config ← local config. **If either fil
 
 These rules govern both how you gather intent and write the task. Internalise and follow them throughout.
 
+- The audience is the implementing agent, with full repo access — not a human catching up on the project. Every line must earn its place for that reader.
 - Be maximally succinct. Capture the user's intent with the fewest words that remove ambiguity. Task content length obviously follows complexity but don't pad.
 - When a task has an authoritative attachment (design brief, spec, report), don't restate its content. Only capture decisions or information that's additional to the attachment.
 - Don't spell out what a capable agent infers from the repo - established conventions (e.g. fail-fast), the single obvious mechanism for a change, enum values readable from a table. Test per line: would two reasonable agents build the same thing without it?
@@ -106,6 +107,8 @@ TODO: Add notes
 
 **Crystallise** the information you gathered in Step 1 and fill it into the task file sections - "Description", "Acceptance criteria", "Notes".
 
+If the project config (§ Feedback Snapshots) names a calibration exemplar, read it before writing — it shows the target length and register for a task of comparable complexity in this project.
+
 ### Description
 
 Describe **what** will be different after this change. Prefer a single sentence; use up to three only when genuinely justifiable. Add **why** only if it isn't obvious from the what — one clause, not a paragraph. Never narrate how the conversation arrived here ("two things came out of the discussion…", "we then realised…") — the next agent needs the decision, not the backstory.
@@ -139,7 +142,7 @@ Add (just) enough ACs so that two reasonable agents would:
 Ensure each AC has the following properties:
 
 - Focused on Behaviour - describes what the system does, not how it's coded. Outside-in, caller's perspective.
-- Specific - names concrete inputs, outputs, or thresholds (e.g. "stocks with <20 days of history are excluded"). If necessary, anchor with a concrete example, input/output, before/after or scenario to make the intent undeniable.
+- Specific - names concrete inputs, outputs, or thresholds (e.g. "stocks with <20 days of history are excluded"). Anchor with a concrete example, input/output, before/after or scenario only when the intent or formula is non-obvious — if the AC is already unambiguous, an example is padding.
 - Testable - pass/fail is mechanical (a test, CLI output, observable state). No "robust", "clean", "handles edge cases".
 - Boundary-aware - covers **non-obvious** edge cases that matter for correctness and an implementing agent might not discover through exploration alone (empty input, nulls, asymmetric conditions)
 - Non-redundant - does not restate what implicitly applies to all tasks ("follows conventions", "tests pass", "build is green", etc.)
@@ -277,9 +280,18 @@ Skip this step unless the project config defines a feedback-snapshot location. I
 
 An epic is simply a high-level task that aggregates a number of sub-tasks.
 
-To create an epic, follow the instructions for creating a standalone task. Drop the `Acceptance criteria` section and instead add a `Tasks` section to the end. Example:
+To create an epic, follow the instructions for creating a standalone task. Drop the `Acceptance criteria` section and instead add a `Tasks` section to the end.
+
+Also add a `Locked Decisions` section: shared conventions and cross-cutting calls that apply to every sub-task (e.g. "regen deferred to the last sub-task", "intermediates stay internal", commit granularity). Sub-task planning treats these as settled — without this section every sub-task re-derives them from scratch. Append to it whenever a sub-task run settles a new cross-cutting question.
+
+Example:
 
 ```markdown
+## Locked Decisions
+
+- Data regen happens once, in the last sub-task — earlier sub-tasks don't re-run it.
+- One commit per sub-task, not per brick.
+
 ## Tasks
 
 | #   | Task                      | File                     | Status |

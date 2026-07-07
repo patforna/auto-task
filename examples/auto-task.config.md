@@ -62,6 +62,8 @@ Default: skipped.
 
 ## Feedback Snapshots
 
-Optional out-of-repo directory where `/at:create-task` offers to snapshot post-clarify task files for later calibration.
+Optional out-of-repo directory where `/at:create-task` offers to snapshot post-clarify task files for later calibration. May also name a **calibration exemplar** — a human-edited task file `/at:create-task` reads before writing, to calibrate length and register.
 
 Default: skipped.
+
+Override example: snapshots go to `~/snapshots/my-repo/`; calibration exemplar: `~/snapshots/my-repo/2026-06-18-some-task-after.md`.

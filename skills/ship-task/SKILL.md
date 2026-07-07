@@ -75,7 +75,11 @@ If verification fails, **stop and fix on `main`** before pushing — do not push
 - Push: `git push origin main` (any worktree — push is repo-wide).
 - Cleanup (after push): `git -C "$primary" worktree remove --force <task_worktree>` and `git -C "$primary" branch -D task/NNN-<slug>` (`-D`, not `-d` — squash-merge leaves the branch tip a non-ancestor of `main`, so `-d` refuses it as "not merged").
 
-## Step 6: Output
+## Step 6: Refresh Transcript (Only If Bound)
+
+If the project config defines a transcript-capture command, re-run it now — the ship commits post-date any capture taken at auto-task wrap-up, and this final capture supersedes it.
+
+## Step 7: Output
 
 One-sentence summary.
 

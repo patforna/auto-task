@@ -12,7 +12,7 @@ description: use to drive a well-defined task end-to-end with minimal human inpu
 ## Modes
 
 - **Full** — default.
-- **Lite (`--lite`)** — only when the user explicitly passes the flag. Single-pass planning (Step 3), a single reviewer (Step 5), and a single task review (Step 8). Worktree, implementation, design review, and wrap-up are unchanged.
+- **Lite (`--lite`)** — single-pass planning (Step 3), a single reviewer (Step 5), and a single task review (Step 8). Worktree, implementation, design review, and wrap-up are unchanged. Applies when the user passes the flag, or by auto-downshift: at Step 1, after reading the full task file, downshift to lite when ALL hold per the task's own description and ACs — single package/module touched, no cross-boundary contract change (API shape, persisted schema, public symbols), and the task is small (≤3 ACs, no epic). Announce the downshift in the Step 1 output and note it in the final report; when in doubt (including when the task alone can't answer the criteria), stay full.
 
 ## Goal
 
@@ -38,8 +38,9 @@ Task files live in the project's task store — `tasks/` in the repo by default.
 Internalise and follow these rules:
 
 - Aim to complete all the steps with high-autonomy - assume there is no human available to help you complete the task. If there are questions, flags or surprises, use your own best judgement, make a note of it to show to the user when you're done and proceed. Only stop i) if the instructions in this file explicitly ask you to or ii) if you truly can't make progress without human intervention.
-- Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be proactive and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Keep checking at 1-min intervals that subprocesses and subagents make progress and don't hang. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
-- When subagents produce user output (e.g. implementation plan, code review findings, etc.), make sure to re-output it in the main agent, so the user can actually see it.
+- Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be proactive and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Rely on the harness's completion notifications for subagents — don't poll on fixed sleep timers; arm at most one long safety-net timer per subagent. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
+- When subagents produce user output (e.g. implementation plan, code review findings, etc.), re-output the decision-relevant core (the plan, the findings table) in the main agent so the user can actually see it. Reference long supporting artifacts by path + one-line summary instead of duplicating them verbatim.
+- Parallel-session hygiene: other auto-task sessions may be running against the same primary repo. Never kill processes by bare name (`pkill -f playwright`, `pkill -f vite` etc. hit every session) — scope kills to this worktree's path or to PIDs from `lsof -ti :<port>` for ports you own. Heavy suites (e2e) contend on CPU across sessions: if a suite dies with SIGTERM before running or pass counts fluctuate, suspect a busy neighbour and retry rather than debugging your own code.
 - Use raw `git worktree add` for worktrees — NOT the harness `EnterWorktree` tool. Reason: the worktree must live at a persistent, predictable path that Step 9/10 hands off to the user's editor/tmux; an opaque harness temp path breaks that handoff.
 - In unattended auto-task, a task at `status: new` that clearly went through `/at:create-task` (locked decisions + acceptance criteria present) may be treated as ready-for-dev — proceed and note the missed status bump in the final report. Don't stall on the status field alone.
 
@@ -51,7 +52,9 @@ Internalise and follow these rules:
 
 ## Step 1: Confirm
 
-Find the task and output its title and status. Bonus points for using figlet =)
+Find the task, read it fully, and output its title and status. Bonus points for using figlet =)
+
+Then apply the Modes auto-downshift check (unless a mode was passed explicitly).
 
 ## Step 2: Worktree
 
@@ -62,7 +65,7 @@ Create a `task/NNN-<slug>` worktree. Default location is a sibling of the repo, 
 
 Then initialise it: run the config's worktree-init command if defined; otherwise install the project's dependencies (a fresh worktree shares no installed deps with the primary) and copy over any gitignored files the app needs to run locally (e.g. `.env` — check `.env.example` and similar templates against the primary checkout).
 
-Refuse to start if the branch already exists or the target worktree path is non-empty.
+If the branch or worktree path already exists but is provably a dead leftover — the branch is 0 commits ahead of main AND the worktree contains only untracked/ignored files — delete both, note it in the final report, and proceed. Otherwise refuse to start: real work could be lost.
 
 All subsequent steps run inside the worktree. Pass the absolute worktree path explicitly to every subagent — their Read/Edit/Write tools must root at the worktree path, not the primary worktree.
 
@@ -70,7 +73,7 @@ With the default in-repo task store, the task file is inside the worktree — pa
 
 ## Step 3: Plan
 
-Create an implementation plan. Important: Invoke /at:panel inline / do not wrap it in a subagent. Panel line-up per config § Models (default: strongest available Claude model + Codex).
+Create an implementation plan. Important: Invoke /at:panel inline / do not wrap it in a subagent. Panel line-up per config § Models (default: strongest available Claude model + Codex). Include a one-line repo orientation (top-level layout, e.g. the package map from the README) in the panel prompt — non-Claude panelists cold-start blind and otherwise burn a round of failed path probes; for Claude panelists it's harmless.
 
     /at:synthesize /at:panel /at:plan-task <task-path>
 
@@ -84,7 +87,11 @@ Spawn a new sub-agent (implementer model per config § Models; default: the stro
 
     /at:impl-task <task-path>
 
+If main moves under you during a long implementation (parallel sessions merging), rebase at the next green checkpoint instead of deferring all integration to Step 8 — late rebases across overlapping files produce conflict pile-ups and risk silent bad auto-merges.
+
 ## Step 5: Review Code
+
+In every mode: if main has advanced since the branch forked, review the merge-base range instead of `main..HEAD` — resolve `base=$(git merge-base main HEAD)` and review `<base>..HEAD` (adversarial reviewer: `--base <base>`) so the diff contains only this task's commits, not reverse-diffs of unrelated main progress.
 
 In `--lite` mode: spawn a single sub-agent to run `/at:review-code main..HEAD`, skip the adversarial pass and the synthesis step, and carry its findings straight into Step 7. The rest of this step applies to full mode only.
 
@@ -125,7 +132,7 @@ In a new subagent:
 4. For each remaining finding, decide one of — every row carries a one-line cited reason (the evidence, not just the verdict):
 
    - Real issue that needs addressing -> Accept (cite what it breaks / why it's worth fixing)
-   - Real issue but probably out of scope -> Reject (capture as a follow-up note in the task's `## Implementation notes`)
+   - Real issue but probably out of scope -> Reject (capture as a follow-up note in the task's `## Implementation Notes`)
    - Value of fix does not exceed cost (esp. complexity) of fix -> Reject (explain why)
    - False positive -> Reject (cite the specific code that disproves it)
    - Would significantly change scope/goal -> Reject (cite the anchor)
@@ -152,7 +159,7 @@ In `--lite` mode, review the fix with a single subagent reviewer, consistent wit
 0. Sync: rebase the worktree branch onto latest main (`git -C "$primary" pull --rebase origin main` — resolve `$primary` as in `/at:ship-task`; skip if no remote — then `git rebase main` from the worktree; on conflicts resolve guided by the task/plan, then re-run the verification command) — surfaces integration drift here instead of at ship time.
 1. Review: In a new subagent, review that the task is complete via `/at:review-task`.
 2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 7.
-3. Second review: Repeat "1. Review". Skip when the first review passed with nothing to address and the branch hasn't changed since — re-reviewing identical state adds nothing; note the skip in the final report. If still failing, stop here and flag it to the user. Do not proceed to Step 9.
+3. Second review: run a second, **independent adversarial gap-check** — a fresh subagent hunting for an AC only superficially met or a regression the first pass missed, not a re-run of the same review. Skip when the first review passed with nothing to address and the branch hasn't changed since — re-reviewing identical state adds nothing; note the skip in the final report. If still failing, stop here and flag it to the user. Do not proceed to Step 9.
 
 In `--lite` mode, run steps 1–2 once and skip the second review (step 3).
 
@@ -167,7 +174,7 @@ Make sure that:
 
 ### 9.2: Capture Session Transcript (Only If Bound)
 
-Skip unless the project config defines a transcript-capture command and destination. If it does, run it and keep the transcript out of the repo (diff and grep noise).
+Skip unless the project config defines a transcript-capture command and destination. If it does, run it and keep the transcript out of the repo (diff and grep noise). If further commits land within this step's session after the capture (e.g. the Step 9.3 status bump, late fix rounds), re-run the capture command before Step 10 so the stored transcript is current. `/at:ship-task` refreshes it again after the merge.
 
 ### 9.3: Update Task and Commit
 
