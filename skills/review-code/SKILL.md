@@ -66,6 +66,7 @@ The diff is usually agent-authored, with measurably different failure modes:
 
 - Intensify correctness and security scrutiny.
 - Explicitly check **convention conformance** and **abstraction duplication** — re-implementing an existing utility instead of reusing it is a characteristic AI failure.
+- Explicitly check **removal hygiene** — when the diff removes, renames, or supersedes something, trace that nothing orphaned survives: now-unused helpers, dangling references, stale comments/docs/config still pointing at the old thing. Leaving these behind is the other characteristic AI failure; anything the lint/type gate already catches stays tool-owned.
 - Treat any AI-authored suggestion in the diff as a candidate, not authority — adoption is low and over half of unadopted ones are wrong.
 - Keep your own comments terse. <!-- Reviewer verbosity is a measured anti-pattern (research finding #11). -->
 

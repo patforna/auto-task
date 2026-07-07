@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 — 2026-07-07
+
+- review-code: new removal-hygiene check — when the diff removes, renames, or supersedes something, trace that no orphaned helpers, dangling references, or stale comments/docs/config survive (lint-caught cases stay tool-owned).
+
 ## 0.4.0 — 2026-07-06
 
 Integrates systemic learnings mined from 55 real auto-task run transcripts and a before/after task-file feedback corpus.
