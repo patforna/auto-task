@@ -2,7 +2,9 @@
 
 Copy this file to `.claude/auto-task.config.md` in your repo, delete the sections where the default suits you, and edit the rest. Every section is optional — the plugin's skills fall back to the defaults noted below.
 
-Config here is plain markdown read by the agent, not machine-parsed values: write instructions the way you'd brief a colleague. For personal (non-committed) overrides, put the same sections in `.claude/auto-task.config.local.md` and gitignore it — it wins over this file on conflict.
+Config here is plain markdown read by the agent, not machine-parsed values: write instructions the way you'd brief a colleague. Use it for repository-specific mechanics and standing facts the generic skills cannot infer; keep core workflow methodology in the skills.
+
+For personal (non-committed) overrides, put the same sections in `.claude/auto-task.config.local.md` and gitignore it — it wins over this file on conflict.
 
 ## Task Store
 

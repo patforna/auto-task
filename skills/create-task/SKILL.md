@@ -32,7 +32,7 @@ Projects override the defaults via **config files** — plain markdown the agent
 - `.claude/auto-task.config.md` — project config, committed, shared by everyone working in the repo.
 - `.claude/auto-task.config.local.md` — personal overrides, gitignored; wins over the project file on conflict.
 
-Precedence: plugin defaults ← project config ← local config. **If either file exists, read it before proceeding.** Recognised sections (all optional): Task Store, Verification, Worktrees, Review, Design Review, Models, Conventions, Transcript Capture, Feedback Snapshots — the plugin's `examples/auto-task.config.md` is a copy-paste template with each section's default spelled out.
+Precedence: plugin defaults ← project config ← local config. **If either file exists, read it before proceeding.** Config is for repository-specific mechanics and standing facts the generic skills cannot infer; core workflow methodology stays in the skills. Recognised sections (all optional): Task Store, Verification, Worktrees, Review, Design Review, Models, Conventions, Transcript Capture, Feedback Snapshots — the plugin's `examples/auto-task.config.md` is a copy-paste template with each section's default spelled out.
 
 ## Guidance (DO NOT IGNORE!)
 

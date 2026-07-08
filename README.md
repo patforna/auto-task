@@ -85,7 +85,7 @@ Add a stats command that reads a file of newline-separated numbers and prints su
 
 ## Project Config
 
-Every default above can be overridden per project — in markdown, not config syntax, because config entries are instructions the agent reads (several are prose, like standing review context), not values code parses.
+Every default above can be overridden per project — in markdown, not config syntax, because config entries are instructions the agent reads (several are prose, like standing review context), not values code parses. Config is for repository-specific mechanics and standing facts the generic skills cannot infer; core workflow methodology stays in the skills.
 
 - **`.claude/auto-task.config.md`** — project config. Committed, shared by everyone in the repo.
 - **`.claude/auto-task.config.local.md`** — personal overrides. Gitignored; wins over the project file on conflict.
