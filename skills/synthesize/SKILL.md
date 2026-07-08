@@ -1,6 +1,6 @@
 ---
 name: synthesize
-description: use to combine N independent perspectives on a prompt into a single synthesis without forcing consensus.
+description: "use to combine N independent perspectives on a prompt into a single synthesis without forcing consensus."
 ---
 
 # Synthesize

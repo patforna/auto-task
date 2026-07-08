@@ -1,6 +1,6 @@
 ---
 name: review-task
-description: Verify that a task has been completed according to its intent and criteria. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task.
+description: "Verify that a task has been completed according to its intent and criteria. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task."
 ---
 
 # Review Task

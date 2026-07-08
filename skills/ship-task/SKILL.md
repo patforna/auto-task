@@ -1,6 +1,6 @@
 ---
 name: ship-task
-description: Use to wrap up a finished task - set status to done, merge, clean up.
+description: "Use to wrap up a finished task - set status to done, merge, clean up."
 ---
 
 # Ship Task

@@ -1,6 +1,6 @@
 ---
 name: review-design
-description: Use to review a design / UI change against its specification. Read-only; produces findings, applies no fixes.
+description: "Use to review a design / UI change against its specification. Read-only; produces findings, applies no fixes."
 ---
 
 # Review Design

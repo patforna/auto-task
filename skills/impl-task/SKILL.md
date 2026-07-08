@@ -1,6 +1,6 @@
 ---
 name: impl-task
-description: Implement a task by executing its implementation plan. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task.
+description: "Implement a task by executing its implementation plan. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task."
 ---
 
 # Implement Task

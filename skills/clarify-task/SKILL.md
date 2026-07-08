@@ -1,6 +1,6 @@
 ---
 name: clarify-task
-description: Use this skill to resolve ambiguities, clarify vague criteria and make implicit assumptions explicit. Invoked at the end of /at:create-task and the start of /at:plan-task. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task.
+description: "Use this skill to resolve ambiguities, clarify vague criteria and make implicit assumptions explicit. Invoked at the end of /at:create-task and the start of /at:plan-task. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task."
 ---
 
 # Clarify Task

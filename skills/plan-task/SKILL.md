@@ -1,6 +1,6 @@
 ---
 name: plan-task
-description: Write an implementation plan for a well-defined task. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task.
+description: "Write an implementation plan for a well-defined task. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task."
 ---
 
 # Plan Task

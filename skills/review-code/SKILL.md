@@ -1,6 +1,6 @@
 ---
 name: review-code
-description: Use to review a diff for correctness, design, security, and convention conformance. High-signal, read-only, severity-gated, with an autofix lane for mechanically-certain trivia. Default review step in /at:auto-task.
+description: "Use to review a diff for correctness, design, security, and convention conformance. High-signal, read-only, severity-gated, with an autofix lane for mechanically-certain trivia. Default review step in /at:auto-task."
 ---
 
 <!-- Distilled from a review of the code-review research literature (May 2026). This file is the distilled instruction, not the bibliography. -->

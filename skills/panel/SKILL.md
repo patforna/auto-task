@@ -1,6 +1,6 @@
 ---
 name: panel
-description: Use to get independent perspectives on a topic from multiple models (a strong Claude model + Codex by default). Use with /at:synthesize to merge.
+description: "Use to get independent perspectives on a topic from multiple models (a strong Claude model + Codex by default). Use with /at:synthesize to merge."
 ---
 
 # Panel

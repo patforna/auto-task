@@ -21,7 +21,7 @@ for s in "${SKILLS[@]}"; do
   rm -rf "$HERE/skills/$s"
   cp -R "$src" "$HERE/skills/$s"
   # vendored copies namespace their internal refs to this plugin:
-  find "$HERE/skills/$s" -name '*.md' -exec sed -i '' 's|/core-skills:|/at:|g' {} +
+  find "$HERE/skills/$s" -name '*.md' -exec perl -pi -e 's|/core-skills:|/at:|g' {} +
   echo "vendored $s"
 done
 

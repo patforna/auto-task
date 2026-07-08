@@ -1,6 +1,6 @@
 ---
 name: create-task
-description: Use this skill to crystallise and scope an ongoing conversation into a well-defined task, capturing user intent at a high level. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task.
+description: "Use this skill to crystallise and scope an ongoing conversation into a well-defined task, capturing user intent at a high level. Typical workflow: create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task."
 ---
 
 # Create Task
