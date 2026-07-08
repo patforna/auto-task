@@ -151,6 +151,7 @@ Ensure each AC has the following properties:
 
 - When structure IS the deliverable (e.g. refactoring), structural criteria are OK (e.g. "no references to compute() functions remain");
 - When a formula or algorithm defines correctness, include it as specification (e.g. "sigma2_t = (1 - lambda) *r_t^2 + lambda* sigma2_{t-1}").
+- When the task replaces, migrates, or removes existing behaviour, include cleanup in the task if stale code or obsolete affordances would otherwise remain ambiguous.
 
 #### Examples
 

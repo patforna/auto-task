@@ -34,10 +34,12 @@ These rules govern what belongs in the plan and how to write it. Internalise and
 - Write for a competent outsider. They can write code, name things, follow patterns but they don't have in-team context beyond what's in the task and the repo.
 - Be maximally succinct. Capture the plan with the fewest words that remove ambiguity. Plan length obviously follows complexity but don't pad.
 - What would you be nervous about if you gave the agent only the task and codebase but no plan? Address those (and only those) things.
+- Treat the plan as a behaviour-verification list. Each step should name the observable behaviour, contract, or spec detail it advances and, when the task's ACs don't already make it obvious, the focused check that would prove it.
 - If (and only if) load-bearing, add pointers to existing code (modules, classes, functions, utilities, etc. to consider), sequencing when ordering matters for correctness, constraints on approach when more than one is plausible.
 - Lock down details of cross-boundary contracts in the plan (e.g. API shapes, DB/parquet schemas, symbols reachable across package boundaries, etc.).
 - Leave decision on internal details to the implementer - no pseudocode, no names for new files/classes/functions, no exact line numbers, no details that will go stale quickly.
 - Do not restate universal truths ("write tests", "handle errors", "follow patterns", "run the build").
+- Do not add generic verification steps. Add verification only when it is specific to the behaviour in that step (e.g. a fixture, grep, measurement, schema assertion, edge case, or UI state the implementer might otherwise miss).
 - Avoid placeholders, i.e. no "TBD"s, no "handle edge cases", no "similar to step 3". If it's worth writing down, be concrete.
 - Use plain English and write like a senior engineer briefing a teammate, not like an AI producing a spec. Avoid AI-slop language and padding.
 
@@ -71,7 +73,7 @@ Write a plan using the structure below (drop sections that aren't needed):
 
 ### Steps
 
-[Numbered list of steps - imperative, specific, terse]
+[Numbered list of steps - imperative, specific, terse. Each step pairs a behaviour/change with the focused check when that check is not already obvious from the task ACs.]
 
 ### Notes
 

@@ -30,7 +30,7 @@ Reading rule for the whole corpus: **mechanisms are live, numbers are dead.** Ev
 ## (Impl-Task-Skill-Research, Tdd-in-the-Agentic-Engineering-Era, Kent-Beck, Tdd-by-Example, Testing-Tools, Architecture-Testing-Tools)
 
 - TDD is the control mechanism, non-negotiable where silent corruption is possible (wrong numbers, not errors); red→green→refactor inline with Fake-It/Triangulate/Obvious.
-- Commit at green per plan step; force a refactor checkpoint after every green — AI only inhales complexity, it never exhales unprompted. **Alignment gap: the tdd skill has refactor-at-green only as optional cadence, not a mandatory logged step.**
+- Commit at green per plan step; force a refactor checkpoint after every green — AI only inhales complexity, it never exhales unprompted. **Skill alignment: the tdd skill now requires commit-at-green and refactor-at-green explicitly.**
 - Pure-wiring steps skip TDD; apply by criticality. Two-attempt fix rule, then backtrack to last green.
 - Keep the impl skill lean (~150 lines); overspecification reduces success while raising cost.
 - **Open decision:** tdd-agentic-era argued for a subagent-isolated Red phase (test author ≠ implementer); impl-task-skill-research bet single-context with the pre-approved plan as substitute. The skills adopted single-context, yet their own guidance admits the failure mode ("AI-written tests often mirror what the code does"). The 2026 evidence (cross-context review, arXiv 2603.12123) favours revisiting — e.g. isolate Red for quant-critical modules only.
