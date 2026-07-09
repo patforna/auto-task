@@ -1,63 +1,76 @@
-# Auto-Task
+# auto-task
 
-**An opinionated, end-to-end agentic task workflow for Claude Code: scope → plan → build → review → ship.**
+An opinionated agentic workflow to automate a non-trivial slice of the software development life cycle (SDLC).
 
-Auto-task drives a well-defined task from intent to squash-merged commit with minimal human input — a git worktree, a two-model planning panel, test-first implementation by fresh-context subagents, independent adversarial code review, evidence-cited triage, and a human ship gate at the end.
+_auto-task_ turns well-defined units of work into shippable code with minimal human input. To achieve this, it uses git worktrees, persistent task state, fresh-context subagents, multi-model panels, TDD, and evidence-cited triage.
 
-Think cruise control, not Full Self-Driving: you own what to build and whether it ships; the workflow owns the distance in between.
+I imagine _auto-task_ will be most useful to experienced engineers who want to ship software at an accelerated pace but remain in control while doing so. **Think: cruise control, not Full Self-Driving.** 🙃
 
-![A real /at:auto-task run at 14x speed](docs/wordwise-demo.gif)
+> [!NOTE]
+> Extracted from my own daily workflow and shared early — rough edges included. Issues and feedback welcome.
 
-*A real, unedited run at 14× speed — plan panel, TDD implementation, adversarial review, triage, ship gate. Full recording: [`docs/wordwise-demo.cast`](docs/wordwise-demo.cast); final report: [`examples/sample-run.md`](examples/sample-run.md).*
+## Typical Workflow
 
-## Quick Start
+At a high-level, a typical _auto-task_ session looks something like this:
+
+1. **Explore:** You explore a topic, e.g. a product increment, a bug, an issue, a refactoring, etc.
+2. **Scope:** Once your idea on what to build converges, you crystallise it into a *well-defined task* (remember: sh\*t in → sh\*t out).
+3. **Build:** You hand the task over to agents to complete with full autonomy.
+4. **Ship:** You review the work, potentially give feedback, and ship.
+
+
+TODO: Add terminal cast
+
+## Prerequisites
+
+- [Claude Code](https://claude.com/product/claude-code)
+- [Codex CLI](https://developers.openai.com/codex/cli) and [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) (strongly recommended; to enable multi-model-family panels)
+- [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp) (only required when reviewing UI changes)
+
+## Installation
+
+Open Claude Code and run:
 
 ```text
 /plugin marketplace add patforna/auto-task
 /plugin install at@auto-task
 ```
 
-Then, in any git repo:
+## Quick Start
 
-1. Discuss what you want to build, then run `/at:create-task` — it crystallises the conversation into a task file under `tasks/` and clarifies ambiguities with you until a fresh agent could pick it up cold.
-2. Run `/at:auto-task tasks/NNN-your-task.md` — it plans, implements, reviews, and fixes autonomously, then stops and shows you a triage report.
-3. Review the report, then `/at:ship-task` — squash-merge, verify the integrated tree, push, clean up.
+Open Claude Code in your project's git repo:
 
-No server, no UI, no lock-in: tasks are plain markdown in your repo.
+1. Explore what to build.
+2. Capture it using `/at:create-task`. Then review and tweak the task. Potentially re-run `/at:clarify-task`.
+3. In a new session, run `/at:auto-task <task>`*.
+4. Review what was built. Then run `/at:ship-task`.
 
-Expect a full `/at:auto-task` run to take 20–60 minutes and spend real tokens — it spawns a planning panel, an implementer, parallel reviewers, and re-reviews across two model families. `--lite` mode (single-pass plan, single reviewer, single task review) roughly halves that.
+*Expect a full run to take 20–40 minutes and spend a decent amount of tokens.
 
 ## The Workflow
 
 ```text
-      SCOPE — human                  BUILD — agents, autonomous                 SHIP — human
-┌───────────────────────┐   ┌───────────────────────────────────────────┐   ┌──────────────────┐
-│ /at:create-task       │ → │ /at:auto-task                             │ → │ ship gate:       │
-│ capture intent;       │   │ plan (two-model panel) → implement (TDD)  │   │ review report,   │
-│ clarify runs inside   │   │ → dual review → triage/fix → verify ACs   │   │ /at:ship-task    │
-└───────────────────────┘   └───────────────────────────────────────────┘   └──────────────────┘
+create → clarify [ worktree · plan · impl · review · triage · fix · verify ] → ship-task
+  (human)                           (autonomous)                             (human)
 ```
 
-Two human touchpoints bookend an autonomous middle. Seven skills underlie the pipeline (`create-task`, `clarify-task`, `plan-task`, `impl-task`, `review-code`, `review-task`, `ship-task`) — you rarely invoke the inner ones directly, but each runs standalone. Inside the build phase:
 
 | Step            | What happens                                                                                                                                                                     |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Worktree**    | The task gets an isolated git worktree at a predictable path, with dependencies installed.                                                                                       |
 | **Plan**        | Two models (Claude + Codex by default) independently write implementation plans; a synthesis merges them without forcing consensus.                                              |
 | **Implement**   | A fresh-context subagent executes the plan test-first (strict TDD), committing as it goes.                                                                                       |
-| **Review**      | Two independent reviews run in parallel — a structured Claude review and an adversarial pass from a different model family.                                                      |
+| **Review**      | Two independent models review in parallel — a structured Claude review and an adversarial pass from a different family (Codex by default).                                       |
 | **Triage**      | Every finding gets an explicit disposition — accept or reject — with cited evidence. Mechanically-certain trivia auto-fixes; Critical/Major findings can never be auto-rejected. |
 | **Fix**         | Accepted findings are fixed test-first; the fix itself gets re-reviewed.                                                                                                         |
-| **Task review** | An independent agent verifies every acceptance criterion against the actual behaviour, not the diff.                                                                             |
-| **Ship gate**   | The workflow stops and reports what was found, fixed, rejected and why. You decide whether it ships.                                                                             |
-
-Why multiple models? Different model families have different blind spots. In practice the adversarial pass regularly catches real bugs the first reviewer missed — and the fix-review catches bugs in the fixes.
+| **Verify**      | An independent agent verifies every acceptance criterion against the actual behaviour, not the diff.                                                                             |
+| **Ship**        | The workflow stops and reports what was found, fixed, rejected and why. You decide whether it ships.                                                                             |
 
 See [`examples/sample-run.md`](examples/sample-run.md) for the verbatim report of a real run on defaults — including the triage decisions and the ship gate.
 
 ## Tasks
 
-Tasks are the workflow's persistent state: created by a human to capture intent (the why and what — never the how), then accumulating the plan, implementation notes, and review decisions as agents work. Anything that isn't in the task file or the repo doesn't exist for the next session — that constraint is the design.
+Tasks are plain markdown files stored in or outside of your repo (default: `tasks/`). They persist and carry state through the workflow: initially created by a human to capture intent (the why and what), then used across agent sessions to capture plans, track status, and log notes and review decisions.
 
 ```markdown
 ---
@@ -78,19 +91,14 @@ Add a stats command that reads a file of newline-separated numbers and prints su
 - A file with no numbers aborts with an error, exit code 1.
 ```
 
-- Location: `tasks/{NNN}-{slug}.md` — attachments in `tasks/attachments/{NNN}/`.
-- Status lifecycle: `new` → `ready-for-dev` → `in-dev` → `ready-for-signoff` → `done` (plus `rejected`, `later`).
-- Types: `feat`, `design`, `tech`, `bug`, `research`, `other`.
-- Acceptance criteria are behavioural, specific, and testable — `/at:create-task` documents the full discipline, including epics.
+## Configuration
 
-## Project Config
+Defaults can be overridden per project in markdown.
 
-Every default above can be overridden per project — in markdown, not config syntax, because config entries are instructions the agent reads (several are prose, like standing review context), not values code parses. Config is for repository-specific mechanics and standing facts the generic skills cannot infer; core workflow methodology stays in the skills.
+- Project config: `.claude/auto-task.config.md` — Committed. Shared by everyone in the repo.
+- Personal overrides: `.claude/auto-task.config.local.md` — Gitignored. Takes precedence over project config on conflict.
 
-- **`.claude/auto-task.config.md`** — project config. Committed, shared by everyone in the repo.
-- **`.claude/auto-task.config.local.md`** — personal overrides. Gitignored; wins over the project file on conflict.
-
-Precedence: plugin defaults ← project config ← local overrides. Copy [`examples/auto-task.config.md`](examples/auto-task.config.md) into your repo and edit — it lists every recognised section with its default:
+[`examples/auto-task.config.md`](examples/auto-task.config.md) lists every recognised section with its default — an easy way to get started is to copy it into your repo and amend as needed:
 
 | Setting            | Default                                                    | Override examples                                        |
 | ------------------ | ---------------------------------------------------------- | -------------------------------------------------------- |
@@ -104,17 +112,27 @@ Precedence: plugin defaults ← project config ← local overrides. Copy [`examp
 | Transcript capture | Skipped                                                    | A capture command + out-of-repo destination              |
 | Feedback snapshots | Skipped                                                    | An out-of-repo snapshot directory                        |
 
-## Requirements and Integrations
-
-- **Claude Code** — the only hard requirement. Skills are namespaced `/at:` and invoked explicitly; nothing auto-triggers.
-- **Codex plugin (optional)** — if [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) is installed (`/plugin marketplace add openai/codex-plugin-cc`, then install `codex`), planning and adversarial review use Codex as the second model family. Without it, a second fresh-context Claude subagent takes that role (weaker: same family, same blind spots).
-- **chrome-devtools MCP (optional)** — used by `/at:review-design` to verify UI changes against a spec with real browser input.
-
-This plugin is self-contained: it vendors its generic dependencies (`panel`, `synthesize`, `tdd`) from [core-skills](https://github.com/patforna/core-skills), so nothing else needs to be installed.
-
 ## Skills
 
-Workflow: `auto-task`, `create-task`, `clarify-task`, `plan-task`, `impl-task`, `review-code`, `review-task`, `ship-task`, `review-design`. Vendored: `panel`, `synthesize`, `tdd`.
+All skills are namespaced under `/at:` and run standalone.
+
+| Skill           | One-liner                                                   |
+| --------------- | ----------------------------------------------------------- |
+| `auto-task`     | Run the whole pipeline on a task, hands-off until shipping.  |
+| `create-task`   | Turn a conversation into a scoped, well-defined task file.   |
+| `clarify-task`  | Surface ambiguities and pin down vague criteria.            |
+| `plan-task`     | Produce an implementation plan for a task.                  |
+| `impl-task`     | Execute a plan test-first, committing as it goes.           |
+| `review-code`   | Review any diff for correctness, design, and security.      |
+| `review-design` | Review a UI change against its design spec.                 |
+| `review-task`   | Check a task meets its intent and acceptance criteria.      |
+| `panel`         | Get independent takes from multiple models on any question. |
+| `synthesize`    | Merge those takes into one view without forcing consensus.  |
+| `tdd`           | Drive new code with strict red/green/refactor.              |
+| `ship-task`     | Finish up: mark done, merge, clean up.                      |
+
+* `clarify-task` runs automatically at the end of `create-task`; invoke it directly to re-validate a task you've hand-edited.
+* `panel`, `synthesize`, and `tdd` are vendored from [core-skills](https://github.com/patforna/core-skills).
 
 ## FAQ
 
@@ -127,11 +145,3 @@ Workflow: `auto-task`, `create-task`, `clarify-task`, `plan-task`, `impl-task`, 
 **Can I use just parts of it?** Yes. Every skill runs standalone — `/at:review-code` on any diff, `/at:create-task` without ever running the orchestrator.
 
 **Where did this come from?** Six months of full-time agentic development on a real quant-research codebase, shaped by XP (small tasks, TDD, continuous integration) and a review protocol distilled from the code-review research literature.
-
-## Status
-
-Early and opinionated (pre-1.0), extracted from daily personal use. Shared as-is; issues and feedback welcome. See [CHANGELOG.md](CHANGELOG.md).
-
-## License
-
-[MIT](LICENSE)
