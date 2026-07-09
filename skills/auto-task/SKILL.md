@@ -50,9 +50,24 @@ Internalise and follow these rules:
 
 ## Protocol
 
-## Step 1: Confirm
+## Step 1: Confirm & Preflight
 
 Find the task, read it fully, and output its title and status. Bonus points for using figlet =)
+
+### Preflight
+
+A pre-autonomy gate — the one point that may stop for the human (the autonomy rule above explicitly permits an instructed stop). Cheap checks only: shell probes, globs, config reads — no subagents, no real model calls. Resolve config first (§ Models, Verification, Design Review), then check:
+
+- **Codex** — only if config § Models routes the plan panel or adversarial review to Codex (the default):
+  - Neither the `openai-codex` plugin nor a `codex` on PATH → **degraded**: panel and adversarial review fall back to single-family Claude, the highest-signal part of the pipeline. Suggest installing the Codex CLI + codex-plugin-cc, or naming a second model family in config § Models.
+  - Present but `codex doctor` fails → **stop-and-fix**: Step 5 fails loud and won't substitute, so the run would die ~20 min in. Suggest `codex login` / checking usage limits, or repointing config § Models — then re-run. Do not offer proceed-as-is.
+- **Verification** — resolve the command (config § Verification, else auto-discover: a `just`/`make` check recipe, the CI workflow's steps, or the full test suite). Report what it resolved to (correctable via config § Verification). Nothing found → **degraded**: the Step 8 and fix-verification gates are hollow; strongly suggest adding config § Verification first.
+- **Design review** — only when the task is `type: design` or its description/ACs signal a rendered-output change: confirm the chrome-devtools MCP is available and config § Design Review names a fixture-backed serve command. Missing either → **degraded**: Step 6 will be flagged-and-skipped rather than failing loud mid-run. Suggest adding the serve command / installing the MCP.
+
+Outcome:
+
+- **Clean** — emit one line and continue into the run, e.g. `Preflight ✓ — full multi-model · verify: just check · tasks: tasks/`. No pause.
+- **Findings** — print the resolved roster (models · verification · task store; design-review readiness on UI tasks), each finding, and its suggestion, then **pause**. Any **stop-and-fix**: do not proceed — the human fixes and re-runs. Only **degraded**: offer proceed (accept the degradation — record each in the Step 10 report) or fix-first.
 
 Then apply the Modes auto-downshift check (unless a mode was passed explicitly).
 
