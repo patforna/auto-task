@@ -3,7 +3,7 @@
 An opinionated agentic workflow to turn well-defined units of work into shippable code with minimal human input.
 
 > [!NOTE]
-> This is a very early extract from my daily workflow — rough edges included. Issues and feedback welcome!
+> This is a very early extract from my daily workflow — rough edges included. Feedback, Issues and PRs welcome!
 
 _auto-task_ aims to deliver high-quality code with high autonomy. To achieve this, it combines human-curated skills with research-backed techniques: workspace isolation, persistent task state, fresh-context subagents, multi-model-family panels and synthesis, TDD, evidence-cited triage, and more.
 

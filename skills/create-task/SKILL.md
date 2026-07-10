@@ -97,6 +97,7 @@ TODO: Add ACs
 TODO: Add notes
 ```
 
+<!-- FIXME: what's the point of having this here (all three points)? Rework -->
 **Task states:** the frontmatter `status` progresses `new` → `ready-for-dev` (end of clarify) → `in-dev` (start of impl) → `ready-for-signoff` (end of task review) → `done` (ship). Off-ramp states: `rejected` (investigated and declined), `later` (consciously postponed).
 
 **Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `tasks/attachments/{NNN}/` (next to the task files) and reference it from the task file — don't drop it as a top-level sibling.
@@ -195,7 +196,7 @@ This could include but is not limited to:
 - Alternatives considered;
 - etc.
 
-Use bullet points and short sentences. If in doubt whether a note is inferable from the repo, leave it out — only keep what a capable agent couldn't discover by exploring. Clarify will surface anything load-bearing that's actually missing.
+Use bullet points and short sentences. If in doubt whether a note is inferable from the repo, leave it out — only keep what a capable agent couldn't discover by exploring. `/clarify-task` will surface anything load-bearing that's actually missing.
 
 #### Examples
 
@@ -257,7 +258,7 @@ Run one succinctness pass before clarifying. Spawn a subagent that reads the tas
 - Inferable from the repo - established conventions, the single obvious mechanism, values readable from a table → cut.
 - Restating an attachment the task already points at → cut.
 - Load-bearing - a decision two reasonable agents would otherwise make differently → keep, or pin it with one line if it's currently only implied.
-- The Description's account of how the conversation evolved is never load-bearing → cut to the compressed why.
+- The Description's account of how the conversation evolved is never load-bearing → cut.
 
 The subagent returns proposed cuts with a one-line reason each. Apply every cut unless you can state, in one line, the specific decision two reasonable agents would otherwise make differently. "Useful context" / "helps a human reader" is not such a reason — the audience is the implementing agent, with full repo access. Bias toward cutting; keeping is the exception you justify. Run it once - don't loop.
 
@@ -283,6 +284,7 @@ An epic is simply a high-level task that aggregates a number of sub-tasks.
 
 To create an epic, follow the instructions for creating a standalone task. Drop the `Acceptance criteria` section and instead add a `Tasks` section to the end.
 
+<!-- FIXME: wtf is that? -->
 Also add a `Locked Decisions` section: shared conventions and cross-cutting calls that apply to every sub-task (e.g. "regen deferred to the last sub-task", "intermediates stay internal", commit granularity). Sub-task planning treats these as settled — without this section every sub-task re-derives them from scratch. Append to it whenever a sub-task run settles a new cross-cutting question.
 
 Example:
