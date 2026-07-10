@@ -1,70 +1,95 @@
 # auto-task
 
-An opinionated agentic workflow to automate a non-trivial slice of the software development lifecycle.
-
-_auto-task_ turns well-defined units of work into shippable code with minimal human input. To achieve this, it uses git worktrees, persistent task state, fresh-context subagents, multi-model panels, TDD, and evidence-cited triage.
-
-Built for experienced engineers who want to ship software at an accelerated pace but remain in control while doing so. **Think: cruise control, not Full Self-Driving.**
+An opinionated agentic workflow to turn well-defined units of work into shippable code with minimal human input.
 
 > [!NOTE]
-> Extracted from my own daily workflow and shared early — rough edges included. Issues and feedback welcome.
+> This is a very early extract from my daily workflow — rough edges included. Issues and feedback welcome!
+
+_auto-task_ aims to deliver high-quality code with high autonomy. To achieve this, it combines human-curated skills with research-backed techniques: workspace isolation, persistent task state, fresh-context subagents, multi-model-family panels and synthesis, TDD, evidence-cited triage, and more.
+
+Built for experienced engineers who want to ship software at an accelerated pace but remain in control while doing so.
+
+**Think cruise control, not Full Self-Driving.**
+
+TODO: add screencast
 
 ## How It Works
 
-At a high-level, a typical _auto-task_ session looks something like this:
+At a high level, a typical _auto-task_ session looks something like this:
 
-1. **Explore:** You explore a topic, e.g. a product increment, a bug, an issue, a refactoring, etc.
-2. **Scope:** Once your idea on what to build converges, you crystallise it into a *well-defined task* (remember: sh\*t in → sh\*t out).
-3. **Build:** You hand the task over to agents to complete with full autonomy.
-4. **Ship:** You review the work, potentially give feedback, and ship.
+1. **Explore:** You explore a topic — a product increment, a bug, an issue, a refactoring, etc.
+2. **Scope:** Once your idea of what to build converges, you crystallise it into a *well-defined task* via `/at:create-task`.
+3. **Build:** You hand the task over to agents to complete with full autonomy via `/at:auto-task`.
+4. **Ship:** You review the work, potentially give feedback, and ship via `/at:ship-task`.
 
-Under the hood, those four steps unfold as a fixed pipeline — you drive the ends, agents own the middle:
+Under the hood, these steps unfold as a fixed pipeline:
 
 ```text
-create → clarify [ worktree · plan · impl · review · triage · fix · verify ] → ship-task
-  (human)                           (autonomous)                             (human)
+create → [ clarify · worktree · plan · impl · review · triage · fix · verify ] → ship
+(human)                              (auto-task)                               (human)
 ```
 
-| Step            | What happens                                                                                                                                                                     |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Worktree**    | The task gets an isolated git worktree at a predictable path, with dependencies installed.                                                                                       |
-| **Plan**        | Two models (Claude + Codex by default) independently write implementation plans; a synthesis merges them without forcing consensus.                                              |
-| **Implement**   | A fresh-context subagent executes the plan test-first (strict TDD), committing as it goes.                                                                                       |
-| **Review**      | Two independent models review in parallel — a structured Claude review and an adversarial pass from a different family (Codex by default).                                       |
-| **Triage**      | Every finding gets an explicit disposition — accept or reject — with cited evidence. Mechanically-certain trivia auto-fixes; Critical/Major findings can never be auto-rejected. |
-| **Fix**         | Accepted findings are fixed test-first; the fix itself gets re-reviewed.                                                                                                         |
-| **Verify**      | An independent agent verifies every acceptance criterion against the actual behaviour, not the diff.                                                                             |
-| **Ship**        | The workflow stops and reports what was found, fixed, rejected and why. You decide whether it ships.                                                                             |
+### Steps
+
+The pipeline in detail. Create and clarify are interactive; worktree through verify run autonomously inside `/at:auto-task`; the ship decision stays with you. Every step backed by a skill also runs standalone.
+
+| Step              | What happens                                                                                                                                                                                | Skill               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| **Create**        | You crystallise an exploration into a task file — intent, acceptance criteria, notes. A tighten pass cuts anything a capable agent could infer itself.                                      | `/at:create‑task`   |
+| **Clarify**       | Pressure-tests the task: would two agents given the task build the same thing and agree when it's done? Gaps come back as focused questions.                                                | `/at:clarify‑task`  |
+| **Worktree**      | The task gets an isolated git worktree at a predictable path, with dependencies installed.                                                                                                  | —                   |
+| **Plan**          | Two models (Claude + Codex by default) independently write implementation plans; a synthesis merges them without forcing consensus.                                                         | `/at:plan‑task`     |
+| **Implement**     | A fresh-context subagent executes the plan test-first (strict TDD), committing as it goes.                                                                                                  | `/at:impl‑task`     |
+| **Review**        | Two independent models review in parallel — a structured Claude review and an adversarial pass from a different model family (Codex by default).                                            | `/at:review‑code`   |
+| **Design review** | UI changes only: boots the app and measures the rendered result against a design spec — geometry, tokens, real interaction states.                                                          | `/at:review‑design` |
+| **Triage**        | Every finding gets an explicit disposition — accept or reject — with cited evidence. Mechanically certain trivia auto-fixes; Critical/Major findings will be flagged to a human at the end. | —                   |
+| **Fix**           | Accepted findings are fixed test-first; fixes get re-reviewed.                                                                                                                              | —                   |
+| **Verify**        | An independent agent verifies every acceptance criterion against the actual behaviour, not the diff.                                                                                        | `/at:review‑task`   |
+| **Ship**          | When the workflow stops and reports what was found, fixed, rejected and why, you decide whether it ships. Shipping squash-merges, verifies the integrated tree, and pushes.                 | `/at:ship‑task`     |
 
 See [`examples/sample-run.md`](examples/sample-run.md) for the verbatim report of a real run on defaults — including the triage decisions and the ship gate.
 
 ## Tasks
 
-Tasks are plain markdown files stored in or outside of your repo (default: `tasks/`). They persist and carry state through the workflow: initially created by a human to capture intent (the why and what), then used across agent sessions to capture plans, track status, and log notes and review decisions.
+Tasks are the central artefact of the _auto-task_ workflow. They span the entire workflow, accumulating and preserving state across agent sessions. They are plain markdown files stored on disk (default: `tasks/`).
+
+Tasks are created by a human to capture user intent at a behavioural level (i.e. the why and what, not the how). I suggest you use `/at:create-task`, which automatically runs `/at:clarify-task` to pressure-test that a new agent understands what to build. You can also write tasks by hand — but then run `/at:clarify-task` explicitly before handing over, as you should whenever a human has written or modified a task. You may include additional guidance or constraints but generally should avoid specifying implementation details — implementation planning is done later, by agents. Once agents take over, they use the task file to persist implementation plans, track status, log notes, surprises, etc.
+
+Creating well-defined tasks is hard, time-consuming and high-leverage. I spend a good chunk of my time here and obsess over making sure that my intention is clear without over-constraining the model that will pick up the task. I also make sure to size tasks into manageable chunks. As a rule of thumb, I aim to cut scope into tasks that would take a human developer in the olden days between 0.5 and 3 days. Everything below that I usually one-shot; anything above, I break down. Spending time here is well worth it. Don't expect AI to magically turn a vague or sloppily written task into correct software. Sh\*t in, sh\*t out.
+
+Here's a sample task:
 
 ```markdown
 ---
-title: Stats command
-date: 2026-07-02
+title: Export invoices as CSV
+date: 2026-07-10
 status: ready-for-dev
 type: feat
 ---
 
-## Stats Command
+## Export Invoices as CSV
 
-Add a stats command that reads a file of newline-separated numbers and prints summary statistics.
+Add a CSV export to the invoices list so customers can pull their data into their own accounting tools.
 
 ### Acceptance Criteria
 
-- `bun run stats <file>` prints one line: `count=<n> median=<m> p90=<p>`.
-- Median: for an even count, the mean of the two middle values.
-- A file with no numbers aborts with an error, exit code 1.
+- An Export button on the invoices list downloads a CSV of the currently filtered rows — not just the visible page.
+- Columns: invoice number, customer, issue date, due date, status, total. Dates are ISO (YYYY-MM-DD); totals are plain decimals, no currency symbol.
+- Fields containing commas, quotes, or newlines are escaped per RFC 4180.
+- An export with no matching rows downloads a CSV with the header row only.
+- Exports are capped at 10,000 rows for now — larger exports fail with an error pointing at the API.
+
+### Notes
+
+- Async export for large row counts is a later task.
 ```
 
 ## Prerequisites
 
+For now, _auto-task_ works with Claude Code and uses Codex as a second model for multi-model-family panels. If Codex and the Claude Code Codex plugin are not installed, _auto-task_ falls back to same-family models for panels, which significantly degrades quality. Using Codex — or another non-Anthropic model (see [Configuration](#configuration)) — as the second model is therefore strongly recommended.
+
 - [Claude Code](https://claude.com/product/claude-code)
-- [Codex CLI](https://developers.openai.com/codex/cli) and [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) (strongly recommended; to enable multi-model-family panels)
+- [Codex CLI](https://developers.openai.com/codex/cli) and [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) (to enable multi-model-family planning and review panels)
 - [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp) (only required when reviewing UI changes)
 
 ## Installation
@@ -80,14 +105,20 @@ Open Claude Code and run:
 
 Open Claude Code in your project's git repo:
 
-1. Explore what to build.
-2. Capture it using `/at:create-task`. Then review and tweak the task. Potentially re-run `/at:clarify-task`.
-3. In a new session, run `/at:auto-task <task>`*.
-4. Review what was built. Then run `/at:ship-task`.
-
-*Expect a full run to take 20–40 minutes and spend a decent amount of tokens. `--lite` mode (single-pass plan, single reviewer, single task review) cuts that meaningfully — pass it explicitly, or let auto-task downshift automatically for small, single-package changes.
+1. Run `/at:create-task` to capture what to build. Review and tweak the task.
+2. In a new session, run `/at:auto-task <task>`.
+3. Review what was built, then run `/at:ship-task`.
 
 ## Configuration
+
+### Flags
+
+Per invocation, `/at:auto-task` takes two flags:
+
+- `--lite` — single-pass plan, single reviewer, single task review. Cuts the runtime meaningfully. _auto-task_ downshifts to lite automatically for small, single-package changes; pass the flag to force it.
+- `--ship` — ship automatically at the end instead of stopping for approval. If a Critical/Major finding needs your call, the ship gate still holds.
+
+### Project Config
 
 Defaults can be overridden per project in markdown.
 
@@ -96,14 +127,41 @@ Defaults can be overridden per project in markdown.
 
 Configurable per project: task store, verification command, worktree layout, standing review context, design-review server, model roster, commit conventions, transcript capture, feedback snapshots. See [`examples/auto-task.config.md`](examples/auto-task.config.md) for every setting with its default — copy it into your repo and amend as needed.
 
+## Development
+
+Skills live in [`skills/`](skills/), one directory per skill.
+
+After changing a skill, bump the version in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`, then refresh the installed plugin:
+
+```sh
+claude plugin marketplace update auto-task
+claude plugin update at@auto-task
+```
+
+`panel`, `synthesize`, and `tdd` are vendored from [core-skills](https://github.com/patforna/core-skills). Don't edit them here — edit them there and re-vendor:
+
+```sh
+scripts/vendor.sh [path-to-core-skills]
+```
+
 ## FAQ
 
-**Why tasks and not specs?** A spec describes a system; a task describes a change — sized like 1–3 old-fashioned human-days, small enough to review honestly, big enough to matter. The task also outlives the chat: it's the only state that survives across sessions, so everything load-bearing must land in it.
+**Why not just prompt Claude Code directly?** For small changes, do. The value shows on bigger units of work: a single session reviews its own output (structurally unreliable), drifts as its context fills, and forgets everything between sessions. _auto-task_ replaces that with fresh-context subagents per step, review by a model family that didn't write the code, evidence-cited triage of every finding, and a task file that persists state. It's the discipline you'd apply if you were building without AI, enforced on every run.
 
-**Why markdown config and not TOML/JSON?** Nothing parses the config — an agent reads it. Several entries are irreducibly prose (standing review context, domain review rules); the rest read better as one-line instructions than as string values quoted inside config syntax.
+**Why tasks and not specs?** I'm coming from an XP lineage and I always had an aversion to "spec" because it implies things are set in stone and there is no room for learning and iteration — waterfall vs iterative development. I was going to go with "[user] stories" but that also didn't feel right because the last "C" (in "Card, Criteria, Conversation") doesn't make so much sense in this new age and I'm also aware that the term user stories has accumulated a lot of baggage over the last 20 years or so. "Issues" or "Tickets" didn't feel appropriate either. "Task" felt more neutral and like a good fit.
+
+**Why do tasks live in the repo?** Because agents are great at plain file I/O and the tasks travel with the code: no API, no auth, readable and editable in any worktree or headless session, and the task file rides the same branch as the change it describes. The downsides are real too: task churn shows up in your git history and diffs, and in a public repo the tasks are published with the code. Both alternatives have trade-offs of their own: an issue tracker gives you collaboration features but puts an API between the agent and its state; a separate task repo keeps the code history clean but the task no longer travels with the branch. The task store is configurable — I currently keep my own tasks in a sibling repo for the history-noise reason.
 
 **Do I need Codex?** No, but the multi-model review is materially better than single-family review — it's the part of this workflow that has most reliably caught real bugs. Any second model family can fill the role via the Models setting.
 
-**Can I use just parts of it?** Yes. Every step is its own `/at:` skill and runs standalone — `/at:review-code` on any diff, `/at:create-task` without the orchestrator, `/at:panel` for a multi-model take on anything. Type `/at:` in Claude Code for the full list. (`panel`, `synthesize`, and `tdd` are vendored from [core-skills](https://github.com/patforna/core-skills).)
+**How long does a run take?** Expect a full run to take ~20–40 minutes and spend a decent amount of tokens. `--lite` about halves it.
 
-**Where did this come from?** Six months of full-time agentic development on a real quant-research codebase, shaped by XP (small tasks, TDD, continuous integration) and a review protocol distilled from the code-review research literature.
+**Why does it merge straight to main — no PRs?** Because by ship time the change has been reviewed harder than most PRs ever are: two model families, adversarial passes, evidence-cited triage, AC-by-AC verification — plus you at the ship gate. Also, the workflow comes from solo trunk-based development; if your team requires PRs, the ship step is the natural seam to adapt.
+
+**Can I use just parts of it?** Yes. Every step is its own `/at:` skill and runs standalone — `/at:review-code` on any diff, `/at:create-task` without the orchestrator, `/at:panel` for a multi-model take on anything. Type `/at:` in Claude Code for the full list.
+
+**Can I run multiple tasks in parallel?** Yes. Each task gets its own worktree, so parallel runs don't collide during implementation, assuming your build process and environment are hermetic (e.g. separate server instances running on separate ports, etc.). Make sure you ship serially though: shipping merges in the primary checkout, and concurrent ships race each other.
+
+**Why markdown config and not TOML/JSON?** Nothing parses the config — an agent reads it. Several entries are irreducibly prose (standing review context, domain review rules); the rest read better as one-line instructions than as string values quoted inside config syntax.
+
+**Where did this come from?** 6+ months of full-time agentic solo development on a quant trading codebase, shaped by XP, years at ThoughtWorks and Google, and deep literature research (see [docs/research](docs/research)).

@@ -5,31 +5,30 @@ description: "use to drive a well-defined task end-to-end with minimal human inp
 
 # Auto Task
 
+<!-- TODO: reconcile the Step 0 intro ("combine the errors ... and abort") with the Step 0.4 Outcome block, which lets degraded findings proceed (proceed-or-fix) — abort vs pause. -->
+<!-- TODO: Step 0.3 (clarify) is interactive (AskUserQuestion, possibly multiple rounds) and can stall unattended/--ship runs — decide unattended behaviour (e.g. flag-and-abort instead of asking). -->
+
 ## Usage
 
-`/at:auto-task <task> [--lite] [further user instructions]`
+`/at:auto-task <task> [--lite] [--ship] [further user instructions]`
 
-## Modes
+## Flags
 
-- **Full** — default.
-- **Lite (`--lite`)** — single-pass planning (Step 3), a single reviewer (Step 5), and a single task review (Step 8). Worktree, implementation, design review, and wrap-up are unchanged. Applies when the user passes the flag, or by auto-downshift: at Step 1, after reading the full task file, downshift to lite when ALL hold per the task's own description and ACs — single package/module touched, no cross-boundary contract change (API shape, persisted schema, public symbols), and the task is small (≤3 ACs, no epic). Announce the downshift in the Step 1 output and note it in the final report; when in doubt (including when the task alone can't answer the criteria), stay full.
+- `--lite` (default: dynamic - see Step 0.5) — single-pass planning (Step 2), a single reviewer (Step 4), and a single task review (Step 7). Worktree, implementation, design review, and wrap-up are unchanged.
+- `--ship` (default: off) — run `/at:ship-task` automatically instead of stopping to ask — only if nothing requires a human call.
 
 ## Goal
 
 Drive a well-defined task end-to-end with minimal human input.
-
-Stop only when human input is genuinely required (ship gate, irreducible ambiguity, etc.).
 
 ## Context
 
 Workflow:
 
     create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
-                                └───────────────────────── auto-task ─────────────────────────┘
+                  └─────────────────────────────── auto-task ────────────────────────────────┘
 
-Task files live in the project's task store — `tasks/` in the repo by default. Project config can override this and every other default below: verification command, worktree location and init, standing review context, design-review serve command, model choices, commit conventions, transcript capture. Config lives in `.claude/auto-task.config.md` (project, committed) and `.claude/auto-task.config.local.md` (personal overrides — win on conflict); see `/at:create-task` § Task Store and Project Config. **Read them first if they exist.** Pass their paths to every subagent you spawn so they read them too.
-
-`main` throughout this skill means the repo's default branch — substitute yours (e.g. `master`) if it differs.
+Task files live in the project's task store — `tasks/` in the repo by default.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -37,41 +36,60 @@ Task files live in the project's task store — `tasks/` in the repo by default.
 
 Internalise and follow these rules:
 
-- Aim to complete all the steps with high-autonomy - assume there is no human available to help you complete the task. If there are questions, flags or surprises, use your own best judgement, make a note of it to show to the user when you're done and proceed. Only stop i) if the instructions in this file explicitly ask you to or ii) if you truly can't make progress without human intervention.
-- Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be proactive and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Rely on the harness's completion notifications for subagents — don't poll on fixed sleep timers; arm at most one long safety-net timer per subagent. If no progress for more than 10 mins, kill them aggressively and restart (don't skip).
+- Aim to complete all the steps after Step 0 (Preflight) until the last step (Ship) with full autonomy - assume there is no human available to help you complete the task. If there are questions, flags or surprises, use your own best judgement, make a note of it, proceed and flag it to the user at the end. Only stop i) if the instructions in this file explicitly ask you to or ii) if it would be truly unreasonable to progress without human intervention.
+- Be resilient against failures. If anything fails or (worse) hangs - a tool call, a spawned process, a subagent, etc. - be proactive and resourceful. Don't skip any steps or details because something failed. Keep trying. If necessary, investigate and fix or try alternative routes. Rely on the harness's completion notifications for subagents — don't poll on fixed sleep timers; arm at most one long safety-net timer per subagent. If no progress for more than 10 mins, kill them aggressively and restart (never skip!).
 - When subagents produce user output (e.g. implementation plan, code review findings, etc.), re-output the decision-relevant core (the plan, the findings table) in the main agent so the user can actually see it. Reference long supporting artifacts by path + one-line summary instead of duplicating them verbatim.
-- Parallel-session hygiene: other auto-task sessions may be running against the same primary repo. Never kill processes by bare name (`pkill -f playwright`, `pkill -f vite` etc. hit every session) — scope kills to this worktree's path or to PIDs from `lsof -ti :<port>` for ports you own. Heavy suites (e2e) contend on CPU across sessions: if a suite dies with SIGTERM before running or pass counts fluctuate, suspect a busy neighbour and retry rather than debugging your own code.
-- Use raw `git worktree add` for worktrees — NOT the harness `EnterWorktree` tool. Reason: the worktree must live at a persistent, predictable path that Step 9/10 hands off to the user's editor/tmux; an opaque harness temp path breaks that handoff.
-- In unattended auto-task, a task at `status: new` that clearly went through `/at:create-task` (locked decisions + acceptance criteria present) may be treated as ready-for-dev — proceed and note the missed status bump in the final report. Don't stall on the status field alone.
+- Parallel-session hygiene: other auto-task sessions may be running against the same primary repo. Never kill processes by bare name (`pkill -f playwright`, `pkill -f vite` etc. hit every session) — scope kills to this worktree's path or to PIDs from `lsof -ti :<port>` for ports you own. Heavy e2e suites, for example, may contend on CPU across sessions: if a suite dies with SIGTERM before running or pass counts fluctuate, suspect a busy neighbour and retry after a few minutes rather than going down a debugging rabbit hole.
+- Use raw `git worktree add` for worktrees — NOT the harness `EnterWorktree` tool. Reason: the worktree must live at a persistent, predictable path that Step 8/9 hands off to the user's editor/tmux; an opaque harness temp path breaks that handoff.
+- `main` throughout this skill means the repo's default branch — substitute (e.g. `master`) if it differs.
 
-## Prerequisite
+<!-- - In unattended auto-task, a task at `status: new` that clearly went through `/at:create-task` (locked decisions + acceptance criteria present) may be treated as ready-for-dev — proceed and note the missed status bump in the final report. Don't stall on the status field alone. -->
 
-- A well-defined task (typically created by a human) with status `ready-for-dev`.
+## Step 0: Preflight
 
-## Protocol
+Run 0.1 and 0.2 first, then run (0.3-0.4) and (0.5) in parallel to speed things up. If any of the preflight checks fail, combine the errors and flag them to the user in one go at the end of the Preflight step and abort.
 
-## Step 1: Confirm & Preflight
+### 0.1 Load Config
 
-Find the task, read it fully, and output its title and status. Bonus points for using figlet =)
+<!-- TODO: de-dupe this and the section in create-task -->
 
-### Preflight
+Project config can override a bunch of defaults (e.g. verification command, worktree location and init, standing review context, design-review serve command, model choices, commit conventions, transcript capture, etc.). Check for existence of config overrides in `.claude/auto-task.config.md` and `.claude/auto-task.config.local.md` (personal overrides — win on conflict) (see `/at:create-task` § Task Store and Project Config for details). **Read them first if they exist and pass them to every subagent you spawn so they read them too**.
 
-A pre-autonomy gate — the one point that may stop for the human (the autonomy rule above explicitly permits an instructed stop). Cheap checks only: shell probes, globs, config reads — no subagents, no real model calls. Resolve config first (§ Models, Verification, Design Review), then check:
+### 0.2 Task check
+
+Find the task (default: `tasks/`; possibly overridden), read it fully, and output its title and status. If installed, show some creativity and render "Task-NNN" using figlet =)
+
+If you can't locate the task, abort and flag it to the user.
+
+### 0.3 Make sure task is clear
+
+Run `/at:clarify-task` to make sure there are no gaping open questions. Don't nitpick.
+
+<!-- TODO: add a marker/timestamp to the task to skip this on an already clarified task / set to ready-for-dev if necessary -->
+
+### 0.4 System health
+
+Cheap checks only: shell probes, globs, config reads — no subagents, no real model calls. Resolve config first (§ Models, Verification, Design Review), then check:
 
 - **Codex** — only if config § Models routes the plan panel or adversarial review to Codex (the default):
   - Neither the `openai-codex` plugin nor a `codex` on PATH → **degraded**: panel and adversarial review fall back to single-family Claude, the highest-signal part of the pipeline. Suggest installing the Codex CLI + codex-plugin-cc, or naming a second model family in config § Models.
-  - Present but `codex doctor` fails → **stop-and-fix**: Step 5 fails loud and won't substitute, so the run would die ~20 min in. Suggest `codex login` / checking usage limits, or repointing config § Models — then re-run. Do not offer proceed-as-is.
-- **Verification** — resolve the command (config § Verification, else auto-discover: a `just`/`make` check recipe, the CI workflow's steps, or the full test suite). Report what it resolved to (correctable via config § Verification). Nothing found → **degraded**: the Step 8 and fix-verification gates are hollow; strongly suggest adding config § Verification first.
-- **Design review** — only when the task is `type: design` or its description/ACs signal a rendered-output change: confirm the chrome-devtools MCP is available and config § Design Review names a fixture-backed serve command. Missing either → **degraded**: Step 6 will be flagged-and-skipped rather than failing loud mid-run. Suggest adding the serve command / installing the MCP.
+  - Present but `codex doctor` fails → **stop-and-fix**: Step 4 fails loud and won't substitute, so the run would die ~20 min in. Suggest `codex login` / checking usage limits, or repointing config § Models — then re-run. Do not offer proceed-as-is.
+- **Verification** — resolve the command (config § Verification, else auto-discover: a `just`/`make` check recipe, the CI workflow's steps, or the full test suite). Report what it resolved to (correctable via config § Verification). Nothing found → **degraded**: the Step 7 and fix-verification gates are hollow; strongly suggest adding config § Verification first.
+- **Design review** — only when the task is `type: design` or its description/ACs signal a rendered-output change: confirm the chrome-devtools MCP is available and config § Design Review names a fixture-backed serve command. Missing either → **degraded**: Step 5 will be flagged-and-skipped rather than failing loud mid-run. Suggest adding the serve command / installing the MCP.
 
 Outcome:
 
 - **Clean** — emit one line and continue into the run, e.g. `Preflight ✓ — full multi-model · verify: just check · tasks: tasks/`. No pause.
-- **Findings** — print the resolved roster (models · verification · task store; design-review readiness on UI tasks), each finding, and its suggestion, then **pause**. Any **stop-and-fix**: do not proceed — the human fixes and re-runs. Only **degraded**: offer proceed (accept the degradation — record each in the Step 10 report) or fix-first.
+- **Findings** — print the resolved roster (models · verification · task store; design-review readiness on UI tasks), each finding, and its suggestion, then **pause**. Any **stop-and-fix**: do not proceed — the human fixes and re-runs. Only **degraded**: offer proceed (accept the degradation — record each in the Step 9 report) or fix-first.
 
-Then apply the Modes auto-downshift check (unless a mode was passed explicitly).
+### 0.5 Potentially downshift to --lite mode
 
-## Step 2: Worktree
+If `--lite` was passed in explicitly, skip this section.
+
+<!-- TODO: revise -->
+Otherwise, downshift to `--lite` mode when ALL hold per the task's own description and ACs — single package/module touched, no cross-boundary contract change (API shape, persisted schema, public symbols), and the task is small (≤3 ACs, no epic). Announce the downshift at the end of preflight and note it in the final report; when in doubt (including when the task alone can't answer the criteria), stay in full mode.
+
+## Step 1: Worktree
 
 Create a `task/NNN-<slug>` worktree. Default location is a sibling of the repo, `../<repo>.worktrees/NNN-<slug>`; the config may pin a different path:
 
@@ -86,7 +104,7 @@ All subsequent steps run inside the worktree. Pass the absolute worktree path ex
 
 With the default in-repo task store, the task file is inside the worktree — pass `<task-path>` to subagents rooted at the worktree, and task-file edits (plan, status bumps) ride the task branch. If the config routes tasks to a separate repo, the task file is **not** in the worktree: pass its absolute external path, and task-file edits commit there, independent of the worktree branch.
 
-## Step 3: Plan
+## Step 2: Plan
 
 Create an implementation plan. Important: Invoke /at:panel inline / do not wrap it in a subagent. Panel line-up per config § Models (default: strongest available Claude model + Codex). Include a one-line repo orientation (top-level layout, e.g. the package map from the README) in the panel prompt — non-Claude panelists cold-start blind and otherwise burn a round of failed path probes; for Claude panelists it's harmless.
 
@@ -96,19 +114,19 @@ In `--lite` mode, skip the panel and synthesis — run `/at:plan-task <task-path
 
 Unless there are major flags, write the plan to the task file.
 
-## Step 4: Implement
+## Step 3: Implement
 
 Spawn a new sub-agent (implementer model per config § Models; default: the strongest available model) and run:
 
     /at:impl-task <task-path>
 
-If main moves under you during a long implementation (parallel sessions merging), rebase at the next green checkpoint instead of deferring all integration to Step 8 — late rebases across overlapping files produce conflict pile-ups and risk silent bad auto-merges.
+If main moves under you during a long implementation (parallel sessions merging), rebase at the next green checkpoint instead of deferring all integration to Step 7 — late rebases across overlapping files produce conflict pile-ups and risk silent bad auto-merges.
 
-## Step 5: Review Code
+## Step 4: Review Code
 
 In every mode: if main has advanced since the branch forked, review the merge-base range instead of `main..HEAD` — resolve `base=$(git merge-base main HEAD)` and review `<base>..HEAD` (adversarial reviewer: `--base <base>`) so the diff contains only this task's commits, not reverse-diffs of unrelated main progress.
 
-In `--lite` mode: spawn a single sub-agent to run `/at:review-code main..HEAD`, skip the adversarial pass and the synthesis step, and carry its findings straight into Step 7. The rest of this step applies to full mode only.
+In `--lite` mode: spawn a single sub-agent to run `/at:review-code main..HEAD`, skip the adversarial pass and the synthesis step, and carry its findings straight into Step 6. The rest of this step applies to full mode only.
 
 In parallel:
 
@@ -125,25 +143,25 @@ When all reviews are complete, spawn a new agent to `/at:synthesize` the respons
 - perspective 1: findings produced by the `/at:review-code` subagent
 - perspective 2: findings produced by the adversarial reviewer
 
-Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's the routing token the Step 7.1 autofix fast-lane keys on, not prose.
+Synthesiser: keep each finding's `Autofix:` line exact when deduping — it's the routing token the Step 6.1 autofix fast-lane keys on, not prose.
 
-## Step 6: Review Design (UI Changes Only)
+## Step 5: Review Design (UI Changes Only)
 
 Skip unless the change alters rendered output (layout, spacing, colour, typography, interaction states).
 
 Run `/at:review-design <task-path>` **execute on the main thread** — do not wrap it in a subagent: it boots the app (per the config's design-review serve command) and drives the chrome-devtools MCP with real input, which a subagent can't do reliably. It is flag-only and emits findings in `/at:review-code`'s format. Navigate to the URL the serve command prints — don't assume a fixed port.
 
-Re-output its findings in the main agent so the user can see them, and carry them into Step 7 alongside the code review findings.
+Re-output its findings in the main agent so the user can see them, and carry them into Step 6 alongside the code review findings.
 
-## Step 7: Address Review Feedback (If Applicable)
+## Step 6: Address Review Feedback (If Applicable)
 
-### 7.1: Triage
+### 6.1: Triage
 
 In a new subagent:
 
 1. Read the task — this is the original intent of the change.
-2. Read the synthesised code review findings from above, plus any design findings from Step 6.
-3. Findings carrying an `Autofix:` line **and severity Minor or Nit** skip the triage table entirely and go straight to the Step 7.2 fix (scoped to changed files only). If an autofix *class* recurs across reviews, flag it to be fixed at the root instead of re-fixing it.
+2. Read the synthesised code review findings from above, plus any design findings from Step 5.
+3. Findings carrying an `Autofix:` line **and severity Minor or Nit** skip the triage table entirely and go straight to the Step 6.2 fix (scoped to changed files only). If an autofix *class* recurs across reviews, flag it to be fixed at the root instead of re-fixing it.
 4. For each remaining finding, decide one of — every row carries a one-line cited reason (the evidence, not just the verdict):
 
    - Real issue that needs addressing -> Accept (cite what it breaks / why it's worth fixing)
@@ -156,46 +174,46 @@ In a new subagent:
 
    Discriminator for the standing-context bullet: gate on the impact *mechanism*, not keywords — keep any finding whose harm mechanism the project actually has.
 
-Never auto-reject a Critical or Major finding. If the instinct is to reject one, surface it in the Step 10 decisions report instead and let the human decide.
+Never auto-reject a Critical or Major finding. If the instinct is to reject one, surface it in the Step 9 decisions report instead and let the human decide.
 
 Render triage results as a table:
 
 | #   | Finding (one line) | Disposition | Reason |
 | --- | ------------------ | ----------- | ------ |
 
-### 7.2: Fix
+### 6.2: Fix
 
-If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new subagent that fixes them following `/at:impl-task`. Review the fix with a single adversarial reviewer scoped to the fix commits (codex `/codex:adversarial-review --base <pre-fix-sha>` when installed, else a fresh review subagent) and address feedback as outlined in Step 5 and 7, respectively.
+If any findings were accepted (step 4) or routed to the autofix fast-lane (step 3), spawn a new subagent that fixes them following `/at:impl-task`. Review the fix with a single adversarial reviewer scoped to the fix commits (codex `/codex:adversarial-review --base <pre-fix-sha>` when installed, else a fresh review subagent) and address feedback as outlined in Step 4 and 6, respectively.
 
-In `--lite` mode, review the fix with a single subagent reviewer, consistent with Step 5. Skip the fix-review entirely when every accepted fix is trivial/mechanical (Minor/Nit, no logic change) — the verification command plus the Step 8 task review cover those.
+In `--lite` mode, review the fix with a single subagent reviewer, consistent with Step 4. Skip the fix-review entirely when every accepted fix is trivial/mechanical (Minor/Nit, no logic change) — the verification command plus the Step 7 task review cover those.
 
-## Step 8: Review Task
+## Step 7: Review Task
 
 0. Sync: rebase the worktree branch onto latest main (`git -C "$primary" pull --rebase origin main` — resolve `$primary` as in `/at:ship-task`; skip if no remote — then `git rebase main` from the worktree; on conflicts resolve guided by the task/plan, then re-run the verification command) — surfaces integration drift here instead of at ship time.
 1. Review: In a new subagent, review that the task is complete via `/at:review-task`.
-2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 7.
-3. Second review: run a second, **independent adversarial gap-check** — a fresh subagent hunting for an AC only superficially met or a regression the first pass missed, not a re-run of the same review. Skip when the first review passed with nothing to address and the branch hasn't changed since — re-reviewing identical state adds nothing; note the skip in the final report. If still failing, stop here and flag it to the user. Do not proceed to Step 9.
+2. Address Feedback: If the review returns findings, triage and address them as outlined in Step 6.
+3. Second review: run a second, **independent adversarial gap-check** — a fresh subagent hunting for an AC only superficially met or a regression the first pass missed, not a re-run of the same review. Skip when the first review passed with nothing to address and the branch hasn't changed since — re-reviewing identical state adds nothing; note the skip in the final report. If still failing, stop here and flag it to the user. Do not proceed to Step 8.
 
 In `--lite` mode, run steps 1–2 once and skip the second review (step 3).
 
-## Step 9: Wrap Up
+## Step 8: Wrap Up
 
-### 9.1: Wrap up Loose Ends
+### 8.1: Wrap up Loose Ends
 
 Make sure that:
 
 - all findings have been addressed (or have been rejected deliberately)
 - all changes have been committed
 
-### 9.2: Capture Session Transcript (Only If Bound)
+### 8.2: Capture Session Transcript (Only If Bound)
 
-Skip unless the project config defines a transcript-capture command and destination. If it does, run it and keep the transcript out of the repo (diff and grep noise). If further commits land within this step's session after the capture (e.g. the Step 9.3 status bump, late fix rounds), re-run the capture command before Step 10 so the stored transcript is current. `/at:ship-task` refreshes it again after the merge.
+Skip unless the project config defines a transcript-capture command and destination. If it does, run it and keep the transcript out of the repo (diff and grep noise). If further commits land within this step's session after the capture (e.g. the Step 8.3 status bump, late fix rounds), re-run the capture command before Step 9 so the stored transcript is current. `/at:ship-task` refreshes it again after the merge.
 
-### 9.3: Update Task and Commit
+### 8.3: Update Task and Commit
 
 Set the task status to `ready-for-signoff` and commit it (frontmatter edit with a `(task/NNN)` subject by default; the config's task-status command if defined — with an external task store the bump commits there, not in the worktree).
 
-### 9.4: Summarise
+### 8.4: Summarise
 
 Output:
 
@@ -203,11 +221,13 @@ Output:
 - any learnings or gotchas that should be integrated back into the harness - only if truly load-bearing.
 - a pointer to the session transcript (if captured)
 
-## Step 10: Ask User How to Proceed
+## Step 9: Ask User How to Proceed (or Ship)
 
 First, surface a short prose summary of the triage decisions so the human can review the critical bits before shipping — a report, not a gate: how many findings were fixed, which were rejected and why, which were deferred, and — called out explicitly — any Critical/Major findings surfaced for a human call rather than auto-actioned.
 
-Then offer the user the following options:
+With `--ship`, and no Critical/Major finding left for a human call: print the summary and run `/at:ship-task <task-path>` directly — no further approval needed.
+
+Otherwise, offer the user the following options:
 
 - Open the worktree in their editor (e.g. VS Code)
 - Open the worktree in a new tmux pane
