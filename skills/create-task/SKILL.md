@@ -25,14 +25,7 @@ As steps (e.g. clarify, plan, impl, review) typically run in new sessions, it's 
 
 ## Task Store and Project Config
 
-This plugin ships an opinionated default task convention: markdown task files in a `tasks/` directory at the repo root, managed by the agent with plain file I/O — no extra tooling required.
-
-Projects override the defaults via **config files** — plain markdown the agent reads, not machine-parsed values:
-
-- `.claude/auto-task.config.md` — project config, committed, shared by everyone working in the repo.
-- `.claude/auto-task.config.local.md` — personal overrides, gitignored; wins over the project file on conflict.
-
-Precedence: plugin defaults ← project config ← local config. **If either file exists, read it before proceeding.** Config is for repository-specific mechanics and standing facts the generic skills cannot infer; core workflow methodology stays in the skills. Recognised sections (all optional): Task Store, Verification, Worktrees, Review, Design Review, Models, Conventions, Transcript Capture, Feedback Snapshots — the plugin's `examples/auto-task.config.md` is a copy-paste template with each section's default spelled out.
+Task-store location, task-file naming and numbering, attachments, and config-file precedence are all owned and resolved by `/at:config` — read settings from the resolved block (see Step 0), not from restated defaults here. The three config layers share one format: shipped defaults (`auto-task.config.defaults.md`) ← project (`.claude/auto-task.config.md`, committed) ← local (`.claude/auto-task.config.local.md`, gitignored, wins on conflict). `/at:config` § Heading → Setting Map lists the recognised sections.
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -51,6 +44,10 @@ These rules govern both how you gather intent and write the task. Internalise an
 - Match scope exactly. For example: don't bundle "review X, then fix it". A review task ends at the review report; a fix task ends at the fix.
 - Avoid AI-slop at all costs - both verbosity and language like "categorised by theme and priority", "promote into guardrails", "earned their keep".
 
+## Step 0: Resolve Config (Mandatory)
+
+If a `Resolved auto-task settings v1` block was passed in, use it verbatim and do NOT re-run detection. Otherwise resolve now by following `/at:config` § Resolve. Do not proceed without a resolved block. At each reference site below, read `settings.*` from the block; never restate a default.
+
 ## Step 1: Understand User Intent
 
 1. Review the current conversation to identify the user's main goal and, if applicable, the agreed approach, constraints, decisions made or important insights discovered during the conversation.
@@ -63,7 +60,7 @@ These rules govern both how you gather intent and write the task. Internalise an
 
 ## Step 2: Create Task File
 
-Create the task file — by default at `tasks/{NNN}-{slug}.md` in the repo, where `{NNN}` is the next task number (max existing + 1, zero-padded to 3 digits) and `{slug}` is a short kebab-case form of the title. If the project config defines a create-task command, use that instead. Use the table below to decide on type:
+Create the task file following `settings.task_store.create`, under `settings.task_store.location` (both from the resolved block). Use the table below to decide on type:
 
 | Type       | Meaning                                     |
 | ---------- | ------------------------------------------- |
@@ -100,7 +97,7 @@ TODO: Add notes
 <!-- FIXME: what's the point of having this here (all three points)? Rework -->
 **Task states:** the frontmatter `status` progresses `new` → `ready-for-dev` (end of clarify) → `in-dev` (start of impl) → `ready-for-signoff` (end of task review) → `done` (ship). Off-ramp states: `rejected` (investigated and declined), `later` (consciously postponed).
 
-**Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `tasks/attachments/{NNN}/` (next to the task files) and reference it from the task file — don't drop it as a top-level sibling.
+**Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `{settings.task_store.location}/attachments/{NNN}/` (next to the task files) and reference it from the task file — don't drop it as a top-level sibling.
 
 **Committing:** commit task-file changes following the repo's commit conventions, with the task-link suffix appended to the subject (default `(task/{NNN})`; config § Conventions can change or drop it). If the config routes tasks to a separate repo or provide commit recipes, follow those — task-file commits then land there, never in the code repo.
 
@@ -108,7 +105,7 @@ TODO: Add notes
 
 **Crystallise** the information you gathered in Step 1 and fill it into the task file sections - "Description", "Acceptance criteria", "Notes".
 
-If the project config (§ Feedback Snapshots) names a calibration exemplar, read it before writing — it shows the target length and register for a task of comparable complexity in this project.
+If `settings.feedback_snapshots.exemplar` is set, read it before writing — it shows the target length and register for a task of comparable complexity in this project.
 
 ### Description
 
@@ -276,7 +273,7 @@ Present the task(s) to the user for review. The user will provide feedback if ap
 
 ## Step 8: Offer a Feedback Snapshot (Only If Bound)
 
-Skip this step unless the project config defines a feedback-snapshot location. If it does, **offer** (per task, never auto-create) to snapshot the post-clarify file there as `YYYY-MM-DD-<task-slug>-before.md` — kept out of the repo so it doesn't travel with the skill.
+Skip this step unless `settings.feedback_snapshots.dir` is set. If it is, **offer** (per task, never auto-create) to snapshot the post-clarify file there as `YYYY-MM-DD-<task-slug>-before.md` — kept out of the repo so it doesn't travel with the skill.
 
 ## Appendix: Creating Epics
 

@@ -8,9 +8,9 @@ For personal (non-committed) overrides, put the same sections in `.claude/auto-t
 
 ## Task Store
 
-Default: markdown task files in `tasks/` at the repo root, managed by the agent (`{NNN}-{slug}.md`, attachments in `tasks/attachments/{NNN}/`).
-
-Override example: tasks live in a sibling repo at `../my-tasks/`; create them with `just create-task "<title>"`; bump statuses with `just task-status <file> <status>` (auto-commits there). Task-file commits then never land in the code repo.
+location: `../my-tasks/` — a sibling repo, not `tasks/` in this repo
+create: `just create-task "<title>"`
+status: `just task-status <file> <status>` — auto-commits there; task-file commits then never land in the code repo
 
 ## Verification
 
@@ -64,8 +64,5 @@ Default: skipped.
 
 ## Feedback Snapshots
 
-Optional out-of-repo directory where `/at:create-task` offers to snapshot post-clarify task files for later calibration. May also name a **calibration exemplar** — a human-edited task file `/at:create-task` reads before writing, to calibrate length and register.
-
-Default: skipped.
-
-Override example: snapshots go to `~/snapshots/my-repo/`; calibration exemplar: `~/snapshots/my-repo/2026-06-18-some-task-after.md`.
+dir: `~/snapshots/my-repo/`
+exemplar: `~/snapshots/my-repo/2026-06-18-some-task-after.md`
