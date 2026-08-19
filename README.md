@@ -11,8 +11,6 @@ Built for experienced engineers who want to ship software at an accelerated pace
 
 **Think cruise control, not Full Self-Driving.**
 
-TODO: add screencast
-
 ## How It Works
 
 At a high level, a typical _auto-task_ session looks something like this:
