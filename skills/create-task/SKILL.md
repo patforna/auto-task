@@ -306,7 +306,7 @@ Example:
 
 Epic sub-tasks are like standalone tasks, except their file name is slightly different to keep them lexicographically close to the epic task.
 
-To create an epic sub-task file, follow the instructions for creating a standalone task, but use the following file format: `<EpicNbr>.<NN><task slug>.md` (e.g. `012.03-remove-sltp.md`). The numbers of the tasks belonging to the epic are zero-padded (`01`, `02`, ... `10`, `11`). Example:
+To create an epic sub-task file, follow the instructions for creating a standalone task, but use the following file format: `<EpicNbr>.<NN><task slug>.md` (e.g. `012.03-remove-sltp.md`). The numbers of the tasks belonging to the epic are zero-padded (`01`, `02`, ... `10`, `11`). A sub-task's number comes from its epic, so bypass `settings.task_store.create` — it mints a fresh top-level number under any override, the default allocator included — and write the sub-task file directly at the epic-derived path. Example:
 
 ```text
 015-reversal-eval.md        ← epic

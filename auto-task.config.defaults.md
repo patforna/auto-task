@@ -16,7 +16,7 @@ Conventions, Transcript Capture) here as their owning skills migrate.
 ## Task Store
 
 location: tasks/
-create: Create {location}/{NNN}-{slug}.md — {NNN} is the next task number (max existing + 1, zero-padded to three digits); {slug} is a short kebab-case form of the title; the file has frontmatter plus body.
+create: Write the task file (frontmatter plus body) to a temp file, then place it by running `${CLAUDE_PLUGIN_ROOT}/skills/create-task/scripts/alloc-task.sh --dir {location} --slug {slug} --from {tempfile}` — `${CLAUDE_PLUGIN_ROOT}` is a template placeholder, not a shell var: substitute the resolved plugin root before running. {slug} is a short kebab-case form of the title. The script prints the allocated basename, e.g. `104-add-widget.md`, on stdout — its leading number is {NNN}.
 status: Edit the task file's `status:` frontmatter field in place.
 
 ## Feedback Snapshots
