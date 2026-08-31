@@ -45,8 +45,6 @@ The pipeline in detail. Create and clarify are interactive; worktree through ver
 | **Verify**        | An independent agent verifies every acceptance criterion against the actual behaviour, not the diff.                                                                                        | `/at:review‑task`   |
 | **Ship**          | When the workflow stops and reports what was found, fixed, rejected and why, you decide whether it ships. Shipping squash-merges, verifies the integrated tree, and pushes.                 | `/at:ship‑task`     |
 
-See [`examples/sample-run.md`](examples/sample-run.md) for the verbatim report of a real run on defaults — including the triage decisions and the ship gate.
-
 ## Tasks
 
 Tasks are the central artefact of the _auto-task_ workflow. They span the entire workflow, accumulating and preserving state across agent sessions. They are plain markdown files stored on disk (default: `tasks/`).
@@ -95,8 +93,8 @@ For now, _auto-task_ works with Claude Code and uses Codex as a second model for
 Open Claude Code and run:
 
 ```text
-/plugin marketplace add patforna/auto-task
-/plugin install at@auto-task
+/plugins marketplace add patforna/auto-task
+/plugins install at@auto-task
 ```
 
 ## Quick Start
@@ -106,6 +104,10 @@ Open Claude Code in your project's git repo:
 1. Run `/at:create-task` to capture what to build. Review and tweak the task.
 2. In a new session, run `/at:auto-task <task>`.
 3. Review what was built, then run `/at:ship-task`.
+
+## Updating
+
+Auto-update is off by default for third-party marketplaces. Turn it on at `/plugins` → **Marketplaces** → `auto-task` → **Enable auto-update**. Claude Code then refreshes the marketplace and updates the plugin within ten minutes of session start.
 
 ## Configuration
 
@@ -129,18 +131,30 @@ Configurable per project: task store, verification command, worktree layout, sta
 
 Skills live in [`skills/`](skills/), one directory per skill.
 
-After changing a skill, bump the version in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`, then refresh the installed plugin:
+Point a marketplace at your checkout. Run once from the checkout root, skipping the first line if you never installed from GitHub:
 
-```sh
-claude plugin marketplace update auto-task
-claude plugin update at@auto-task
+```text
+/plugins marketplace remove auto-task
+/plugins marketplace add ./
+/plugins install at@auto-task
 ```
+
+Edits are then live in the next session; `/reload-plugins` applies them to the current one. To go back to the released copy, remove the marketplace and re-add `patforna/auto-task`.
 
 `panel`, `synthesize`, and `tdd` are vendored from [core-skills](https://github.com/patforna/core-skills). Don't edit them here — edit them there and re-vendor:
 
 ```sh
 scripts/vendor.sh [path-to-core-skills]
 ```
+
+### Releasing
+
+Users are pinned to `version` in `plugin.json` — pushing to `main` without bumping it ships nothing.
+
+1. Bump `version` in `.claude-plugin/plugin.json` and in the `at` entry of `.claude-plugin/marketplace.json`.
+2. `claude plugin validate .claude-plugin/plugin.json`
+3. Commit and push.
+4. `claude plugin tag --push` — tags `at--v<version>`.
 
 ## FAQ
 

@@ -27,9 +27,6 @@ done
 
 cat <<'EOF'
 
-Re-vendored from core-skills. To make it take effect:
-  1. Bump the version in .claude-plugin/plugin.json and .claude-plugin/marketplace.json
-  2. git commit + push
-  3. Refresh the installed plugin:
-     claude plugin marketplace update auto-task && claude plugin update at@auto-task
+Re-vendored from core-skills. Live in your own checkout already; to ship it,
+cut a release — see README section "Releasing".
 EOF
