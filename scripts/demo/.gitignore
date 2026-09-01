@@ -1,0 +1,8 @@
+# Vendored asciinema player, fetched on demand by mkpreview.py
+assets/
+# Generated previews and intermediates
+demo.html
+demo-raw.gif
+demo-*.gif
+demo-*.html
+__pycache__/

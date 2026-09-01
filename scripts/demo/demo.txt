@@ -1,0 +1,65 @@
+# auto-task demo screenplay.  Render with ./render.sh  ·  full reference: cast.py
+#
+# Plain lines print verbatim (blank lines and indentation included).
+# "#" at column 0 is a comment; an indented "#" is content, so markdown survives.
+# Styling: {bold} {dim} {orange} {green} {cyan} {yellow}, each closed by {/}
+#
+# The numbers are NOT all durations:
+#
+#   @prompt <text>          a human types it, then enter.  Takes NO number.
+#                           A leading /command is bolded, its arguments are not.
+#   @step <secs> a|b|c      a line with a braille spinner, revealed chunk by
+#                           chunk.  <secs> is PER CHUNK, not total (±CHUNK_JITTER).
+#                           Resolves to a green tick.
+#   @step! <secs> a|b       the same, but left SPINNING until an @resolve. Use it
+#                           when the step is genuinely blocked on the human.
+#   @resolve <secs>         finish the pending @step! in place.  <secs> is the
+#                           beat before the tick lands.  One pending step at a time.
+#   @ask <text>             a question handed back to you.
+#   @select <n> a|b         a TUI picker.  <n> is the 1-BASED OPTION chosen,
+#                           not a duration.  Timings live in cast.py (SELECT_*).
+#   @pause <secs>           wait, showing nothing new.
+#   @clear                  wipe the screen and start again at the top.
+#
+# Blank lines never double up.  The last frame is always held for END_PAUSE.
+# Lines wider than COLS (80) print a warning on render.
+
+@pause 0.4
+@prompt /at:create-task build a hello-world cli that greets by name. TS + bun.
+@step! 0.45 {bold}Clarifying task...{/}|{dim} read the repo...{/}|{dim} find the ambiguities{/}
+@ask How is the name passed?
+@select 2 Positional; error if missing|Positional; default "World"
+@resolve 0.25
+@step 0.45 {bold}Creating task...{/}|{dim} write acceptance criteria...{/}|{dim} commit{/}
+
+{green}✓{/} {bold}Task 001 ready for dev.{/}
+{dim}tasks/001-hello-world-cli.md{/}
+
+# {cyan}tasks/001-hello-world-cli.md{/} {dim}— ready-for-dev{/}
+#  {bold}## Hello World CLI{/}
+#  Scaffold a TypeScript CLI, running on Bun.
+#
+#  {bold}### Acceptance Criteria{/}
+#  - `hello` prints `Hello, World`.
+#  - `hello Bob` prints `Hello, Bob`.
+@pause 1.1
+
+@clear
+@prompt /at:auto-task 001
+@pause 0.3
+@step 0.45 {bold}Preflight...{/}|{dim} check task and tooling...{/}|{dim} set up worktree...{/}|{dim} install deps{/}
+@step 0.45 {bold}Planning...{/}|{dim} use panel of models to plan...{/}|{dim} synthesise{/}
+@step 0.45 {bold}Implementing...{/}|{dim} fresh context...{/}|{dim} write tests first...{/}|{dim} commit{/}
+@step 0.45 {bold}Reviewing...{/}|{dim} launch review panel...{/}|{dim} triage...{/}|{dim} fix...{/}|{dim} re-review{/}
+@step 0.45 {bold}Verifying...{/}|{dim} run CLI...{/}|{dim} validate AC{/}
+@pause 0.3
+
+{green}✓{/} {bold}Task 001 ready for signoff.{/}
+{dim}8 commits on task/001-hello-world-cli · build green{/}
+
+@ask 🚢 Ship?
+@pause 0.9
+@prompt yes
+@pause 0.4
+{bold}🎉 Shipped{/} {dim}— squash-merged into main, worktree and branch removed{/}
+@pause 2.5
