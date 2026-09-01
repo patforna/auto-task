@@ -102,6 +102,8 @@ Resolved auto-task settings v1 (run: standalone; source: /abs/path/to/repo)
 - settings.feedback_snapshots.exemplar: ~/snaps/x-after.md [local]
 ````
 
+Both examples elide the create recipe deliberately: `<…>` stands for whatever the defaults file or an override actually says. Never paste a default's real text into this skill — the copy drifts.
+
 Rules:
 
 - **Header:** `Resolved auto-task settings v1 (run: <task-id or standalone>; source: <abs repo-root path>)`.
@@ -109,7 +111,6 @@ Rules:
 - **Commands** are backticked (e.g. `` `just create-task "<title>"` ``).
 - **Provenance** — every leaf carries a `[provenance]` tag from the closed vocabulary `default | detected | project | local`, naming the layer its value came from (`default` = the shipped defaults file). `detected` may append the fact (e.g. `[detected: codex on PATH]`) — unused this slice.
 - **Single-line values** (a path, command, or short phrase) render inline: `- settings.x: <value> [provenance]`. **Multi-line / compound values** render as a fenced ` ```text ` sub-block indented under the leaf line (which ends with just its `[provenance]` tag). This slice: `settings.task_store.create` fences (multi-line); `settings.task_store.status` and the two feedback-snapshot paths render inline.
-- **The examples above show shape, not content.** A value written as `<…>` stands in for whatever the defaults file (or an override) actually says. Never paste a default's real text into this skill — that restates a default, and the copy drifts.
 - **Empty prose** renders inline as `settings.x: "" [default]` (no fenced block). No Slice-1 leaf is empty-prose, but the rule is part of `v1`.
 - **Skipped feedback snapshots** render inline per leaf as `settings.feedback_snapshots.dir: skipped [default]` and `settings.feedback_snapshots.exemplar: skipped [default]`.
 - Only the five Slice-1 leaves (`settings.task_store.location`, `settings.task_store.create`, `settings.task_store.status`, `settings.feedback_snapshots.dir`, `settings.feedback_snapshots.exemplar`) ever appear this slice.
