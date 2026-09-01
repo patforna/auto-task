@@ -2,14 +2,18 @@
 #
 # Plain lines print verbatim (blank lines and indentation included).
 # "#" at column 0 is a comment; an indented "#" is content, so markdown survives.
-# Styling: {bold} {dim} {orange} {green} {cyan} {yellow} {red}, the phase-row greys
-# {pending} {clock} {sep}, and {n} for a count, each closed by {/}.  {/} pops to the
-# enclosing tag, so {dim}a · {n}4{/} ACs{/} leaves "ACs" grey.
+# Styling: {bold} {dim} {orange} {green} {cyan} {yellow} {red} and the phase-row
+# greys {pending} {clock} {sep}, each closed by {/}.  {bold} sets the weight AND
+# returns to the default foreground, which is what lifts a count out of the grey
+# around it.  {/} pops to the enclosing tag, so "{bold}4{/} ACs" in a gloss or an
+# @detail leaves "ACs" grey.  A brace-wrapped word that isn't a tag warns on render.
 #
 # Every phase row sits on one grid: glyph cols 1-2, label 3-19, gloss 20-55, clock
 # at 56.  Write labels BARE — the renderer bolds them, appends "..." while the row
-# runs and drops it when it lands.  "·" inside a gloss is tinted automatically; on a
-# plain line write it {sep}·{/} yourself.
+# runs and drops it when it lands.  The label width is only there to line a gloss
+# up, so a row with neither gloss nor clock lets its label run on — that is how a
+# heading is written.  "·" tints itself inside a gloss and inside an @detail; on any
+# other line write it {sep}·{/} yourself.
 #
 # The numbers are NOT all durations:
 #
@@ -32,7 +36,9 @@
 #                           from 0:00 to it.  Four fields swap the gloss on landing.
 #   @row <glyph> <l>|<g>    one finished phase row, printed as-is: no spinner, no
 #                           tick, no "...".  Takes NO number; a third field adds
-#                           a clock.
+#                           a clock.  With no gloss at all, it is a heading.
+#   @detail <text>          a line under a heading: indented to col 3, in the gloss
+#                           grey, separators tinted for you.  Takes NO number.
 #   @ask <text>             a question handed back to you.
 #   @select <n> a|b         a TUI picker.  <n> is the 1-BASED OPTION chosen,
 #                           not a duration.  Timings live in cast.py (SELECT_*).
@@ -54,25 +60,31 @@
 @resolve 0.35
 
 @step 1.5 Creating task|context · ACs · notes
-@step 1.1 Tightening|{n}3{/} lines cut
+@step 1.1 Tightening|{bold}3{/} lines cut
 
-{green}✓{/} {bold}Task 001 ready for dev{/}
-  {dim}tasks/001-hello-world-cli.md {sep}·{/} {n}4{/} ACs{/}
+@row {green}✓{/} Task 001 ready for dev
+@detail tasks/001-hello-world-cli.md · {bold}4{/} ACs
 @pause 1.5
 
+# A typed command before the wipe, so the mid-clip clear can't be mistaken for the
+# loop restarting: both go full screen -> blank -> a prompt types out, and only this
+# one has a beat in front of it.  /clear is also what you would really do here —
+# the task file carries the state, so the build starts on fresh context.
+@prompt /clear
+@pause 0.35
 @clear
 @prompt /at:auto-task 001
 @pause 0.3
 @checklist Preflight|Planning|Implementing|Reviewing|Verifying
-@run 1.54 Preflight|task · worktree · deps|0:44
-@run 1.54 Planning|run claude + codex · synthesize|{n}2{/} plans · {n}1{/} conflict resolved|2:29
-@run 1.54 Implementing|test · code · refactor · commit|2:10
-@run 1.54 Reviewing|run claude + codex · triage|{n}2{/} reviews · {n}1{/} flag · {n}0{/} blocking|1:48
-@run 1.54 Verifying|run CLI · check ACs|2:09
+@run 0.98 Preflight|task · worktree · deps|0:44
+@run 0.98 Planning|run claude + codex · synthesize|{bold}2{/} plans · {bold}1{/} conflict resolved|2:29
+@run 0.98 Implementing|test · code · refactor · commit|2:10
+@run 0.98 Reviewing|run claude + codex · triage|{bold}2{/} reviews · {bold}1{/} flag · {bold}0{/} blocking|1:48
+@run 0.98 Verifying|run CLI · check ACs|2:09
 
-{green}✓{/} {bold}Task 001 ready for signoff{/}
-  {dim}task/001-hello-world-cli{/}
-  {dim}{n}8{/} commits {sep}·{/} {n}3{/}/{n}3{/} tests pass {sep}·{/} {n}1{/} flag {sep}·{/} {n}9m 20s{/}{/}
+@row {green}✓{/} Task 001 ready for signoff
+@detail task/001-hello-world-cli
+@detail {bold}8{/} commits · {bold}3/3{/} tests pass · {bold}1{/} flag · {bold}9m 20s{/}
 
 @pause 0.5
 @ask Ship?

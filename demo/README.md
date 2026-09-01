@@ -27,16 +27,17 @@ demo.txt ──cast.py──> demo.cast ──agg──> demo-raw.gif ──chro
 | -------------------------- | ------------------------------------------------------------------------ | --------- |
 | `demo.txt`                 | the screenplay — the file you edit                                       | yes       |
 | `cast.py`                  | screenplay -> asciicast. Its docstring is the language reference         | yes       |
-| `test_cast.py`             | 28 checks: fixtures replayed into a `pyte.Screen`, asserted cell by cell | yes       |
+| `test_cast.py`             | 31 checks: fixtures replayed into a `pyte.Screen`, asserted cell by cell | yes       |
 | `chrome.py`                | frames agg's GIF in a window — corners, title bar, traffic lights        | yes       |
 | `mkpreview.py`             | wraps a cast in a self-contained HTML player                             | yes       |
 | `render.sh`, `variants.sh` | the two entry points                                                     | yes       |
 | `demo.cast`                | asciicast v2 — the source of truth for timing                            | yes       |
-| `demo.gif`                 | the deliverable, framed, ~350 KB                                         | yes       |
+| `demo.gif`                 | the deliverable, framed, ~300 KB                                         | yes       |
 | `demo-raw.gif`             | agg's bare output, before chrome                                         | no        |
 | `demo.html`                | scrubbing preview, player inlined, works offline                         | no        |
 | `demo-<theme>.*`           | output of `variants.sh`                                                  | no        |
 | `assets/`                  | asciinema player, fetched on first preview                               | no        |
+| `transcripts/`             | session transcripts behind Provenance, kept out of the repo              | no        |
 
 Needs `python3`, [`agg`](https://github.com/asciinema/agg) (`brew install agg`) and `uv`
 (for Pillow, which draws the chrome). If Pillow is unreachable, `render.sh` warns and falls
@@ -56,15 +57,16 @@ The numbers are not all durations:
 
 | directive                                     | what it does                                                         |
 | --------------------------------------------- | -------------------------------------------------------------------- |
-| `@prompt <text>`                              | a human types it, then enter. **No number.** A leading `/command` is bolded, its arguments are not |
+| `@prompt <text>`                              | a human types it, then enter. **No number.** A leading `/command` is bolded and its arguments are not; a bare answer is bolded whole |
 | `@step <secs> <l>\|<g>`                       | a phase row that spins for `<secs>` — the **whole row**, ±`HOLD_JITTER` — then ticks over to done in place |
 | `@step! <secs> <l>\|<g>`                      | the same, but left **spinning** until an `@resolve`. For a step genuinely blocked on the human |
 | `@resolve <secs>`                             | finish the pending `@step!` in place, however far the cursor has moved on. `<secs>` is the beat before the tick lands. One pending step at a time |
 | `@checklist <a>\|<b>\|<c>`                    | print every phase up front, all pending, so the shape of the run is on screen before any of it happens |
 | `@run <secs> <l>\|<g>\|<clock>`               | tick one checklist row over: it spins for `<secs>`, then lands. Rows must run in the order they were listed. `<clock>` is **how long that row took**, `M:SS` |
 | `@run <secs> <l>\|<running>\|<done>\|<clock>` | four fields swap the gloss when the row lands — `fixing 2 of 3` becomes `3 fixed` |
-| `@row <glyph> <l>\|<g>[\|<clock>]`            | one finished phase row, printed as-is: no spinner, no tick, no `...`. **No number.** For a phase that never runs, e.g. the 🎉 signoff |
-| `@ask <text>`                                 | a question handed back to you, at col 3, prefixed with `ASK_MARK` (currently none) |
+| `@row <glyph> <l>\|<g>[\|<clock>]`            | one finished phase row, printed as-is: no spinner, no tick, no `...`. **No number.** For a phase that never runs, e.g. the 🎉 signoff. With neither gloss nor clock it is a heading, and its label runs free |
+| `@detail <text>`                              | an indented line under a heading: col 3, in the gloss grey, its `·` separators tinted for you. **No number.** |
+| `@ask <text>`                                 | a question handed back to you: col 3, bold, prefixed with `ASK_MARK` (currently none) |
 | `@select <n> <a>\|<b>`                        | a TUI picker. `<n>` is the **1-based option chosen**, not a duration. The options land unhighlighted, the highlight arrives on the first, walks to `<n>`, then flashes to confirm |
 | `@pause <secs>`                               | wait, showing nothing new |
 | `@clear`                                      | wipe the screen and start again at the top |
@@ -81,11 +83,22 @@ them reads as a column rather than a zigzag (columns are 1-indexed):
 | cols  | what                                                                 |
 | ----- | -------------------------------------------------------------------- |
 | 1-2   | status glyph, padded by **display width**: `✓ · ⠋` take a trailing space, `🎉` is already two cells wide and takes none |
-| 3-19  | label, bold in the default foreground |
+| 3-19  | label, bold in the default foreground. The width is only there to line a gloss up, so a row with neither gloss nor clock lets its label run on |
 | 20-55 | gloss, in the gloss grey. A `·` inside it is tinted automatically |
 | 56-59 | clock, `M:SS`, in its own grey. Never emphasised — it is read positionally, and competing with it flattens both |
 
-A gloss with no clock beside it gets the rest of the row instead, running on to col 78.
+A gloss with no clock beside it gets the rest of the row instead, running on to col 78. A
+row with neither is a heading: nothing follows the label, so nothing has to line up, and it
+is neither padded nor width-checked.
+
+```
+@row {green}✓{/} Task 001 ready for signoff
+@detail task/001-hello-world-cli
+```
+
+The moment a gloss or a clock follows, the column is load-bearing again and an over-long
+label warns as before. `@detail` is the line that belongs under such a heading: it starts
+at col 3, on the label column, in the gloss grey.
 
 `...` means "still running", and the renderer owns it: it appends the dots while a row
 spins and drops them when the row lands, so screenplays write bare labels. A pending row
@@ -95,21 +108,31 @@ gloss nor clock, because it has nothing to report yet.
 An open `@checklist` survives a `@pause`; anything else that prints closes the block and
 drops the cursor below it, and `@clear` forgets it. A `@run` naming a row that isn't in the
 checklist, or one that is out of order, fails the compile — in the GIF it would look like a
-rendering bug. A label, gloss or line that outgrows its column warns on render, because a
-column going ragged is invisible until then.
+rendering bug. So does a `@checklist` opened while a `@step!` is still pending — both
+repaint above the cursor. A gloss, a line past `COLS`, or a label with a gloss or clock
+after it warns on render, because a column going ragged is invisible until then.
 
 ### Inline styling
 
-`{bold}` `{dim}` `{orange}` `{green}` `{cyan}` `{yellow}` `{red}`, the three phase-row
-greys `{pending}` `{clock}` `{sep}`, and `{n}` — each closed by `{/}`. `{orange}` is the
-accent slot, whatever hue the theme gives it. `{n}` is a count: bold in the default
-foreground, because the numbers are the evidence and their labels are not.
+`{bold}` `{dim}` `{orange}` `{green}` `{cyan}` `{yellow}` `{red}` and the three phase-row
+greys `{pending}` `{clock}` `{sep}` — each closed by `{/}`. That is the whole set.
+`{orange}` is the accent slot, whatever hue the theme gives it.
+
+`{bold}` sets the weight **and** returns to the default foreground, which is what lifts a
+count out of the grey around it: in `{bold}6{/} commits`, weight alone would only give you
+a heavier grey. So one tag marks every count — the numbers are the evidence, their labels
+are not.
 
 `{/}` pops back to the *enclosing* tag rather than resetting, which is what lets
-`{dim}… {n}4{/} ACs{/}` leave `ACs` grey instead of dropping it to the default foreground;
-inside a gloss it returns to the gloss grey. No implicit styling otherwise — write
-`{green}✓{/}` for a tick, and `{sep}·{/}` for a separator on a plain line. Inside a gloss
-the `·` is tinted for you, so there write it as plain text.
+`{dim}… {bold}4{/} ACs{/}` leave `ACs` grey instead of dropping it to the default
+foreground; inside a gloss or an `@detail` it returns to the gloss grey. No implicit
+styling otherwise — write `{green}✓{/}` for a tick. A `·` tints itself inside a gloss and
+inside an `@detail`, which between them cover every separator the screenplay writes, so
+`{sep}` is never spelled out by hand; it stays available for a `·` on any other line.
+
+A brace-wrapped word that isn't a tag — a typo, or one that was renamed away — warns on
+render. Otherwise it prints as literal text in the GIF, and nothing catches that until you
+watch it.
 
 Two invariants so layout can't drift as you edit: consecutive blank lines collapse to one,
 and the final frame is held for at least `END_PAUSE` before the loop restarts.
@@ -127,7 +150,7 @@ Constants at the top of `cast.py`:
 | `STEP_DONE_MARK`, `STEP_DONE`                    | `✓`, green      | what a finished row lands on |
 | `STEP_PENDING_MARK`                              | `·`             | a phase that hasn't run yet |
 | `RUNNING_MARK`                                   | `...`           | appended to a label while its row spins, dropped when it lands |
-| `SEP`                                            | `·`             | tinted automatically wherever it turns up in a gloss |
+| `SEP`                                            | `·`             | tinted automatically wherever it turns up in a gloss or an `@detail` |
 | `HOLD_JITTER`                                    | `0.40`          | ± on a row's hold, so a stack of rows isn't metronomic |
 | `FRAME`, `CLOCK_TICK`                            | `0.11`, `0.22`  | spinner frame interval, and how often a running clock moves — two frames: often enough to read as counting, slow enough not to strobe |
 | `SELECT_*`                                       | see file        | picker intro, walk, settle, flash, rest |
@@ -150,6 +173,12 @@ col 80 marks the row instead.
 constants (`BAR`, `RADIUS`, `TITLE_SIZE`, …) are 1× values that `--scale` multiplies, so
 `TITLE_SIZE = 10` draws at 20 px on the 2× render. It sets the title in JetBrains Mono —
 the terminal's own face — and falls back to the macOS system sans on a machine without it.
+
+That title is derived, not written down twice. `cast.title()` returns `auto-task · 80×16`;
+`cast.py` puts it in the cast header and `render.sh` hands the same string to `chrome.py`,
+so the window has one name instead of two that drift apart. It carries the grid on purpose —
+the frame is a fixed raster, so anyone reproducing the render needs the size, and the title
+bar is the one place it can't go stale.
 
 ### On colour
 
@@ -189,7 +218,7 @@ column sums to the signoff total, so editing one figure means editing two.
 Three things are illustrative rather than true of that run. **`1 flag`** — the run flagged
 five degradations and deviations, only one of which (a justified plan deviation) actually
 wanted a human; the demo shows what the flag column is *for* rather than that run's tally.
-**`install deps`** — the repo was empty at preflight, so there was nothing to install. And
+**`deps`** — the repo was empty at preflight, so there was nothing to install. And
 the phase glosses generally, which summarise a stage rather than an instance. Deliberate:
 the clip illustrates the workflow, it is not a recording.
 

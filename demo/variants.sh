@@ -7,6 +7,7 @@ cd "$(dirname "$0")"
 cols=$(python3 -c 'import cast; print(cast.COLS)')
 rows=$(python3 -c 'import cast; print(cast.ROWS)')
 FONT="${FONT:-JetBrains Mono,Menlo,Apple Color Emoji}"
+title=$(python3 -c 'import cast; print(cast.title())')   # one name for the window
 
 themes=("$@")
 [ ${#themes[@]} -eq 0 ] && themes=(ghostty kiro catppuccin)
@@ -18,7 +19,7 @@ import cast; t = cast.THEMES['$theme']; print(t['win'], t['bar'], t['outer'])")"
   agg --cols "$cols" --rows "$rows" --font-size 30 --font-family "$FONT" \
       "/tmp/$theme.cast" "/tmp/$theme-raw.gif" >/dev/null 2>&1
   uv run --with pillow python chrome.py "/tmp/$theme-raw.gif" "demo-$theme.gif" \
-      "Terminal" --scale 2 --win "$win" --bar "$bar" --outer "$outer" >/dev/null
+      "$title" --scale 2 --win "$win" --bar "$bar" --outer "$outer" >/dev/null
   python3 mkpreview.py "/tmp/$theme.cast" "demo-$theme.html" >/dev/null
   printf '%-12s gif %s · preview demo-%s.html\n' \
     "$theme" "$(du -h "demo-$theme.gif" | cut -f1)" "$theme"

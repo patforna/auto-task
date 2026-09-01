@@ -48,8 +48,8 @@ CREATE = """\
 @resolve 0.2
 @step 0.4 Creating task|write ACs · commit
 
-{green}✓{/} {bold}Task 001 ready for dev{/}
-{dim}tasks/001-hello-world-cli.md · {n}4{/} ACs{/}
+@row {green}✓{/} Task 001 ready for dev
+@detail tasks/001-hello-world-cli.md · {bold}4{/} ACs
 """
 
 AUTO = """\
@@ -57,8 +57,8 @@ AUTO = """\
 @checklist """ + PHASES + """
 @run 1.2 Preflight|task · tooling · worktree · deps|0:14
 @run 1.2 Planning|panel of models · synthesise|1:07
-@run 1.2 Implementing|tests first · {n}6{/} commits|2:31
-@run 1.2 Reviewing|{n}3{/} issues found · fixing 2 of 3|{n}3{/} issues found · {n}3{/} fixed|3:52
+@run 1.2 Implementing|tests first · {bold}6{/} commits|2:31
+@run 1.2 Reviewing|{bold}3{/} issues found · fixing 2 of 3|{bold}3{/} issues found · {bold}3{/} fixed|3:52
 @run 1.2 Verifying|run CLI · validate ACs|4:12
 
 @row 🎉 Shipped|squash-merged · build green · worktree removed
@@ -219,7 +219,7 @@ def separators_are_dimmer_than_the_gloss_around_them():
 
 @check
 def counts_carry_the_emphasis_and_their_labels_do_not():
-    """{n}6{/} commits: 6 bold in the default fg, commits back in gloss grey"""
+    """{bold}6{/} commits: 6 lifts out of the grey, commits drops back into it"""
     _, s = final(AUTO)
     y = row_of(s, "✓ Implementing")
     col = 20 + text(s, y, 20, 36).index("6")
@@ -238,14 +238,46 @@ def a_gloss_without_counts_has_no_emphasis_at_all():
 
 
 @check
-def a_count_on_a_plain_line_returns_to_the_grey_it_came_from():
-    """{dim}… {n}4{/} ACs{/} — the 4 is emphasised, ACs is not, both stay in the line"""
+def a_count_on_a_detail_line_returns_to_the_grey_it_came_from():
+    """@detail … {bold}4{/} ACs — the 4 is emphasised, ACs is not, both stay in the line"""
     _, s = final(CREATE)
     y = row_of(s, "tasks/001")
     col = text(s, y).index("4") + 1
     four, word = cell(s, y, col), cell(s, y, col + 2)
     assert four.data == "4" and four.bold and four.fg == FG, (four.data, four.bold, four.fg)
     assert word.data == "A" and not word.bold and word.fg == GLOSS, (word.data, word.bold, word.fg)
+
+
+@check
+def a_heading_row_lets_its_label_run_past_the_column():
+    """the label column only exists to line a gloss up, so a heading ignores it"""
+    long = "Task 001 ready for signoff"          # 26 cells, well past LABEL_W
+    c = cast.render("@row {green}\u2713{/} " + long + "\n")
+    assert c.warn == [], f"nothing follows the label, so nothing is misaligned: {c.warn}"
+    _, s = final("@row {green}\u2713{/} " + long + "\n")
+    assert text(s, 0, 3, len(long)) == long, repr(text(s, 0))
+    # ...but the moment a gloss follows, the column is load-bearing again
+    c = cast.render("@row {green}\u2713{/} " + long + "|x\n")
+    assert any("label >" in w for w in c.warn), c.warn
+
+
+@check
+def a_detail_line_gets_the_gloss_treatment_without_asking():
+    """@detail indents to col 3, greys the words and tints the separators itself"""
+    _, s = final(CREATE)
+    y = row_of(s, "tasks/001")
+    assert text(s, y, 1, 2) == "  ", repr(text(s, y, 1, 6))
+    assert cell(s, y, 3).fg == GLOSS, cell(s, y, 3).fg
+    col = text(s, y).index("\u00b7") + 1
+    assert cell(s, y, col).fg == SEP, f"the separator tints itself: {cell(s, y, col).fg}"
+
+
+@check
+def a_tag_that_is_not_a_tag_is_caught_before_it_reaches_the_gif():
+    """an unknown {tag} prints as literal text, which is invisible until rendered"""
+    assert any("unknown tag {nope}" in w for w in cast.render("{nope}x{/}\n").warn)
+    assert cast.render("{bold}x{/}\n").warn == [], "a real tag is not a typo"
+    assert cast.render(CREATE).warn == [] and cast.render(AUTO).warn == []
 
 
 @check

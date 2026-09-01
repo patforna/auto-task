@@ -5,8 +5,8 @@ Directives, all starting at column 0. Note what each number means — they are n
 all durations:
 
   @prompt <text>          a human types <text> at the prompt, then hits enter.
-                          Takes NO number. A leading /command is bolded, its
-                          arguments are not.
+                          Takes NO number. A leading /command is bolded and its
+                          arguments are not; a bare answer ("yes") is bolded whole.
   @pause <secs>           wait, showing nothing new
   @clear                  wipe the screen and start again at the top
 
@@ -32,7 +32,9 @@ all durations:
                           a second gloss for the landed row ("fixing 2 of 3" ->
                           "3 fixed"). Rows must be run in the order they were
                           listed. Every frame repaints the whole block, so rows
-                          above stay done and rows below stay pending.
+                          above stay done and rows below stay pending. A checklist
+                          and a pending @step! both want the cursor, so opening one
+                          while the other is live is refused at compile time.
                           <clock> is how long THIS row took. Each row is its own
                           stopwatch: it runs from 0:00 and lands exactly on
                           <clock>, so the column adds up to the run's total. That
@@ -42,9 +44,14 @@ all durations:
   @row <glyph> <l>|<g>    one finished phase row, printed as-is: no spinner, no
                           tick, no "...". Takes NO number. For a row that never
                           runs, e.g. the 🎉 signoff line. An optional third field
-                          adds a clock.
+                          adds a clock. With NO gloss and no clock the label runs
+                          free — that is a heading, e.g. "✓ Task 001 ready".
+  @detail <text>          a line under a heading: indented to col 3 and given the
+                          gloss treatment — the gloss grey, and separators tinted
+                          for you. Takes NO number.
 
-  @ask <text>             a question handed back to you, marked with ASK_MARK
+  @ask <text>             a question handed back to you, bold at col 3, marked
+                          with ASK_MARK
   @select <n> <a>|<b>     a TUI picker. <n> is the 1-BASED OPTION that ends up
                           chosen — not a duration. The highlight lands on the
                           first option, walks down to <n>, then pulses to confirm.
@@ -60,7 +67,9 @@ so a stack of them reads as a column rather than a zigzag (columns are 1-indexed
               space, 🎉 is already two cells wide and takes none
   cols 3-19   label, bold in the default foreground. "..." means still running:
               the renderer appends it while the row spins and drops it when the
-              row lands, so screenplays write the bare label
+              row lands, so screenplays write the bare label. The width is there
+              to line a gloss up, so a row with neither gloss nor clock lets its
+              label run on
   cols 20-55  gloss, in the gloss grey; "·" separators are tinted automatically.
               With no clock beside it a gloss may run on to col 78
   col 56      clock, 4 characters ("0:14"), in its own grey. Never emphasised —
@@ -71,12 +80,15 @@ and no clock, because it has nothing to report yet.
 
 Blank lines never double up: consecutive blanks collapse to one.
 
-Inline styling: {bold} {dim} {orange} {green} {cyan} {yellow} {red}, the phase-row
-greys {pending} {clock} {sep}, and {n}, each closed by {/}. {n} is a count —
-bold in the default foreground, because the numbers are the evidence and their
-labels are not ("{n}6{/} commits"). {/} pops back to the enclosing tag, so inside
-a gloss it returns to the gloss grey instead of resetting the whole field.
-Use {green}✓{/} explicitly for a tick; there is no implicit marker on plain lines.
+Inline styling: {bold} {dim} {orange} {green} {cyan} {yellow} {red} and the
+phase-row greys {pending} {clock} {sep}, each closed by {/}. {bold} sets the weight
+AND returns to the default foreground, which is what lifts a count out of the grey
+around it ("{bold}6{/} commits" — weight alone would only give you a heavier grey).
+{/} pops back to the enclosing tag, so inside a gloss or an @detail it returns to
+the gloss grey rather than resetting the whole line. A "·" inside a gloss or an
+@detail tints itself; anywhere else write {sep}·{/}. Use {green}✓{/} explicitly for
+a tick; there is no implicit marker on plain lines. A brace-wrapped word that isn't
+a tag warns on render — otherwise it would print as literal text in the GIF.
 
 Everything scrolls naturally: content never uses absolute cursor addressing, so
 the prompt moves up the screen like a real terminal and nothing leaves ghosts.
@@ -86,7 +98,7 @@ so they scroll with the transcript like any other content.
 """
 import argparse, json, random, re, unicodedata
 
-COLS, ROWS = 80, 16   # peak height is 14 rows either side of the @clear
+COLS, ROWS = 80, 16   # the screenplay fills 12 rows before the @clear and 15 after
 
 # The phase-row grid: glyph at cols 1-2, label 3-19, gloss 20-55, clock at 56.
 # Every directive that prints a row pads to these, so the columns hold whatever
@@ -108,13 +120,13 @@ def rgb(hexcode):
     return "\x1b[38;2;%d;%d;%dm" % tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
 
 
-# {n} is a count inside a gloss: numbers read as evidence, so they take the weight
-# and their labels stay grey. The five theme-driven entries are placeholders here —
-# apply_theme() points them at the running theme's own greys.
-C = {"bold": "\x1b[1m", "dim": "\x1b[2m", "red": "\x1b[31m", "green": "\x1b[32m",
+# {bold} sets the weight AND returns to the default foreground, so it lifts a count
+# out of the grey around it — inside a gloss, weight alone would just give you a
+# heavier grey. The four theme-driven entries are placeholders here; apply_theme()
+# points them at the running theme's own greys.
+C = {"bold": EMPHASIS, "dim": "\x1b[2m", "red": "\x1b[31m", "green": "\x1b[32m",
      "yellow": "\x1b[33m", "cyan": "\x1b[36m", "orange": "\x1b[38;5;209m",
-     "pending": "\x1b[2m", "clock": "\x1b[2m", "sep": "\x1b[2m",
-     "n": EMPHASIS, "/": R}
+     "pending": "\x1b[2m", "clock": "\x1b[2m", "sep": "\x1b[2m", "/": R}
 
 
 def apply_theme(name):
@@ -128,6 +140,9 @@ def apply_theme(name):
     h = t["tint"].lstrip("#")
     PROMPT_BG = "\x1b[48;2;%d;%d;%dm" % tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
 TAG = re.compile(r"\{(" + "|".join(re.escape(k) for k in C) + r")\}")
+# Anything brace-wrapped that ISN'T a tag: a typo or a renamed one, which style()
+# would otherwise pass through and print as literal text in the GIF.
+STRAY_TAG = re.compile(r"\{/?[a-z][a-z0-9]*\}")
 ANSI = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]")
 
 
@@ -284,13 +299,23 @@ def row(glyph, label, gloss="", clock="", muted=False):
     """
     if muted:
         return C["pending"] + pad(glyph, GLYPH_W) + style(label) + R
-    out = pad(glyph, GLYPH_W) + EMPHASIS + pad(style(label), LABEL_W) + WEIGHT_OFF
+    # The label column only exists to line a gloss up. With nothing after it, a
+    # label runs as far as it likes — that is what a heading row is.
+    text = style(label)
+    out = pad(glyph, GLYPH_W) + EMPHASIS + (pad(text, LABEL_W) if gloss or clock
+                                            else text) + WEIGHT_OFF
     if gloss:
-        body = span(gloss.replace(SEP, "{sep}" + SEP + "{/}"), C["dim"])
+        body = detail(gloss)
         out += pad(body, GLOSS_W) if clock else body
     elif clock:
         out += " " * GLOSS_W
     return out + (C["clock"] + clock if clock else "") + R
+
+
+def detail(text):
+    """Gloss styling for text that isn't in a gloss column: the same grey, and the
+    same automatic tint on its separators."""
+    return span(text.replace(SEP, "{sep}" + SEP + "{/}"), C["dim"])
 
 
 def clock_secs(s):
@@ -344,7 +369,7 @@ class Cast:
         A row that overflows pushes everything after it sideways, and a column of
         rows going ragged is invisible until the GIF is rendered.
         """
-        if cells(visible(style(label))) > LABEL_W:
+        if (clock or any(glosses)) and cells(visible(style(label))) > LABEL_W:
             self.warn.append(f"label >{LABEL_W} cols: {label}")
         # A gloss beside a clock gets one column fewer than it owns: filling the
         # column leaves no gap, and "commit2:10" reads as one word.
@@ -410,6 +435,19 @@ class Cast:
             self.out("\r\x1b[2K" + row(C[STEP_DONE] + STEP_DONE_MARK, label, gloss)
                      + "\r\n", FRAME)
             self.advance()
+        self.last_blank = False
+
+    def detail(self, text):
+        """A line under a heading: indented to col 3, in the gloss grey.
+
+        The same treatment a gloss gets, for text that isn't in the gloss column —
+        so a screenplay writes the words and the separators tint themselves.
+        """
+        body = "  " + detail(text)
+        if cells(visible(body)) > COLS:
+            self.warn.append(f"detail >{COLS} cols: {text}")
+        self.out(body + R + "\r\n", 0.12)
+        self.advance()
         self.last_blank = False
 
     def static_row(self, glyph, label, gloss="", clock=""):
@@ -599,6 +637,8 @@ def render(script):
     if lines and lines[-1] == "":   # the file's closing newline, not a blank row: it
         lines.pop()                 # would cost a row, and every row is spoken for
     for raw in lines:
+        for m in STRAY_TAG.findall(TAG.sub("", raw)):
+            c.warn.append(f"unknown tag {m}: {raw.strip()[:60]}")
         if raw.startswith("#"):        # comment: only at column 0, so indented
             continue                   # markdown headings in content still print
         if not raw.startswith("@"):
@@ -624,6 +664,8 @@ def render(script):
             c.out("  " + mark + style("{bold}" + rest + "{/}") + "\r\n", 0.12)
             c.advance()
             c.last_blank = False
+        elif cmd == "detail":         # an indented line under a heading, at col 3
+            c.detail(rest)
         elif cmd in ("step", "step!"):   # a phase row that spins, then ticks over
             secs, _, text = rest.partition(" ")
             label, gloss = fields(text, 1, 2, f"@{cmd} <secs> <label>|<gloss>")
@@ -651,6 +693,15 @@ def render(script):
     return c
 
 
+def title():
+    """What the window is called, for the cast header and the GIF's chrome alike.
+
+    Carries the grid, because the frame is a fixed raster: anyone reproducing the
+    render needs the size, and the title bar is the one place it can't go stale.
+    """
+    return f"auto-task · {COLS}\u00d7{ROWS}"
+
+
 def cast_theme():
     t = THEMES[THEME_NAME]
     return {"fg": t["fg"], "bg": t["bg"], "palette": ":".join(t["palette"])}
@@ -670,7 +721,7 @@ def main():
         globals()["ASK_MARK"] = a.ask_mark
     c = render(open(a.script).read())
     hdr = {"version": 2, "width": COLS, "height": ROWS, "theme": cast_theme(),
-           "title": "auto-task", "env": {"TERM": "xterm-256color", "SHELL": "/bin/zsh"}}
+           "title": title(), "env": {"TERM": "xterm-256color", "SHELL": "/bin/zsh"}}
     with open(a.out, "w") as f:
         f.write(json.dumps(hdr) + "\n")
         for e in c.events:
