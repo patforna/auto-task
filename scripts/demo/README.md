@@ -15,6 +15,7 @@ comes from a real run, so the artefacts and counts are true (see [Provenance](#p
 FONT_SIZE=15 ./render.sh    # half-resolution GIF (smaller file, softer on retina)
 ./variants.sh               # render every theme, for comparison
 ./variants.sh kiro          # just one
+python3 test_cast.py        # check the compiler against a real terminal screen
 ```
 
 ```
@@ -22,18 +23,25 @@ demo.txt ──cast.py──> demo.cast ──agg──> demo-raw.gif ──chro
                           └────────mkpreview.py────────────────────> demo.html
 ```
 
-| file           | what it is                                       | committed |
-| -------------- | ------------------------------------------------ | --------- |
-| `demo.cast`    | asciicast v2 — the source of truth for timing    | yes       |
-| `demo.gif`     | the deliverable, framed, ~320 KB                 | yes       |
-| `demo-raw.gif` | agg's bare output, before chrome                 | no        |
-| `demo.html`    | scrubbing preview, player inlined, works offline | no        |
-| `demo-<theme>.*` | output of `variants.sh`                        | no        |
-| `assets/`      | asciinema player, fetched on first preview       | no        |
+| file                       | what it is                                                               | committed |
+| -------------------------- | ------------------------------------------------------------------------ | --------- |
+| `demo.txt`                 | the screenplay — the file you edit                                       | yes       |
+| `cast.py`                  | screenplay -> asciicast. Its docstring is the language reference         | yes       |
+| `test_cast.py`             | 28 checks: fixtures replayed into a `pyte.Screen`, asserted cell by cell | yes       |
+| `chrome.py`                | frames agg's GIF in a window — corners, title bar, traffic lights        | yes       |
+| `mkpreview.py`             | wraps a cast in a self-contained HTML player                             | yes       |
+| `render.sh`, `variants.sh` | the two entry points                                                     | yes       |
+| `demo.cast`                | asciicast v2 — the source of truth for timing                            | yes       |
+| `demo.gif`                 | the deliverable, framed, ~350 KB                                         | yes       |
+| `demo-raw.gif`             | agg's bare output, before chrome                                         | no        |
+| `demo.html`                | scrubbing preview, player inlined, works offline                         | no        |
+| `demo-<theme>.*`           | output of `variants.sh`                                                  | no        |
+| `assets/`                  | asciinema player, fetched on first preview                               | no        |
 
 Needs `python3`, [`agg`](https://github.com/asciinema/agg) (`brew install agg`) and `uv`
 (for Pillow, which draws the chrome). If Pillow is unreachable, `render.sh` warns and falls
-back to the unframed GIF. `curl` is used once, to fetch the player.
+back to the unframed GIF. `curl` is used once, to fetch the player. `test_cast.py` needs
+`pyte`, and borrows one through `uv` if it isn't installed.
 
 **Watch `demo.html` while iterating** — it has a scrubber. But judge the *GIF*: it renders
 at 2× and is meant to display at half width, which supersamples the text and comes out
@@ -46,19 +54,62 @@ comments start at column 0 — an indented `#` is content, so markdown headings 
 
 The numbers are not all durations:
 
-| directive              | what it does                                                          |
-| ---------------------- | --------------------------------------------------------------------- |
-| `@prompt <text>`       | a human types it, then enter. **No number.** A leading `/command` is bolded, its arguments are not |
-| `@step <secs> a\|b\|c` | a line with a braille spinner, revealed chunk by chunk. `<secs>` is **per chunk**, not total, ±`CHUNK_JITTER`. Resolves to a green tick |
-| `@step! <secs> a\|b`   | the same, but left **spinning** until an `@resolve`. For a step genuinely blocked on the human |
-| `@resolve <secs>`      | finish the pending `@step!` in place, however many lines have been printed since. One pending step at a time |
-| `@ask <text>`          | a question handed back to you, prefixed with `ASK_MARK` (currently none) |
-| `@select <n> a\|b`     | a TUI picker. `<n>` is the **1-based option chosen**, not a duration. The highlight lands on the first option, walks to `<n>`, then flashes to confirm |
-| `@pause <secs>`        | wait, showing nothing new                                              |
-| `@clear`               | wipe the screen and start again at the top                             |
+| directive                                     | what it does                                                         |
+| --------------------------------------------- | -------------------------------------------------------------------- |
+| `@prompt <text>`                              | a human types it, then enter. **No number.** A leading `/command` is bolded, its arguments are not |
+| `@step <secs> <l>\|<g>`                       | a phase row that spins for `<secs>` — the **whole row**, ±`HOLD_JITTER` — then ticks over to done in place |
+| `@step! <secs> <l>\|<g>`                      | the same, but left **spinning** until an `@resolve`. For a step genuinely blocked on the human |
+| `@resolve <secs>`                             | finish the pending `@step!` in place, however far the cursor has moved on. `<secs>` is the beat before the tick lands. One pending step at a time |
+| `@checklist <a>\|<b>\|<c>`                    | print every phase up front, all pending, so the shape of the run is on screen before any of it happens |
+| `@run <secs> <l>\|<g>\|<clock>`               | tick one checklist row over: it spins for `<secs>`, then lands. Rows must run in the order they were listed. `<clock>` is **how long that row took**, `M:SS` |
+| `@run <secs> <l>\|<running>\|<done>\|<clock>` | four fields swap the gloss when the row lands — `fixing 2 of 3` becomes `3 fixed` |
+| `@row <glyph> <l>\|<g>[\|<clock>]`            | one finished phase row, printed as-is: no spinner, no tick, no `...`. **No number.** For a phase that never runs, e.g. the 🎉 signoff |
+| `@ask <text>`                                 | a question handed back to you, at col 3, prefixed with `ASK_MARK` (currently none) |
+| `@select <n> <a>\|<b>`                        | a TUI picker. `<n>` is the **1-based option chosen**, not a duration. The options land unhighlighted, the highlight arrives on the first, walks to `<n>`, then flashes to confirm |
+| `@pause <secs>`                               | wait, showing nothing new |
+| `@clear`                                      | wipe the screen and start again at the top |
 
-Inline styling: `{bold}` `{dim}` `{orange}` `{green}` `{cyan}` `{yellow}` `{red}`, each
-closed by `{/}`. No implicit styling — use `{green}✓{/}` explicitly.
+Each row's clock is its own stopwatch: a running row counts *up* from `0:00` and lands
+exactly on its `<clock>`, so the column adds up to the run's total. That ticking is what
+stops a block of five rows reading as a slow typewriter.
+
+### Phase rows
+
+`@step`, `@step!`, `@checklist`, `@run` and `@row` all print on one grid, so a stack of
+them reads as a column rather than a zigzag (columns are 1-indexed):
+
+| cols  | what                                                                 |
+| ----- | -------------------------------------------------------------------- |
+| 1-2   | status glyph, padded by **display width**: `✓ · ⠋` take a trailing space, `🎉` is already two cells wide and takes none |
+| 3-19  | label, bold in the default foreground |
+| 20-55 | gloss, in the gloss grey. A `·` inside it is tinted automatically |
+| 56-59 | clock, `M:SS`, in its own grey. Never emphasised — it is read positionally, and competing with it flattens both |
+
+A gloss with no clock beside it gets the rest of the row instead, running on to col 78.
+
+`...` means "still running", and the renderer owns it: it appends the dots while a row
+spins and drops them when the row lands, so screenplays write bare labels. A pending row
+is the exception to all of the above — pending grey throughout, not bold, and neither
+gloss nor clock, because it has nothing to report yet.
+
+An open `@checklist` survives a `@pause`; anything else that prints closes the block and
+drops the cursor below it, and `@clear` forgets it. A `@run` naming a row that isn't in the
+checklist, or one that is out of order, fails the compile — in the GIF it would look like a
+rendering bug. A label, gloss or line that outgrows its column warns on render, because a
+column going ragged is invisible until then.
+
+### Inline styling
+
+`{bold}` `{dim}` `{orange}` `{green}` `{cyan}` `{yellow}` `{red}`, the three phase-row
+greys `{pending}` `{clock}` `{sep}`, and `{n}` — each closed by `{/}`. `{orange}` is the
+accent slot, whatever hue the theme gives it. `{n}` is a count: bold in the default
+foreground, because the numbers are the evidence and their labels are not.
+
+`{/}` pops back to the *enclosing* tag rather than resetting, which is what lets
+`{dim}… {n}4{/} ACs{/}` leave `ACs` grey instead of dropping it to the default foreground;
+inside a gloss it returns to the gloss grey. No implicit styling otherwise — write
+`{green}✓{/}` for a tick, and `{sep}·{/}` for a separator on a plain line. Inside a gloss
+the `·` is tinted for you, so there write it as plain text.
 
 Two invariants so layout can't drift as you edit: consecutive blank lines collapse to one,
 and the final frame is held for at least `END_PAUSE` before the loop restarts.
@@ -67,41 +118,85 @@ and the final frame is held for at least `END_PAUSE` before the loop restarts.
 
 Constants at the top of `cast.py`:
 
-| constant                                    | default        | effect                                        |
-| ------------------------------------------- | -------------- | ---------------------------------------------- |
-| `COLS`, `ROWS`                              | `80`, `15`     | frame size. Lines wider than `COLS` warn on render |
-| `THEMES`, `THEME_NAME`                       | `ghostty`      | palette, accent, dim, prompt tint and chrome colours, per theme. Also `--theme` |
-| `STEP_SPINNER`, `STEP_COLOUR`               | braille, accent | the per-step inline spinner                    |
-| `STEP_DONE_MARK`, `STEP_DONE`               | `✓`, green     | what a finished `@step` resolves to            |
-| `CHUNK_JITTER`                              | `0.40`         | ± on each chunk's hold, so the reveal isn't metronomic |
-| `SELECT_*`                                  | see file       | picker intro, walk, settle, flash, rest         |
-| `SELECT_FILL`                               | `False`        | `True` spans the bar across the frame, fzf-style |
-| `ASK_MARK`, `ASK_COLOUR`                    | `""`           | marker before an `@ask`. Also `--ask-mark`      |
-| `PROMPT_BG`, `PROMPT_FILL`                  | tint, `False`  | background behind `@prompt` lines and the picker highlight |
-| `TYPING_SEED`, `KEY`, `WORD_PAUSE*`, `HESITATE*` | seeded    | typing rhythm — fast within words, a beat between them, occasional hesitation. Seeded, so rebuilds are identical |
-| `END_PAUSE`                                 | `3.0`          | minimum hold on the last frame before looping   |
+| constant                                         | default         | effect                                         |
+| ------------------------------------------------ | --------------- | ---------------------------------------------- |
+| `COLS`, `ROWS`                                   | `80`, `16`      | frame size. Lines wider than `COLS` warn on render |
+| `GLYPH_W`, `LABEL_W`, `GLOSS_W`                  | `2`, `17`, `36` | the phase-row columns. `GLOSS_MAX` (`59`) is what a gloss gets instead when no clock follows it |
+| `THEMES`, `THEME_NAME`                           | `ghostty`       | palette, accent, the greys, prompt tint and chrome colours, per theme. Also `--theme` |
+| `STEP_SPINNER`, `STEP_COLOUR`                    | braille, accent | the per-row spinner |
+| `STEP_DONE_MARK`, `STEP_DONE`                    | `✓`, green      | what a finished row lands on |
+| `STEP_PENDING_MARK`                              | `·`             | a phase that hasn't run yet |
+| `RUNNING_MARK`                                   | `...`           | appended to a label while its row spins, dropped when it lands |
+| `SEP`                                            | `·`             | tinted automatically wherever it turns up in a gloss |
+| `HOLD_JITTER`                                    | `0.40`          | ± on a row's hold, so a stack of rows isn't metronomic |
+| `FRAME`, `CLOCK_TICK`                            | `0.11`, `0.22`  | spinner frame interval, and how often a running clock moves — two frames: often enough to read as counting, slow enough not to strobe |
+| `SELECT_*`                                       | see file        | picker intro, walk, settle, flash, rest |
+| `SELECT_FILL`, `SELECT_PAD`                      | `True`, `5`     | the highlight bar spans the frame, fzf-style; the pad is `"  ❯ "` in front of an option and a space behind it, so a filled bar ends exactly on `COLS` |
+| `HUMAN_MARK`                                     | `❯`             | one glyph for everything the human typed — the command at a `@prompt` and the option they pick in a `@select`, both in the accent |
+| `ASK_MARK`, `ASK_COLOUR`                         | `""`, accent    | marker before an `@ask`. Also `--ask-mark` |
+| `PROMPT_BG`, `PROMPT_FILL`                       | tint, `False`   | background behind a `@prompt` line and under the picker highlight |
+| `TYPING_SEED`, `KEY`, `WORD_PAUSE*`, `HESITATE*` | seeded          | typing rhythm — fast within words, a beat between them, occasional hesitation. Seeded, so rebuilds are identical |
+| `END_PAUSE`                                      | `3.0`           | minimum hold on the last frame before looping |
+
+The two fill flags disagree deliberately. `SELECT_FILL` is on because a picker is a list:
+in the cast this replaced, bars shrink-wrapped to their own text measured 107, 359 and
+557 px and read as three different things rather than three options. `PROMPT_FILL` is off
+because a prompt is a transcript: the tint marks what the human typed, and running it to
+col 80 marks the row instead.
 
 `mkpreview.py` takes `--font-size` (18), `--line-height` (1.45) and `--font-family`
 (JetBrains Mono). Preview only — the GIF's size comes from `agg --font-size` in
-`render.sh`. `chrome.py` takes `--scale`, `--win`, `--bar`, `--outer`.
+`render.sh`. `chrome.py` takes a title plus `--scale`, `--win`, `--bar`, `--outer`; its own
+constants (`BAR`, `RADIUS`, `TITLE_SIZE`, …) are 1× values that `--scale` multiplies, so
+`TITLE_SIZE = 10` draws at 20 px on the 2× render. It sets the title in JetBrains Mono —
+the terminal's own face — and falls back to the macOS system sans on a machine without it.
 
 ### On colour
 
-Only background, foreground, green and cyan are palette-driven. The **accent** (every
-in-progress state, the `>` and `❯` markers) and the **prompt tint** are pinned per theme,
-because both must hold a contrast relationship with the ground — a palette swap must never
-silently recolour them.
+Background, foreground and the ANSI tags (`{green}` `{cyan}` `{red}` `{yellow}`) are
+palette-driven. Everything else is pinned per theme, because it has to hold a contrast
+relationship with the ground that a palette swap must never silently break:
+
+- the **accent** — every in-progress state, and `HUMAN_MARK`
+- the **prompt tint** — behind a `@prompt` line, and under the picker highlight
+- the **greys** — `dim`, which is every gloss, and the three phase-row greys stepped below
+  it: `clock` ~0.67 of the way from the ground up to `dim`, `sep` ~0.55, `pending` ~0.47.
+  Each theme redraws that ladder on its own ground rather than borrowing ghostty's hexes
+
+`dim` is an explicit grey rather than SGR 2, which darkens *towards the background* and on
+a lifted charcoal collapses the detail text into mush.
+
+ghostty's `dim` and `tint` were both lifted a step — `#9aa4b5` → `#a9afb8` and
+`#2b2f37` → `#2e323c`. They are the first two things GIF quantisation eats, and nothing
+else carries what they carry: the gloss holds every detail on screen, and the tint is the
+only mark that input was typed. Don't darken them back.
 
 ## Provenance
 
 Content comes from a real `/at:auto-task` run against a scratch repo (`~/github/hello-world`,
-task 001 — a hello-world CLI on Bun + TypeScript). The task file, the clarify question and
-its options, the commit count and the ship result are from that run.
+task 001 — a hello-world CLI on Bun + TypeScript), session `6718d57a`, 31 Aug 2026. Every
+count on screen is from that run bar one: 4 acceptance criteria, 3 lines cut by the
+tightening pass, two plans with one panel disagreement resolved, two reviewers with nothing
+blocking, 8 commits on `task/001-hello-world-cli`, `3/3 tests pass` (the run printed
+`3 pass / 0 fail`), and a squash-merge whose build was re-verified on main afterwards.
 
-The step wording is written for a viewer rather than quoted. Two things are true of the
-workflow rather than of that run: `install deps` (the repo was empty at preflight, so there
-was nothing to install) and the step descriptions generally, which summarise a stage rather
-than an instance. Deliberate: the clip illustrates the workflow, it is not a recording.
+**The clocks are derived, not quoted.** `/at:auto-task` prints no duration string at all:
+the per-phase figures and the `9m 20s` total are computed from the session's own message
+timestamps, one boundary per phase, with the demo's five phases folding the run's steps a
+little (preflight absorbs the worktree setup, verifying absorbs the summarise). The phase
+column sums to the signoff total, so editing one figure means editing two.
+
+Three things are illustrative rather than true of that run. **`1 flag`** — the run flagged
+five degradations and deviations, only one of which (a justified plan deviation) actually
+wanted a human; the demo shows what the flag column is *for* rather than that run's tally.
+**`install deps`** — the repo was empty at preflight, so there was nothing to install. And
+the phase glosses generally, which summarise a stage rather than an instance. Deliberate:
+the clip illustrates the workflow, it is not a recording.
+
+The clarify question is the one the run asked; its two options are rewritten. The run's
+were two shades of positional argument, which is the sharper example of what clarify is for
+but takes longer to read than a demo has — a flag against a positional says the same thing
+in a glance.
 
 ## Gotchas
 
@@ -109,23 +204,39 @@ Each of these cost real time to find.
 
 - **Never use absolute cursor addressing for content.** An earlier approach was abandoned
   entirely because its chrome repainted at fixed rows inside the scrolling area: the prompt
-  didn't scroll, the spinner left ghosts, rules landed on text. The two in-place effects
-  here (`@select`'s highlight, `@resolve`) move *relative* to the cursor and return to it.
+  didn't scroll, the spinner left ghosts, rules landed on text. The three in-place effects
+  here (`@select`'s highlight, `@resolve`, the `@checklist` block) are laid down once and
+  afterwards move *relative* to the cursor and back, so they scroll with the transcript.
 - **Track net cursor movement, not newlines.** `@resolve` has to know how many rows above
   the cursor the pending line sits. Counting `\n` in the output stream is wrong — the
   picker repaints in place, moving up before writing — and the line reprints progressively
   further up, duplicating itself. Only operations that genuinely advance a row call
   `advance()`.
-- **Reset weight with `\x1b[22m`, not `\x1b[0m`** — a full reset also clears the prompt tint.
+- **`@prompt` advances the cursor, so `@resolve` has to count it.** `prompt()` didn't call
+  `advance()`, so a `@prompt` between a `@step!` and its `@resolve` finished the wrong row.
+  Same class as the one above: consuming a row and saying so are two different things.
+- **A screenplay's trailing newline must not become a blank row.** The file ends with `\n`,
+  which compiled to a real blank line and cost a row the design had already spent — enough
+  to scroll the prompt off a final frame that fills the frame to its last line. `render()` drops it; a blank line the
+  screenplay actually asks for still prints.
+- **Reset weight with `\x1b[22m`, not `\x1b[0m`** — a full reset also clears the prompt
+  tint, and inside a gloss it clears the gloss grey.
 - **`--font-family` disables agg's fallback chain**, so every font you need must be named.
-  JetBrains Mono has none of the braille or dingbat glyphs; without `Menlo` in the list they
-  resolve to Apple Color Emoji and the spinner renders in colour.
+  JetBrains Mono has neither the braille spinner nor `🎉`: drop `Menlo` from the list and
+  the braille falls through to Apple Color Emoji, so the spinner renders in colour; drop
+  `Apple Color Emoji` and the party popper vanishes.
 - **The GIF is a fixed raster.** It renders at 2× and is displayed at half width. Font
   choice does not fix sharpness; pixels do.
 - **Don't give the framed GIF transparent corners.** GIF transparency forces a per-frame
-  palette and full frames — 6.4 MB versus 264 KB. `chrome.py` backs the corners with `OUTER`.
+  palette and full frames — around 20× the bytes, for a detail nobody sees on a dark page.
+  `chrome.py` backs the corners with `OUTER` instead.
 - **Build the GIF palette from a spread of composed frames.** Sampling frame 1 (nearly
-  blank) starves it of the shades text antialiasing needs and the glyphs come out chunky.
+  blank), or the bare terminal without its chrome, starves it of the shades text
+  antialiasing needs and the glyphs come out chunky.
+- **Don't compare finished GIFs to prove chrome pixels are unchanged.** The 256-colour
+  palette is quantised from the composed frames, so touching anything at all shifts the
+  palette and perturbs every pixel by up to 1/255. Compare the composed frames *before*
+  quantisation.
 - **`chrome.py` must scale with the render.** Its constants are 1× values; `render.sh`
   passes `--scale` derived from the font size.
 - **`mkpreview.py`'s HTML is a `%`-format template** — a literal `%` in its CSS must be `%%`.
@@ -133,9 +244,10 @@ Each of these cost real time to find.
   `mkpreview.py` overrides `.ap-terminal` at higher specificity.
 - **asciicast v3 stores relative intervals**, v2 absolute. `cast.py` emits v2; `mkpreview.py`
   handles both.
-- **Verify frames; don't read escape codes.** For anything structural — layout, timing,
-  whether an effect actually applied — feed the cast into a `pyte.Screen`
-  (`uv run --with pyte python …`), which shows per-cell colours and reverse video. For
+- **Verify frames; don't read escape codes.** For anything structural — a column, a colour,
+  whether an effect actually applied — the only proof is the screen the terminal ends up
+  with, and that discipline lives in `test_cast.py`: it compiles fixture screenplays,
+  replays them into a `pyte.Screen` and asserts on cell contents and per-cell colour. For
   anything visual — weight, contrast, spacing, chrome — screenshot the preview with
   `shot-scraper <file>.html -o /tmp/x.png --width 1100 --wait <ms>` and look at the PNG
   (~60-90s; pass a bare path, not a `file://` URL). Neither judges **motion**: flicker,

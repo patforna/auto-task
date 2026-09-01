@@ -2,19 +2,37 @@
 #
 # Plain lines print verbatim (blank lines and indentation included).
 # "#" at column 0 is a comment; an indented "#" is content, so markdown survives.
-# Styling: {bold} {dim} {orange} {green} {cyan} {yellow}, each closed by {/}
+# Styling: {bold} {dim} {orange} {green} {cyan} {yellow} {red}, the phase-row greys
+# {pending} {clock} {sep}, and {n} for a count, each closed by {/}.  {/} pops to the
+# enclosing tag, so {dim}a · {n}4{/} ACs{/} leaves "ACs" grey.
+#
+# Every phase row sits on one grid: glyph cols 1-2, label 3-19, gloss 20-55, clock
+# at 56.  Write labels BARE — the renderer bolds them, appends "..." while the row
+# runs and drops it when it lands.  "·" inside a gloss is tinted automatically; on a
+# plain line write it {sep}·{/} yourself.
 #
 # The numbers are NOT all durations:
 #
 #   @prompt <text>          a human types it, then enter.  Takes NO number.
 #                           A leading /command is bolded, its arguments are not.
-#   @step <secs> a|b|c      a line with a braille spinner, revealed chunk by
-#                           chunk.  <secs> is PER CHUNK, not total (±CHUNK_JITTER).
-#                           Resolves to a green tick.
-#   @step! <secs> a|b       the same, but left SPINNING until an @resolve. Use it
+#   @step <secs> <l>|<g>    a phase row that spins for <secs> — the whole row,
+#                           ±HOLD_JITTER — then ticks over to done in place.
+#   @step! <secs> <l>|<g>   the same, but left SPINNING until an @resolve.  Use it
 #                           when the step is genuinely blocked on the human.
-#   @resolve <secs>         finish the pending @step! in place.  <secs> is the
-#                           beat before the tick lands.  One pending step at a time.
+#   @resolve <secs>         finish the pending @step! in place, however far the
+#                           cursor has moved on.  <secs> is the beat before the
+#                           tick lands.  One pending step at a time.
+#   @checklist <a>|<b>|<c>  print every phase up front, all pending, so the shape
+#                           of the run is on screen before any of it happens.
+#   @run <secs> <l>|<g>|<clock>
+#   @run <secs> <l>|<running g>|<done g>|<clock>
+#                           tick one checklist row over: it spins for <secs>, then
+#                           lands.  Rows must run in the order they were listed.
+#                           <clock> is how long THAT row took, M:SS — it counts up
+#                           from 0:00 to it.  Four fields swap the gloss on landing.
+#   @row <glyph> <l>|<g>    one finished phase row, printed as-is: no spinner, no
+#                           tick, no "...".  Takes NO number; a third field adds
+#                           a clock.
 #   @ask <text>             a question handed back to you.
 #   @select <n> a|b         a TUI picker.  <n> is the 1-BASED OPTION chosen,
 #                           not a duration.  Timings live in cast.py (SELECT_*).
@@ -22,44 +40,44 @@
 #   @clear                  wipe the screen and start again at the top.
 #
 # Blank lines never double up.  The last frame is always held for END_PAUSE.
-# Lines wider than COLS (80) print a warning on render.
-
-@pause 0.4
-@prompt /at:create-task build a hello-world cli that greets by name. TS + bun.
-@step! 0.45 {bold}Clarifying task...{/}|{dim} read the repo...{/}|{dim} find the ambiguities{/}
-@ask How is the name passed?
-@select 2 Positional; error if missing|Positional; default "World"
-@resolve 0.25
-@step 0.45 {bold}Creating task...{/}|{dim} write acceptance criteria...{/}|{dim} commit{/}
-
-{green}✓{/} {bold}Task 001 ready for dev.{/}
-{dim}tasks/001-hello-world-cli.md{/}
-
-# {cyan}tasks/001-hello-world-cli.md{/} {dim}— ready-for-dev{/}
-#  {bold}## Hello World CLI{/}
-#  Scaffold a TypeScript CLI, running on Bun.
+# A label past 17 cells, a gloss past its column or a line past 80 warns on render.
 #
-#  {bold}### Acceptance Criteria{/}
-#  - `hello` prints `Hello, World`.
-#  - `hello Bob` prints `Hello, Bob`.
-@pause 1.1
+# Every count below is from one real run — README.md § Provenance has the receipts.
+# Change one only with evidence, and keep the two screens agreeing: the phase
+# clocks sum to the signoff block's 9m 20s.
+
+@prompt /at:create-task build a hello-world cli that greets by name. TS + bun.
+@step! 1.2 Clarifying|read repo · find ambiguities
+
+@ask How should the name be passed?
+@select 2 Named flag: hello --name Bob|Positional: hello Bob
+@resolve 0.35
+
+@step 1.5 Creating task|context · ACs · notes
+@step 1.1 Tightening|{n}3{/} lines cut
+
+{green}✓{/} {bold}Task 001 ready for dev{/}
+  {dim}tasks/001-hello-world-cli.md {sep}·{/} {n}4{/} ACs{/}
+@pause 1.5
 
 @clear
 @prompt /at:auto-task 001
 @pause 0.3
-@step 0.45 {bold}Preflight...{/}|{dim} check task and tooling...{/}|{dim} set up worktree...{/}|{dim} install deps{/}
-@step 0.45 {bold}Planning...{/}|{dim} use panel of models to plan...{/}|{dim} synthesise{/}
-@step 0.45 {bold}Implementing...{/}|{dim} fresh context...{/}|{dim} write tests first...{/}|{dim} commit{/}
-@step 0.45 {bold}Reviewing...{/}|{dim} launch review panel...{/}|{dim} triage...{/}|{dim} fix...{/}|{dim} re-review{/}
-@step 0.45 {bold}Verifying...{/}|{dim} run CLI...{/}|{dim} validate AC{/}
-@pause 0.3
+@checklist Preflight|Planning|Implementing|Reviewing|Verifying
+@run 1.92 Preflight|task · worktree · deps|0:44
+@run 1.92 Planning|run claude + codex · synthesize|{n}2{/} plans · {n}1{/} conflict resolved|2:29
+@run 1.92 Implementing|test · code · refactor · commit|2:10
+@run 1.92 Reviewing|run claude + codex · triage|{n}2{/} reviews · {n}1{/} flag · {n}0{/} blocking|1:48
+@run 1.92 Verifying|run CLI · check ACs|2:09
 
-{green}✓{/} {bold}Task 001 ready for signoff.{/}
-{dim}8 commits on task/001-hello-world-cli · build green{/}
+{green}✓{/} {bold}Task 001 ready for signoff{/}
+  {dim}task/001-hello-world-cli{/}
+  {dim}{n}8{/} commits {sep}·{/} {n}3{/}/{n}3{/} tests pass {sep}·{/} {n}1{/} flag {sep}·{/} {n}9m 20s{/}{/}
 
-@ask 🚢 Ship?
+@pause 0.5
+@ask Ship?
 @pause 0.9
 @prompt yes
-@pause 0.4
-{bold}🎉 Shipped{/} {dim}— squash-merged into main, worktree and branch removed{/}
-@pause 2.5
+@pause 0.45
+
+@row 🎉 Shipped|squash-merged · build green · worktree removed

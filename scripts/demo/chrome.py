@@ -19,6 +19,7 @@ RADIUS = 12
 BAR_BG = (54, 59, 69)
 WIN_BG = (40, 44, 52)   # #282c34, same as the terminal
 TITLE = (150, 156, 166)
+TITLE_SIZE = 10    # at scale 1; the body mono a size down, 20 px at the 2x render
 LIGHTS = [(255, 95, 87), (254, 188, 46), (40, 200, 64)]
 
 
@@ -26,9 +27,13 @@ def px(v):
     return int(round(v * SCALE))
 
 
-def font(size=13):
+def font(size=TITLE_SIZE):
     size = px(size)
-    for path in ("/System/Library/Fonts/SFNS.ttf",
+    # The terminal's own face first — Pillow resolves a bare filename against the
+    # system font dirs — with the macOS sans behind it, so a machine without it
+    # still gets a title rather than a crash.
+    for path in ("JetBrainsMono-Regular.ttf",
+                 "/System/Library/Fonts/SFNS.ttf",
                  "/System/Library/Fonts/Helvetica.ttc"):
         try:
             return ImageFont.truetype(path, size)
@@ -53,7 +58,9 @@ def window(size, title):
         d.ellipse([x, bar // 2 - r, x + 2 * r, bar // 2 + r], fill=colour + (255,))
     f = font()
     tw = d.textlength(title, font=f)
-    d.text(((w - tw) / 2, bar // 2 - px(8)), title, font=f, fill=TITLE + (255,))
+    _, top, _, bottom = f.getbbox(title)   # centre on the ink, not a tuned offset
+    y = bar // 2 - (top + bottom) // 2
+    d.text(((w - tw) / 2, y), title, font=f, fill=TITLE + (255,))
     return img
 
 

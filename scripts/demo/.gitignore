@@ -6,3 +6,5 @@ demo-raw.gif
 demo-*.gif
 demo-*.html
 __pycache__/
+# Session transcripts behind Provenance — kept locally, not published
+transcripts/
