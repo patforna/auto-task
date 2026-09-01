@@ -133,6 +133,10 @@ Each of these cost real time to find.
   `mkpreview.py` overrides `.ap-terminal` at higher specificity.
 - **asciicast v3 stores relative intervals**, v2 absolute. `cast.py` emits v2; `mkpreview.py`
   handles both.
-- **Verify frames with a terminal emulator, not by reading escape codes.**
-  `uv run --with pyte python …` feeding the cast into a `pyte.Screen` shows exactly what
-  lands on screen, including per-cell colours and reverse video.
+- **Verify frames; don't read escape codes.** For anything structural — layout, timing,
+  whether an effect actually applied — feed the cast into a `pyte.Screen`
+  (`uv run --with pyte python …`), which shows per-cell colours and reverse video. For
+  anything visual — weight, contrast, spacing, chrome — screenshot the preview with
+  `shot-scraper <file>.html -o /tmp/x.png --width 1100 --wait <ms>` and look at the PNG
+  (~60-90s; pass a bare path, not a `file://` URL). Neither judges **motion**: flicker,
+  pacing and reveal rhythm need a human.
