@@ -12,7 +12,7 @@ Built for experienced engineers who want to ship software at an accelerated pace
 **Think cruise control, not Full Self-Driving.**
 
 <p align="center">
-  <img src="scripts/demo/demo.gif" width="738" alt="A terminal: /at:create-task turns a one-line request into task 001, asking one question along the way. /at:auto-task then runs preflight, planning, implementation, review and verification unattended, and reports back for signoff. A human answers &quot;yes&quot; and it ships.">
+  <img src="demo/demo.gif" width="738" alt="A terminal: /at:create-task turns a one-line request into task 001, asking one question along the way. /at:auto-task then runs preflight, planning, implementation, review and verification unattended, and reports back for signoff. A human answers &quot;yes&quot; and it ships.">
 </p>
 
 ## How It Works

@@ -64,11 +64,11 @@
 @prompt /at:auto-task 001
 @pause 0.3
 @checklist Preflight|Planning|Implementing|Reviewing|Verifying
-@run 1.92 Preflight|task · worktree · deps|0:44
-@run 1.92 Planning|run claude + codex · synthesize|{n}2{/} plans · {n}1{/} conflict resolved|2:29
-@run 1.92 Implementing|test · code · refactor · commit|2:10
-@run 1.92 Reviewing|run claude + codex · triage|{n}2{/} reviews · {n}1{/} flag · {n}0{/} blocking|1:48
-@run 1.92 Verifying|run CLI · check ACs|2:09
+@run 1.54 Preflight|task · worktree · deps|0:44
+@run 1.54 Planning|run claude + codex · synthesize|{n}2{/} plans · {n}1{/} conflict resolved|2:29
+@run 1.54 Implementing|test · code · refactor · commit|2:10
+@run 1.54 Reviewing|run claude + codex · triage|{n}2{/} reviews · {n}1{/} flag · {n}0{/} blocking|1:48
+@run 1.54 Verifying|run CLI · check ACs|2:09
 
 {green}✓{/} {bold}Task 001 ready for signoff{/}
   {dim}task/001-hello-world-cli{/}
