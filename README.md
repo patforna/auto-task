@@ -12,7 +12,7 @@ Built for experienced engineers who want to ship software at an accelerated pace
 **Think cruise control, not Full Self-Driving.**
 
 <p align="center">
-  <img src="demo/demo.gif" width="738" alt="A terminal: /at:create-task turns a one-line request into task 001, asking one question along the way. /at:auto-task then runs preflight, planning, implementation, review and verification unattended, and reports back for signoff. A human answers &quot;yes&quot; and it ships.">
+  <img src="demo/demo.gif" width="738" alt="A terminal: /at:create-task turns a one-line request into task 001, asking one question along the way. /at:auto-task then runs preflight, planning, implementation, review and verification unattended, and reports back for signoff: 8 commits, 3/3 tests passing, 1 flag, 9m 20s. A human answers &quot;yes&quot; and it ships.">
 </p>
 
 ## How It Works
@@ -129,7 +129,7 @@ Defaults can be overridden per project in markdown.
 - Project config: `.claude/auto-task.config.md` — Committed. Shared by everyone in the repo.
 - Personal overrides: `.claude/auto-task.config.local.md` — Gitignored. Takes precedence over project config on conflict.
 
-Configurable per project: task store, verification command, worktree layout, standing review context, design-review server, model roster, commit conventions, transcript capture, feedback snapshots. See [`examples/auto-task.config.md`](examples/auto-task.config.md) for every setting with its default — copy it into your repo and amend as needed.
+Configurable per project: task store, verification command, worktree layout, standing review context, design-review server, model roster, commit conventions, transcript capture, feedback snapshots. See [`examples/auto-task.config.md`](examples/auto-task.config.md) for every setting with a worked override — copy it into your repo and amend as needed. The shipped defaults live in [`auto-task.config.defaults.md`](auto-task.config.defaults.md), and `/at:config` prints the settings actually in effect with each value's origin.
 
 ## Development
 
@@ -164,7 +164,7 @@ Users are pinned to `version` in `plugin.json` — pushing to `main` without bum
 
 **Why not just prompt Claude Code directly?** For small changes, do. The value shows on bigger units of work: a single session reviews its own output (structurally unreliable), drifts as its context fills, and forgets everything between sessions. _auto-task_ replaces that with fresh-context subagents per step, review by a model family that didn't write the code, evidence-cited triage of every finding, and a task file that persists state. It's the discipline you'd apply if you were building without AI, enforced on every run.
 
-**Why tasks and not specs?** I'm coming from an XP lineage and I always had an aversion to "spec" because it implies things are set in stone and there is no room for learning and iteration — waterfall vs iterative development. I was going to go with "[user] stories" but that also didn't feel right because the last "C" (in "Card, Criteria, Conversation") doesn't make so much sense in this new age and I'm also aware that the term user stories has accumulated a lot of baggage over the last 20 years or so. "Issues" or "Tickets" didn't feel appropriate either. "Task" felt more neutral and like a good fit.
+**Why tasks and not specs?** I'm coming from an XP lineage and I always had an aversion to "spec" because it implies things are set in stone and there is no room for learning and iteration — waterfall vs iterative development. I was going to go with "[user] stories" but that also didn't feel right because the middle "C" (in "Card, Conversation, Confirmation") doesn't make so much sense in this new age and I'm also aware that the term user stories has accumulated a lot of baggage over the last 20 years or so. "Issues" or "Tickets" didn't feel appropriate either. "Task" felt more neutral and like a good fit.
 
 **Why do tasks live in the repo?** Because agents are great at plain file I/O and the tasks travel with the code: no API, no auth, readable and editable in any worktree or headless session, and the task file rides the same branch as the change it describes. The downsides are real too: task churn shows up in your git history and diffs, and in a public repo the tasks are published with the code. Both alternatives have trade-offs of their own: an issue tracker gives you collaboration features but puts an API between the agent and its state; a separate task repo keeps the code history clean but the task no longer travels with the branch. The task store is configurable — I currently keep my own tasks in a sibling repo for the history-noise reason.
 
@@ -174,7 +174,7 @@ Users are pinned to `version` in `plugin.json` — pushing to `main` without bum
 
 **Why does it merge straight to main — no PRs?** Because by ship time the change has been reviewed harder than most PRs ever are: two model families, adversarial passes, evidence-cited triage, AC-by-AC verification — plus you at the ship gate. Also, the workflow comes from solo trunk-based development; if your team requires PRs, the ship step is the natural seam to adapt.
 
-**Can I use just parts of it?** Yes. Every step is its own `/at:` skill and runs standalone — `/at:review-code` on any diff, `/at:create-task` without the orchestrator, `/at:panel` for a multi-model take on anything. Type `/at:` in Claude Code for the full list.
+**Can I use just parts of it?** Yes. Most steps are their own `/at:` skill and run standalone — `/at:review-code` on any diff, `/at:create-task` without the orchestrator, `/at:panel` for a multi-model take on anything. Type `/at:` in Claude Code for the full list.
 
 **Can I run multiple tasks in parallel?** Yes. Each task gets its own worktree, so parallel runs don't collide during implementation, assuming your build process and environment are hermetic (e.g. separate server instances running on separate ports, etc.). Make sure you ship serially though: shipping merges in the primary checkout, and concurrent ships race each other.
 

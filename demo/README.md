@@ -203,8 +203,8 @@ only mark that input was typed. Don't darken them back.
 ## Provenance
 
 Content comes from a real `/at:auto-task` run against a scratch repo (`~/github/hello-world`,
-task 001 — a hello-world CLI on Bun + TypeScript), session `6718d57a`, 31 Aug 2026. Every
-count on screen is from that run bar one: 4 acceptance criteria, 3 lines cut by the
+task 001 — a hello-world CLI on Bun + TypeScript), session `6718d57a`, 31 Aug 2026 — bar
+the signoff, answered the next morning. Every count on screen is from that run bar one: 4 acceptance criteria, 3 lines cut by the
 tightening pass, two plans with one panel disagreement resolved, two reviewers with nothing
 blocking, 8 commits on `task/001-hello-world-cli`, `3/3 tests pass` (the run printed
 `3 pass / 0 fail`), and a squash-merge whose build was re-verified on main afterwards.
@@ -222,10 +222,11 @@ wanted a human; the demo shows what the flag column is *for* rather than that ru
 the phase glosses generally, which summarise a stage rather than an instance. Deliberate:
 the clip illustrates the workflow, it is not a recording.
 
-The clarify question is the one the run asked; its two options are rewritten. The run's
-were two shades of positional argument, which is the sharper example of what clarify is for
-but takes longer to read than a demo has — a flag against a positional says the same thing
-in a glance.
+The clarify question is the run's, shortened; its three options are cut to two. The run
+offered a `--name` flag, a positional that errors when the name is missing, and a positional
+defaulting to `World` — the answer. Dropping the second positional keeps the fork that reads
+in a glance. The question came from `/at:create-task`'s own ambiguity pass; the later
+`/at:clarify-task` round asked about test level and the bin entry, and is not shown.
 
 ## Gotchas
 
