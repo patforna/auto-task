@@ -1,3 +1,5 @@
 .DS_Store
 TODOS.md
 TODO.md
+.claude/scheduled_tasks.lock
+.claude/auto-task.config.local.md

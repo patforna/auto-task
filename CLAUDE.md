@@ -14,4 +14,4 @@ This plugin is self-contained: its skills invoke each other via the `/at:<skill>
 
 Skills must stay project-agnostic: generic instructions with sensible defaults, and any project-specific behaviour sourced from the consuming repo's config — `.claude/auto-task.config.md` (project) and `.claude/auto-task.config.local.md` (personal overrides, win on conflict). Never hardcode a specific project's paths, recipes, conventions, or context into a skill body.
 
-When adding or renaming a config setting, update all three places in the same change: the skill(s) that consume it, `examples/auto-task.config.md` (the copy-paste template), and the README's config table.
+When adding or renaming a config setting, update it in the same change in: `auto-task.config.defaults.md` (the default), `skills/config/SKILL.md` (§ Settings and § Heading → Setting Map), `examples/auto-task.config.md` (the override example), and the settings list in the README's Configuration section.

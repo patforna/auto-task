@@ -4,7 +4,7 @@
 
 `auto-task` is a **Claude Code plugin** — skills namespaced `/at:*` (`create-task`, `clarify-task`, `plan-task`, `impl-task`, `review-code`, `review-design`, `review-task`, `ship-task`, `auto-task` [orchestrator], + vendored `panel`/`synthesize`/`tdd`). Drives a unit of work end-to-end: create → clarify → worktree → plan → implement → review → triage → fix → verify → ship. Public plugin, installed into arbitrary consuming repos. Skills stay project-agnostic; repo-specific facts come from config.
 
-**Load-bearing fact: nothing machine-parses the config — an LLM agent reads it at runtime.** No parser, no schema. Repo: `/Users/patric/github/auto-task`.
+**Load-bearing fact: nothing machine-parses the config — an LLM agent reads it at runtime.** No parser, no schema.
 
 ## 1. Problems with the current mechanism
 
