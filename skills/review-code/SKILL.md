@@ -128,6 +128,7 @@ Worked example:
 [Nit] docs/load.md:18
 Issue:   User-facing typo in section heading
 Why:     Introduced by this diff; carried verbatim into generated docs
+Fix:     Correct the typo in the heading
 Autofix: Replace `teh schema` with `the schema` in the heading
 ```
 

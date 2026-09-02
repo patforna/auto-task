@@ -11,7 +11,7 @@ description: "Use to wrap up a finished task - set status to done, merge, clean 
 
 ## Goal
 
-Use to wrap up a finished task - set status to done, merge, clean up.
+Wrap up a finished task - set status to done, merge, clean up.
 
 ## Context
 

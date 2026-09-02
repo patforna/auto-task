@@ -1,6 +1,6 @@
 ---
 name: auto-task
-description: "use to drive a well-defined task end-to-end with minimal human input: plan, implement, review, ship."
+description: "Use to drive a well-defined task end-to-end with minimal human input: plan, implement, review, ship."
 ---
 
 # Auto Task

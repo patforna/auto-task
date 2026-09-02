@@ -82,6 +82,7 @@ Write a plan using the structure below (drop sections that aren't needed):
 - Things you'd be nervous whether a new agent gets right if not written down.
 - Not yet captured insights, assumptions, flags, constraints, decisions, etc.
 - Anything worth capturing for posterity.]
+```
 
 ## Step 4: Self-Audit
 

@@ -94,7 +94,6 @@ TODO: Add ACs
 TODO: Add notes
 ```
 
-<!-- FIXME: what's the point of having this here (all three points)? Rework -->
 **Task states:** the frontmatter `status` progresses `new` → `ready-for-dev` (end of clarify) → `in-dev` (start of impl) → `ready-for-signoff` (end of task review) → `done` (ship). Off-ramp states: `rejected` (investigated and declined), `later` (consciously postponed).
 
 **Attachments:** if the task comes with supporting material (a design brief, reference artifact, screenshot, sample data), put it in `{settings.task_store.location}/attachments/{NNN}/` (next to the task files) and reference it from the task file — don't drop it as a top-level sibling.
@@ -118,7 +117,7 @@ Save the rest for the "Acceptance criteria" or "Notes" sections.
 ```markdown
 # Show Ticker Data in Frontend
 
-This task is about sending a tracerbullet through the system and surfacing some real ohlvc for a hardcoded ticker.
+This task is about sending a tracerbullet through the system and surfacing some real ohlcv for a hardcoded ticker.
 ```
 
 ```markdown
@@ -145,7 +144,7 @@ Ensure each AC has the following properties:
 - Boundary-aware - covers **non-obvious** edge cases that matter for correctness and an implementing agent might not discover through exploration alone (empty input, nulls, asymmetric conditions)
 - Non-redundant - does not restate what implicitly applies to all tasks ("follows conventions", "tests pass", "build is green", etc.)
 
-**Two exceptions** to the behaviour-level default:
+**Three exceptions** to the behaviour-level default:
 
 - When structure IS the deliverable (e.g. refactoring), structural criteria are OK (e.g. "no references to compute() functions remain");
 - When a formula or algorithm defines correctness, include it as specification (e.g. "sigma2_t = (1 - lambda) *r_t^2 + lambda* sigma2_{t-1}").
@@ -176,7 +175,7 @@ Ensure each AC has the following properties:
   | NVDA   | $180  | 6%        |
   | TSLA   | $340  | −8%       |
 
-- Content is delivered from backend API (close from ohlvc data, 5d return from features data)
+- Content is delivered from backend API (close from ohlcv data, 5d return from features data)
 - ...
 ```
 
@@ -193,7 +192,7 @@ This could include but is not limited to:
 - Alternatives considered;
 - etc.
 
-Use bullet points and short sentences. If in doubt whether a note is inferable from the repo, leave it out — only keep what a capable agent couldn't discover by exploring. `/clarify-task` will surface anything load-bearing that's actually missing.
+Use bullet points and short sentences. If in doubt whether a note is inferable from the repo, leave it out — only keep what a capable agent couldn't discover by exploring. `/at:clarify-task` will surface anything load-bearing that's actually missing.
 
 #### Examples
 
@@ -281,7 +280,6 @@ An epic is simply a high-level task that aggregates a number of sub-tasks.
 
 To create an epic, follow the instructions for creating a standalone task. Drop the `Acceptance criteria` section and instead add a `Tasks` section to the end.
 
-<!-- FIXME: wtf is that? -->
 Also add a `Locked Decisions` section: shared conventions and cross-cutting calls that apply to every sub-task (e.g. "regen deferred to the last sub-task", "intermediates stay internal", commit granularity). Sub-task planning treats these as settled — without this section every sub-task re-derives them from scratch. Append to it whenever a sub-task run settles a new cross-cutting question.
 
 Example:
@@ -306,7 +304,7 @@ Example:
 
 Epic sub-tasks are like standalone tasks, except their file name is slightly different to keep them lexicographically close to the epic task.
 
-To create an epic sub-task file, follow the instructions for creating a standalone task, but use the following file format: `<EpicNbr>.<NN><task slug>.md` (e.g. `012.03-remove-sltp.md`). The numbers of the tasks belonging to the epic are zero-padded (`01`, `02`, ... `10`, `11`). A sub-task's number comes from its epic, so bypass `settings.task_store.create` — it mints a fresh top-level number under any override, the default allocator included — and write the sub-task file directly at the epic-derived path. Example:
+To create an epic sub-task file, follow the instructions for creating a standalone task, but use the following file format: `<EpicNbr>.<NN>-<task slug>.md` (e.g. `012.03-remove-sltp.md`). The numbers of the tasks belonging to the epic are zero-padded (`01`, `02`, ... `10`, `11`). A sub-task's number comes from its epic, so bypass `settings.task_store.create` — it mints a fresh top-level number under any override, the default allocator included — and write the sub-task file directly at the epic-derived path. Example:
 
 ```text
 015-reversal-eval.md        ← epic
