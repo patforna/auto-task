@@ -17,7 +17,8 @@ OUTER = (24, 26, 31)   # behind the rounded corners; a shade under the window
 BAR = 34           # title bar height, at scale 1
 RADIUS = 12
 BAR_BG = (54, 59, 69)
-WIN_BG = (40, 44, 52)   # #282c34, same as the terminal
+WIN_BG = (40, 44, 52)   # #282c34, a shade above the terminal ground; PAD=0,
+                        # so only the corner arcs ever show it
 TITLE = (150, 156, 166)
 TITLE_SIZE = 10    # at scale 1; the body mono a size down, 20 px at the 2x render
 LIGHTS = [(255, 95, 87), (254, 188, 46), (40, 200, 64)]

@@ -214,7 +214,7 @@ THEMES = {
         "fg": "#e6e8ea", "bg": "#21242b",   # rather than a near-black, but with
         "accent": "#ff875f", "dim": "#a9afb8", "tint": "#2e323c",  # more contrast
         "pending": "#5f656e", "clock": "#7b818a", "sep": "#6b7178",
-        "win": "#21242b", "bar": "#2e323b", "outer": "#131519",
+        "win": "#282c34", "bar": "#363b45", "outer": "#181a1f",
         "palette": ["#1d1f21", "#cc6666", "#b5bd68", "#f0c674", "#81a2be", "#b294bb",
                     "#8abeb7", "#c5c8c6", "#666666", "#d54e53", "#b9ca4a", "#e7c547",
                     "#7aa6da", "#c397d8", "#70c0b1", "#eaeaea"],
@@ -632,7 +632,7 @@ def fields(text, lo, hi, form):
 def render(script):
     c = Cast()
     c.out("\x1b[2J\x1b[H\x1b[?25l")
-    c.wait(0.4)
+    c.wait(0.15)   # the loop seam: any longer and every restart opens on a blank frame
     lines = script.split("\n")
     if lines and lines[-1] == "":   # the file's closing newline, not a blank row: it
         lines.pop()                 # would cost a row, and every row is spoken for
@@ -688,8 +688,10 @@ def render(script):
             c.select(int(idx), [p.strip() for p in text.split("|")])
         else:
             raise SystemExit(f"unknown directive @{cmd}")
+    # No trailing "\x1b[?25h": a recording that ends hands the terminal back to
+    # nobody, and agg turns the un-hide into an extra frame — a cursor popping onto
+    # the payoff frame, plus a second END_PAUSE from --last-frame-duration.
     c.wait(max(0.0, END_PAUSE - (c.t - c.last_visible)))   # hold before the loop
-    c.out("\x1b[?25h")
     return c
 
 

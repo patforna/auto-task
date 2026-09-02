@@ -48,7 +48,8 @@
 # Blank lines never double up.  The last frame is always held for END_PAUSE.
 # A label past 17 cells, a gloss past its column or a line past 80 warns on render.
 #
-# Every count below is from one real run — README.md § Provenance has the receipts.
+# Every count below is from one real run bar `1 flag` — README.md § Provenance has the
+# receipts.
 # Change one only with evidence, and keep the two screens agreeing: the phase
 # clocks sum to the signoff block's 9m 20s.
 
@@ -76,6 +77,7 @@
 @prompt /at:auto-task 001
 @pause 0.3
 @checklist Preflight|Planning|Implementing|Reviewing|Verifying
+@pause 0.5
 @run 0.98 Preflight|task · worktree · deps|0:44
 @run 0.98 Planning|run claude + codex · synthesize|{bold}2{/} plans · {bold}1{/} conflict resolved|2:29
 @run 0.98 Implementing|test · code · refactor · commit|2:10
