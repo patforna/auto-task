@@ -168,7 +168,7 @@ Users are pinned to `version` in `plugin.json` — pushing to `main` without bum
 
 **Why do tasks live in the repo?** Because agents are great at plain file I/O and the tasks travel with the code: no API, no auth, readable and editable in any worktree or headless session, and the task file rides the same branch as the change it describes. The downsides are real too: task churn shows up in your git history and diffs, and in a public repo the tasks are published with the code. Both alternatives have trade-offs of their own: an issue tracker gives you collaboration features but puts an API between the agent and its state; a separate task repo keeps the code history clean but the task no longer travels with the branch. The task store is configurable — I currently keep my own tasks in a sibling repo for the history-noise reason.
 
-**Do I need Codex?** No, but the multi-model review is materially better than single-family review — it's the part of this workflow that has most reliably caught real bugs. Any second model family can fill the role via the Models setting.
+**Do I need Codex?** No, but the cross-family review is materially better than single-family review — it's the part of this workflow that has most reliably caught real bugs. Any second model family can fill the role via the Models setting.
 
 **How long does a run take?** Expect a full run to take ~20–40 minutes and spend a decent amount of tokens. `--lite` about halves it.
 
