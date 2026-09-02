@@ -119,7 +119,7 @@ Non-goals are more valuable than goals. Alternatives-considered proves you've th
 
 For agent plans: state the approach, state what you're NOT doing, name one alternative you considered and why you rejected it. Three sentences, not three pages.
 
-### ThoughtWorks / Lean
+### Thoughtworks / Lean
 
 Walking skeleton first — thinnest end-to-end implementation touching all architectural components. Thin vertical slices — each increment is independently testable. Last responsible moment — defer reversible decisions until you have better information.
 
@@ -263,7 +263,7 @@ After stripping team coordination overhead:
 4. **Verification criteria** — "single highest-leverage thing" (Anthropic)
 5. **Context preparation** — which files, patterns, domain terms
 
-### ThoughtWorks + Google Synthesis
+### Thoughtworks + Google Synthesis
 
 | Google design doc section | TAD equivalent            | Notes                            |
 | ------------------------- | ------------------------- | -------------------------------- |

@@ -15,7 +15,7 @@ Key findings:
 3. **Context isolation is the critical architectural insight.** Single-context TDD degrades because the test-writer's knowledge bleeds into the implementer. Multi-agent with separate contexts: 96.3% pass@1 vs 67% single-agent (AgentCoder).
 4. **Unstructured AI use hurts productivity.** The METR RCT — the most rigorous study — shows experienced developers are 19% *slower* with unstructured AI, despite believing they're 20% faster.
 5. **Mechanical enforcement beats prompt-only TDD.** Every tool defaults to implementation-first. Hooks, subagent isolation, and role constraints are the only reliable enforcement.
-6. **TDD is being revived, not killed, by AI.** ThoughtWorks Radar, DORA 2025, Anthropic best practices, and the Deer Valley workshop all converge on this.
+6. **TDD is being revived, not killed, by AI.** Thoughtworks Radar, DORA 2025, Anthropic best practices, and the Deer Valley workshop all converge on this.
 
 ---
 
@@ -127,7 +127,7 @@ Both camps agree testing is essential. The disagreement is on **step size**. In 
 
 ### Institutional Backing
 
-- **ThoughtWorks Technology Radar Vol. 33**: explicitly recommends reinforcing TDD and embedding it into AI coding workflows
+- **Thoughtworks Technology Radar Vol. 33**: explicitly recommends reinforcing TDD and embedding it into AI coding workflows
 - **Anthropic Claude Code best practices**: "TDD is the single strongest pattern for working with agentic coding tools"
 - **DORA 2025**: "AI doesn't fix a team; it amplifies what's already there"
 - **Deer Valley Workshop (Feb 2026)**: ~50 tech leaders: "TDD produces dramatically better results from AI coding agents"
@@ -353,7 +353,7 @@ The evidence shows this matters:
 - [Steve Yegge + Gene Kim: Vibe Coding (book review)](https://mikehadlow.com/posts/2026-02-23-vibe-coding/)
 - [DHH: Promoting AI Agents](https://world.hey.com/dhh/promoting-ai-agents-3ee04945)
 - [Thorsten Ball: A Few Words on Testing](https://registerspill.thorstenball.com/p/a-few-words-on-testing)
-- [ThoughtWorks Technology Radar Vol. 33](https://www.thoughtworks.com/about-us/news/2025/thoughtworks-tech-radar-33-rapid-ai)
+- [Thoughtworks Technology Radar Vol. 33](https://www.thoughtworks.com/about-us/news/2025/thoughtworks-tech-radar-33-rapid-ai)
 
 ### Practitioner Case Studies
 

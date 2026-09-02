@@ -180,4 +180,4 @@ Users are pinned to `version` in `plugin.json` — pushing to `main` without bum
 
 **Why markdown config and not TOML/JSON?** Nothing parses the config — an agent reads it. Several entries are irreducibly prose (standing review context, domain review rules); the rest read better as one-line instructions than as string values quoted inside config syntax.
 
-**Where did this come from?** 6+ months of full-time agentic solo development on a quant trading codebase, shaped by XP, years at ThoughtWorks and Google, and deep literature research (see [docs/research](docs/research)).
+**Where did this come from?** 6+ months of full-time agentic solo development on a quant trading codebase, shaped by XP, years at Thoughtworks and Google, and deep literature research (see [docs/research](docs/research)).
