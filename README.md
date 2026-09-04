@@ -29,24 +29,25 @@ At a high level, a typical _auto-task_ session looks something like this:
 Under the hood, these steps unfold as a fixed pipeline:
 
 ```text
-create → [ clarify · worktree · plan · impl · review · triage · fix · verify ] → ship
-(human)                              (auto-task)                               (human)
+create → [ preflight · clarify · worktree · plan · impl · review · triage · fix · verify ] → ship
+(human)                                     (auto-task)                                   (human)
 ```
 
 ### Steps
 
-The pipeline in detail. Create and clarify are interactive; worktree through verify run autonomously inside `/at:auto-task`; the ship decision stays with you. Every step backed by a skill also runs standalone.
+The pipeline in detail. Create and clarify are interactive; everything else inside `/at:auto-task` runs autonomously; the ship decision stays with you. Every step backed by a skill also runs standalone. The Plan, Review and Verify rows describe full mode — small single-package changes downshift to `--lite` automatically (see [Flags](#flags)).
 
 | Step              | What happens                                                                                                                                                                                | Skill               |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
 | **Create**        | You crystallise an exploration into a task file — intent, acceptance criteria, notes. A tighten pass cuts anything a capable agent could infer itself.                                      | `/at:create‑task`   |
+| **Preflight**     | Checks the roster is actually alive — second model, verification command, design-review server — so a run that would die twenty minutes in stops now, not later.                            | —                   |
 | **Clarify**       | Pressure-tests the task: would two agents given the task build the same thing and agree when it's done? Gaps come back as focused questions.                                                | `/at:clarify‑task`  |
 | **Worktree**      | The task gets an isolated git worktree at a predictable path, with dependencies installed.                                                                                                  | —                   |
 | **Plan**          | Two models (Claude + Codex by default) independently write implementation plans; a synthesis merges them without forcing consensus.                                                         | `/at:plan‑task`     |
 | **Implement**     | A fresh-context subagent executes the plan test-first (strict TDD), committing as it goes.                                                                                                  | `/at:impl‑task`     |
 | **Review**        | Two independent models review in parallel — a structured Claude review and an adversarial pass from a different model family (Codex by default).                                            | `/at:review‑code`   |
 | **Design review** | UI changes only: boots the app and measures the rendered result against a design spec — geometry, tokens, real interaction states.                                                          | `/at:review‑design` |
-| **Triage**        | Every finding gets an explicit disposition — accept or reject — with cited evidence. Mechanically certain trivia auto-fixes; Critical/Major findings will be flagged to a human at the end. | —                   |
+| **Triage**        | Every finding is accepted or rejected with cited evidence; mechanically certain trivia auto-fixes. It can accept on its own, but never rejects a Critical or Major finding without you.     | —                   |
 | **Fix**           | Accepted findings are fixed test-first; fixes get re-reviewed.                                                                                                                              | —                   |
 | **Verify**        | An independent agent verifies every acceptance criterion against the actual behaviour, not the diff.                                                                                        | `/at:review‑task`   |
 | **Ship**          | When the workflow stops and reports what was found, fixed, rejected and why, you decide whether it ships. Shipping squash-merges, verifies the integrated tree, and pushes.                 | `/at:ship‑task`     |
@@ -86,9 +87,11 @@ Add a CSV export to the invoices list so customers can pull their data into thei
 - Async export for large row counts is a later task.
 ```
 
+For a finished one — plan, implementation notes, post-review fixes — see [tasks/001](tasks/001-at-config-slice-1.md).
+
 ## Prerequisites
 
-For now, _auto-task_ works with Claude Code and uses Codex as a second model for multi-model-family panels. If Codex and the Claude Code Codex plugin are not installed, _auto-task_ falls back to same-family models for panels, which significantly degrades quality. Using Codex — or another non-Anthropic model (see [Configuration](#configuration)) — as the second model is therefore strongly recommended.
+For now, _auto-task_ works with Claude Code and uses Codex as a second model for multi-model-family panels. If Codex and the Claude Code Codex plugin are not installed, _auto-task_ falls back to same-family models for panels — materially worse in practice (see the FAQ). Using Codex — or another non-Anthropic model (see [Configuration](#configuration)) — as the second model is therefore strongly recommended.
 
 - [Claude Code](https://claude.com/product/claude-code)
 - [Codex CLI](https://developers.openai.com/codex/cli) and [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) (to enable multi-model-family planning and review panels)
@@ -161,6 +164,7 @@ Users are pinned to `version` in `plugin.json` — pushing to `main` without bum
 2. `claude plugin validate .claude-plugin/plugin.json`
 3. Commit and push.
 4. `claude plugin tag --push` — tags `at--v<version>`.
+5. `gh release create at--v<version> --notes '…'` — the tag alone publishes nothing readable; say what changed.
 
 ## FAQ
 
@@ -172,7 +176,7 @@ Users are pinned to `version` in `plugin.json` — pushing to `main` without bum
 
 **Do I need Codex?** No, but the cross-family review is materially better than single-family review — it's the part of this workflow that has most reliably caught real bugs. Any second model family can fill the role via the Models setting.
 
-**How long does a run take?** Expect a full run to take ~20–40 minutes and spend a decent amount of tokens. `--lite` about halves it.
+**How long does a run take?** Expect a full run on real work to take ~20–40 minutes and spend a decent amount of tokens. `--lite` about halves it.
 
 **Why does it merge straight to main — no PRs?** Because by ship time the change has been reviewed harder than most PRs ever are: two model families, adversarial passes, evidence-cited triage, AC-by-AC verification — plus you at the ship gate. Also, the workflow comes from solo trunk-based development; if your team requires PRs, the ship step is the natural seam to adapt.
 
@@ -183,3 +187,7 @@ Users are pinned to `version` in `plugin.json` — pushing to `main` without bum
 **Why markdown config and not TOML/JSON?** Nothing parses the config — an agent reads it. Several entries are irreducibly prose (standing review context, domain review rules); the rest read better as one-line instructions than as string values quoted inside config syntax.
 
 **Where did this come from?** 6+ months of full-time agentic solo development on a quant trading codebase, shaped by XP, years at Thoughtworks and Google, and deep literature research (see [docs/research](docs/research)).
+
+## Licence
+
+MIT — see [LICENSE](LICENSE).
