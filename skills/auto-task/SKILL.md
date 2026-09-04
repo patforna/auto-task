@@ -5,8 +5,6 @@ description: "Use to drive a well-defined task end-to-end with minimal human inp
 
 # Auto Task
 
-<!-- TODO: Step 0.3 (clarify) is interactive (AskUserQuestion, possibly multiple rounds) and can stall unattended/--ship runs — decide unattended behaviour (e.g. flag-and-abort instead of asking). -->
-
 ## Usage
 
 `/at:auto-task <task> [--lite] [--ship] [further user instructions]`
@@ -64,6 +62,8 @@ If you can't locate the task, abort and flag it to the user.
 
 Run `/at:clarify-task` to make sure there are no gaping open questions. Don't nitpick.
 
+With `--ship` — the unattended path — don't ask: record the open questions in the task's `## Notes`, proceed on the best reading, and list them in the Step 9 report.
+
 <!-- TODO: add a marker/timestamp to the task to skip this on an already clarified task / set to ready-for-dev if necessary -->
 
 ### 0.4 System health
@@ -85,7 +85,6 @@ Outcome:
 
 If `--lite` was passed in explicitly, skip this section.
 
-<!-- TODO: revise -->
 Otherwise, downshift to `--lite` mode when ALL hold per the task's own description and ACs — single package/module touched, no cross-boundary contract change (API shape, persisted schema, public symbols), and the task is small (≤3 ACs, no epic). Announce the downshift at the end of preflight and note it in the final report; when in doubt (including when the task alone can't answer the criteria), stay in full mode.
 
 ## Step 1: Worktree
