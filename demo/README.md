@@ -177,11 +177,14 @@ constants (`BAR`, `RADIUS`, `TITLE_SIZE`, …) are 1× values that `--scale` mul
 `TITLE_SIZE = 10` draws at 20 px on the 2× render. It sets the title in JetBrains Mono —
 the terminal's own face — and falls back to the macOS system sans on a machine without it.
 
-That title is derived, not written down twice. `cast.title()` returns `auto-task · 80×16`;
-`cast.py` puts it in the cast header and `render.sh` hands the same string to `chrome.py`,
-so the window has one name instead of two that drift apart. It carries the grid on purpose —
-the frame is a fixed raster, so anyone reproducing the render needs the size, and the title
-bar is the one place it can't go stale.
+That title is derived, not written down anywhere else. `cast.title()` returns
+`auto-task · 80×16`; `cast.py` puts it in the cast header, `render.sh` hands the same
+string to `chrome.py`, and `mkpreview.py` reads it back out of the header — so the GIF
+and the preview carry one name instead of drifting apart. (`mkpreview.py` falls back to
+`Terminal — <cols>×<rows>` only for a foreign cast with no title of its own.)
+
+It carries the grid on purpose — the frame is a fixed raster, so anyone reproducing the
+render needs the size, and the title bar is the one place it can't go stale.
 
 ### On colour
 

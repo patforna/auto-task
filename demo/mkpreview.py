@@ -7,6 +7,7 @@ resulting page works offline and can be opened straight from the filesystem.
 Usage: mkpreview.py <cast> <html> [--font-size 14] [--font-family "..."]
 """
 import json, pathlib, subprocess, sys
+from html import escape
 
 PLAYER = "https://cdn.jsdelivr.net/npm/asciinema-player@3.10.0/dist/bundle"
 ASSETS = pathlib.Path(__file__).parent / "assets"
@@ -47,7 +48,7 @@ TEMPLATE = """<!doctype html><html><head><meta charset="utf-8">
     <i class="dot" style="background:#ff5f57"></i>
     <i class="dot" style="background:#febc2e"></i>
     <i class="dot" style="background:#28c840"></i>
-    <span class="t">Terminal &mdash; %d&times;%d</span>
+    <span class="t">%s</span>
   </div>
   <div id="player"></div>
 </div>
@@ -87,8 +88,12 @@ def main():
         if e[1] in ("o", "i"):
             out.append([round(t, 3), e[1], e[2]])
 
+    # The cast header carries cast.title() — the same string render.sh hands
+    # chrome.py. Use it, so the preview and the GIF can't drift apart.
+    title = hdr.get("title") or f"Terminal \u2014 {cols}\u00d7{rows}"
+
     v2 = {"version": 2, "width": cols, "height": rows,
-          "title": hdr.get("title", "auto-task"),
+          "title": title,
           "env": {"TERM": "xterm-256color", "SHELL": "/bin/zsh"}}
     if hdr.get("theme"):
         v2["theme"] = hdr["theme"]
@@ -98,7 +103,7 @@ def main():
     cast = json.dumps(v2) + "\n" + "\n".join(
         json.dumps(e, ensure_ascii=False) for e in out) + "\n"
 
-    html = TEMPLATE % (asset("asciinema-player.css"), font_family, cols, rows,
+    html = TEMPLATE % (asset("asciinema-player.css"), font_family, escape(title),
                        asset("asciinema-player.min.js").replace("</script", "<\\/script"),
                        json.dumps(cast).replace("</script", "<\\/script"), cols, rows,
                        font_size, json.dumps(font_family), line_height)
