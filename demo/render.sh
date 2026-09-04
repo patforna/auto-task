@@ -24,9 +24,8 @@ python3 cast.py "$script" -o demo.cast
 # the spinner cycles through nor the tick, and without a text fallback they resolve
 # to Apple Color Emoji and render in colour.
 FONT="${FONT:-JetBrains Mono,Menlo,Apple Color Emoji}"
-end=$(python3 -c 'import cast; print(cast.END_PAUSE)')
 agg --cols "$cols" --rows "$rows" --font-size "${FONT_SIZE:-30}" \
-    --last-frame-duration "$end" --font-family "$FONT" demo.cast demo-raw.gif >/dev/null
+    --font-family "$FONT" demo.cast demo-raw.gif >/dev/null
 
 # Frame it in window chrome (agg can't). Falls back to the bare GIF if Pillow
 # isn't reachable, so a missing uv never blocks a render.

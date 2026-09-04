@@ -43,7 +43,7 @@ all durations:
 
   @row <glyph> <l>|<g>    one finished phase row, printed as-is: no spinner, no
                           tick, no "...". Takes NO number. For a row that never
-                          runs, e.g. the 🎉 signoff line. An optional third field
+                          runs, e.g. the signoff line. An optional third field
                           adds a clock. With NO gloss and no clock the label runs
                           free — that is a heading, e.g. "✓ Task 001 ready".
   @detail <text>          a line under a heading: indented to col 3 and given the
@@ -698,10 +698,13 @@ def render(script):
             c.select(int(idx), [p.strip() for p in text.split("|")])
         else:
             raise SystemExit(f"unknown directive @{cmd}")
-    # No trailing "\x1b[?25h": a recording that ends hands the terminal back to
-    # nobody, and agg turns the un-hide into an extra frame — a cursor popping onto
-    # the payoff frame, plus a second END_PAUSE from --last-frame-duration.
     c.wait(max(0.0, END_PAUSE - (c.t - c.last_visible)))   # hold before the loop
+    # The hold has to land IN the cast: wait() only advances the clock, so without a
+    # trailing event the file ends on the last painted row and every player — the
+    # demo.html preview included — drops the final frame the moment it appears. Only
+    # agg papers over it, via --last-frame-duration. Re-hiding the already-hidden
+    # cursor is the no-op that carries the hold: "\x1b[?25h" would paint one.
+    c.out("\x1b[?25l")
     return c
 
 

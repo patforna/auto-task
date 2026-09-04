@@ -67,7 +67,7 @@ The numbers are not all durations:
 | `@checklist <a>\|<b>\|<c>`                    | print every phase up front, all pending, so the shape of the run is on screen before any of it happens |
 | `@run <secs> <l>\|<g>\|<clock>`               | tick one checklist row over: it spins for `<secs>`, then lands. Rows must run in the order they were listed. `<clock>` is **how long that row took**, `M:SS` |
 | `@run <secs> <l>\|<running>\|<done>\|<clock>` | four fields swap the gloss when the row lands — `fixing 2 of 3` becomes `3 fixed` |
-| `@row <glyph> <l>\|<g>[\|<clock>]`            | one finished phase row, printed as-is: no spinner, no tick, no `...`. **No number.** For a phase that never runs, e.g. the 🎉 signoff. With neither gloss nor clock it is a heading, and its label runs free |
+| `@row <glyph> <l>\|<g>[\|<clock>]`            | one finished phase row, printed as-is: no spinner, no tick, no `...`. **No number.** For a phase that never runs, e.g. the signoff. With neither gloss nor clock it is a heading, and its label runs free |
 | `@detail <text>`                              | an indented line under a heading: col 3, in the gloss grey, its `·` separators tinted for you. **No number.** |
 | `@ask <text>`                                 | a question handed back to you: col 3, bold, prefixed with `ASK_MARK` (currently none) |
 | `@select <n> <a>\|<b>`                        | a TUI picker. `<n>` is the **1-based option chosen**, not a duration. The options land unhighlighted, the highlight arrives on the first, walks to `<n>`, then flashes to confirm |
