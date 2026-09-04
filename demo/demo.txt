@@ -1,4 +1,4 @@
-# auto-task demo screenplay.  Render with ./render.sh  ·  full reference: cast.py
+# auto-task demo screenplay.  Render with ./render.sh  ·  directives and full reference: cast.py
 #
 # Plain lines print verbatim (blank lines and indentation included).
 # "#" at column 0 is a comment; an indented "#" is content, so markdown survives.
@@ -56,11 +56,11 @@
 @prompt /at:create-task build a hello-world cli that greets by name. TS + bun.
 @step! 1.2 Clarifying|read repo · find ambiguities
 
-@ask How should the name be passed?
-@select 2 Named flag: hello --name Bob|Positional: hello Bob
+@ask What if no name is given?
+@select 2 hello → usage, exit 1|hello → Hello, World
 @resolve 0.35
 
-@step 1.5 Creating task|context · ACs · notes
+@step 1.5 Creating task|intent · ACs · notes
 @step 1.1 Tightening|{bold}3{/} lines cut
 
 @row {green}✓{/} Task 001 ready for dev
@@ -94,4 +94,4 @@
 @prompt yes
 @pause 0.45
 
-@row 🎉 Shipped|squash-merged · build green · worktree removed
+@row {green}✓{/} Shipped 🎉|squash-merged · build green · worktree removed

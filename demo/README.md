@@ -42,7 +42,10 @@ demo.txt ──cast.py──> demo.cast ──agg──> demo-raw.gif ──chro
 Needs `python3`, [`agg`](https://github.com/asciinema/agg) (`brew install agg`) and `uv`
 (for Pillow, which draws the chrome). If Pillow is unreachable, `render.sh` warns and falls
 back to the unframed GIF. `curl` is used once, to fetch the player. `test_cast.py` needs
-`pyte`, and borrows one through `uv` if it isn't installed.
+`pyte`, and borrows one through `uv` if it isn't installed. The font chain `render.sh` pins —
+JetBrains Mono, Menlo, Apple Color Emoji — is macOS-only as configured: install JetBrains Mono
+(`brew install --cask font-jetbrains-mono`), and on another OS repoint `FONT` at a monospace
+face, a text fallback that has the braille spinner and `✓`, and an emoji font.
 
 **Watch `demo.html` while iterating** — it has a scrubber. But judge the *GIF*: it renders
 at 2× and is meant to display at half width, which supersamples the text and comes out
@@ -157,7 +160,7 @@ Constants at the top of `cast.py`:
 | `SELECT_FILL`, `SELECT_PAD`                      | `True`, `5`     | the highlight bar spans the frame, fzf-style; the pad is `"  ❯ "` in front of an option and a space behind it, so a filled bar ends exactly on `COLS` |
 | `HUMAN_MARK`                                     | `❯`             | one glyph for everything the human typed — the command at a `@prompt` and the option they pick in a `@select`, both in the accent |
 | `ASK_MARK`, `ASK_COLOUR`                         | `""`, accent    | marker before an `@ask`. Also `--ask-mark` |
-| `PROMPT_BG`, `PROMPT_FILL`                       | tint, `False`   | background behind a `@prompt` line and under the picker highlight |
+| `PROMPT_BG`, `PROMPT_FILL`                       | tint, `False`   | background behind a `@prompt` line and under the picker highlight; the confirm flash paints `ACCENT_BG` instead |
 | `TYPING_SEED`, `KEY`, `WORD_PAUSE*`, `HESITATE*` | seeded          | typing rhythm — fast within words, a beat between them, occasional hesitation. Seeded, so rebuilds are identical |
 | `END_PAUSE`                                      | `3.0`           | minimum hold on the last frame before looping |
 
@@ -186,7 +189,8 @@ Background, foreground and the ANSI tags (`{green}` `{cyan}` `{red}` `{yellow}`)
 palette-driven. Everything else is pinned per theme, because it has to hold a contrast
 relationship with the ground that a palette swap must never silently break:
 
-- the **accent** — every in-progress state, and `HUMAN_MARK`
+- the **accent** — every in-progress state, `HUMAN_MARK`, and the picker's confirm flash
+  (ground-on-accent, via `ACCENT_BG`)
 - the **prompt tint** — behind a `@prompt` line, and under the picker highlight
 - the **greys** — `dim`, which is every gloss, and the three phase-row greys stepped below
   it: `clock` ~0.67 of the way from the ground up to `dim`, `sep` ~0.55, `pending` ~0.47.
@@ -222,11 +226,16 @@ wanted a human; the demo shows what the flag column is *for* rather than that ru
 the phase glosses generally, which summarise a stage rather than an instance. Deliberate:
 the clip illustrates the workflow, it is not a recording.
 
-The clarify question is the run's, shortened; its three options are cut to two. The run
-offered a `--name` flag, a positional that errors when the name is missing, and a positional
-defaulting to `World` — the answer. Dropping the second positional keeps the fork that reads
-in a glance. The question came from `/at:create-task`'s own ambiguity pass; the later
-`/at:clarify-task` round asked about test level and the bin entry, and is not shown.
+The clarify question is the run's, cut to its second half: it asked how the name is passed
+*and* what happens when it's missing, offering a `--name` flag, a positional that errors when
+the name is missing, and a positional defaulting to `World` — the answer. The demo keeps the
+missing-name fork, the half two agents would genuinely split on, and drops the flag. The
+question came from `/at:create-task`'s own ambiguity pass; the later `/at:clarify-task`
+round asked about test level and the bin entry, and is not shown.
+
+The signoff prompt is compressed the same way: the run offered four options (ship, open the
+worktree in an editor, in a tmux pane, or both) and `Ship it` was chosen; the demo asks
+`Ship?`.
 
 ## Gotchas
 

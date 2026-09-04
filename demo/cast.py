@@ -131,10 +131,13 @@ C = {"bold": EMPHASIS, "dim": "\x1b[2m", "red": "\x1b[31m", "green": "\x1b[32m",
 
 def apply_theme(name):
     """Point the colour table and the prompt tint at one of THEMES."""
-    global THEME_NAME, PROMPT_BG
+    global THEME_NAME, PROMPT_BG, ACCENT_BG, FLASH_FG
     THEME_NAME = name
     t = THEMES[name]
     C["orange"] = rgb(t["accent"])     # "orange" is the accent slot, whatever its hue
+    a = t["accent"].lstrip("#")
+    ACCENT_BG = "\x1b[48;2;%d;%d;%dm" % tuple(int(a[i:i + 2], 16) for i in (0, 2, 4))
+    FLASH_FG = rgb(t["bg"])            # the ground, so the flash is dark-on-accent
     for role in ("dim", "pending", "clock", "sep"):
         C[role] = rgb(t[role])
     h = t["tint"].lstrip("#")
@@ -187,6 +190,12 @@ END_PAUSE = 3.0
 # "" for none; PROMPT_FILL extends the tint to the full width of the row.
 PROMPT_BG = "\x1b[48;2;46;50;60m"   # one step up from the background
 PROMPT_FILL = False
+
+# The picker's confirm flash: the whole bar in the accent with the ground as text,
+# so the one moment of emphasis stays inside the clip's palette. Reverse video
+# painted a near-white slab instead. Placeholders; apply_theme() sets both.
+ACCENT_BG = "\x1b[48;2;255;135;95m"
+FLASH_FG = "\x1b[38;2;33;36;43m"
 
 FRAME = 0.11
 # Typing rhythm. A fixed table cycles and reads as uniform, so this is drawn from
@@ -465,10 +474,11 @@ class Cast:
         # The human's choice wears the human's colour: the same tint as a @prompt
         # line, plus the accent cursor. The cursor takes col 3 and the text col 5,
         # so a chosen option sits on the same columns as an unchosen one. Flashing
-        # swaps the tint for reverse video, which paints the whole bar in the accent.
-        tint = "\x1b[7m" if flash else PROMPT_BG
-        fg_off = "" if flash else "\x1b[39m"   # back to default fg, keeping the tint
-        return (f"\r\x1b[2K{tint}  {C['orange']}{HUMAN_MARK}{fg_off} "
+        # paints the whole bar in the accent, ground-on-accent, cursor included.
+        if flash:
+            return (f"\r\x1b[2K{ACCENT_BG}{FLASH_FG}  {HUMAN_MARK} "
+                    f"\x1b[1m{body}{WEIGHT_OFF} {R}")
+        return (f"\r\x1b[2K{PROMPT_BG}  {C['orange']}{HUMAN_MARK}\x1b[39m "
                 f"{C['bold']}{body}{WEIGHT_OFF} {R}")
 
     def advance(self, n=1):
