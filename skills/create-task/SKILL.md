@@ -262,7 +262,7 @@ If you decomposed into multiple tasks, run the pass on each.
 
 ## Step 6: Clarify
 
-Run `/at:clarify-task <task-path>` in a subagent to validate whether the task would be clear to a new agent. If not, address the feedback and keep repeating until no major gaps are left.
+Run `/at:clarify-task <task-path>` to validate whether the task would be clear to a new agent — split, not wrapped in a subagent: its analysis (clarify Steps 1–2) runs in a fresh subagent so the task is read cold; its questions and edits (Step 3 onward) run on the main thread, because a subagent can neither ask the user nor spawn the Step 5 verifier. If gaps come back, address the feedback and keep repeating until no major gaps are left.
 
 If clarifying an epic, make sure that the epic task and all sub-tasks are clarified.
 

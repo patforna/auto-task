@@ -11,15 +11,15 @@ description: "Use this skill to resolve auto-task settings. It owns the procedur
 
 Setting-consuming skills don't call this as a command. They follow § Resolve — via their mandatory Step 0 — to obtain a **resolved block**, then read `settings.*` from it. Every setting's canonical default lives in the shipped defaults file (§ Resolve layer 1) and nowhere else, so a skill never restates a default: change it there and every consumer follows.
 
-## Scope This Slice
+## Scope
 
-This slice populates only the settings `/at:create-task` consumes: `settings.task_store.*` and `settings.feedback_snapshots.*` — their defaults live in the shipped `auto-task.config.defaults.md` (§ Resolve layer 1). Both are static (no environment detection), so § Detection is an empty stub for now.
+`/at:config` currently resolves the settings `/at:create-task` consumes: `settings.task_store.*` and `settings.feedback_snapshots.*` — their defaults live in the shipped `auto-task.config.defaults.md` (§ Resolve layer 1). Both are static (no environment detection), so § Detection is an empty stub for now.
 
-The other settings still live inline in their own skills and migrate in later slices. Their config-file headings are already **recognised** here (see § Heading → Setting Map) so an existing full config raises no false warnings during migration — they just don't resolve to live settings yet.
+The other seven headings are **recognised** (see § Heading → Setting Map), so a full config raises no false warnings, but their values still live in the skills that consume them — they don't resolve to live settings yet.
 
 ## Settings
 
-The settings `/at:config` owns this slice. Their **default values live in the shipped `auto-task.config.defaults.md`** (§ Resolve layer 1), not here — this section maps each setting to its meaning and its override label.
+The settings `/at:config` owns. Their **default values live in the shipped `auto-task.config.defaults.md`** (§ Resolve layer 1), not here — this section maps each setting to its meaning and its override label.
 
 | Setting                                | Meaning                                          | Resolved by | Override (heading → label)             |
 | :------------------------------------- | :----------------------------------------------- | :---------- | :------------------------------------- |
@@ -35,9 +35,9 @@ An override supplies only the leaves it names (e.g. a `## Task Store` giving jus
 
 ## Heading → Setting Map
 
-The nine canonical config-file headings and the settings they map to. All nine are **recognised** (never warn); only Task Store and Feedback Snapshots **resolve** to live settings this slice — the rest are recognised-but-inert until their owning skill migrates.
+The nine canonical config-file headings and the settings they map to. All nine are **recognised** (never warn); only Task Store and Feedback Snapshots **resolve** to live settings — the rest are recognised but inert, their values still living in the skills that consume them.
 
-| Config heading         | Setting(s)                                   | Live this slice? |
+| Config heading         | Setting(s)                                   | Live?            |
 | :--------------------- | :------------------------------------------- | :--------------- |
 | `## Task Store`        | `location:` / `create:` / `status:`          | yes              |
 | `## Verification`      | `settings.verify`                            | no               |
@@ -53,11 +53,11 @@ A heading outside this set is **unrecognised** → warn (see § Inspect). Never 
 
 ## Detection
 
-**No-op this slice.** Nothing is detected: both live settings (`settings.task_store.*`, `settings.feedback_snapshots.*`) are static, so the resolver runs no environment probes. Real detection (codex presence, a check recipe/script, Chrome DevTools MCP) arrives in Slice 2, when it will resolve only leaves left at `auto` and never clobber an explicit override.
+**Not yet.** Nothing is detected: both live settings (`settings.task_store.*`, `settings.feedback_snapshots.*`) are static, so the resolver runs no environment probes. When detection lands (codex presence, a check recipe/script, Chrome DevTools MCP), it will resolve only leaves left at `auto` and never clobber an explicit override.
 
 ## Resolve
 
-Produce a resolved block for the current repo. Standalone path only this slice (orchestrator injection and resolve-from-primary-before-worktree arrive in Slice 2).
+Produce a resolved block for the current repo. Standalone path only for now (orchestrator injection and resolve-from-primary-before-worktree are not implemented yet).
 
 The config chain is **three files of identical format** — `## Heading` sections with labelled sub-lines — read and merged the same way at every layer:
 
@@ -66,13 +66,13 @@ The config chain is **three files of identical format** — `## Heading` section
 3. **Layer 2 — project.** If `.claude/auto-task.config.md` exists at the repo root, read it. Skip silently if absent.
 4. **Layer 3 — local.** If `.claude/auto-task.config.local.md` exists at the repo root, read it. Skip silently if absent.
 5. **Merge per-leaf — local beats project beats defaults, each leaf independently.** Parse all three files the same way: map each `##` heading to its setting group via § Heading → Setting Map, and each labelled sub-line to a leaf. A layer supplies **only** the leaves it names; unnamed leaves keep the lower layer's value. Never replace a whole section wholesale — that would erase sub-defaults in compound settings. A leaf's provenance is the layer its final value came from: `default` (defaults file), `project`, or `local`.
-6. Detection: none this slice (see § Detection).
+6. Detection: none yet (see § Detection).
 7. Emit the resolved block per § Resolved-block Grammar. The `run:` field is the passed-in task id if one was given, else `standalone`; the `source:` field is the absolute repo-root path.
 8. Report the repo-root path and which of the three config files were found vs absent.
 
 ## Resolved-block Grammar
 
-The `v1` contract. **LOCKED** — later slices reproduce it exactly; the `v1` tag gates any future format change. Do not "improve" it without bumping past `v1`.
+The `v1` contract. **LOCKED** — later changes reproduce it exactly; the `v1` tag gates any future format change. Do not "improve" it without bumping past `v1`.
 
 Header line, then one entry per leaf:
 
@@ -109,11 +109,11 @@ Rules:
 - **Header:** `Resolved auto-task settings v1 (run: <task-id or standalone>; source: <abs repo-root path>)`.
 - **One leaf per line** for scalars: `- settings.x: <value> [provenance]`.
 - **Commands** are backticked (e.g. `` `just create-task "<title>"` ``).
-- **Provenance** — every leaf carries a `[provenance]` tag from the closed vocabulary `default | detected | project | local`, naming the layer its value came from (`default` = the shipped defaults file). `detected` may append the fact (e.g. `[detected: codex on PATH]`) — unused this slice.
-- **Single-line values** (a path, command, or short phrase) render inline: `- settings.x: <value> [provenance]`. **Multi-line / compound values** render as a fenced ` ```text ` sub-block indented under the leaf line (which ends with just its `[provenance]` tag). This slice: `settings.task_store.create` fences (multi-line); `settings.task_store.status` and the two feedback-snapshot paths render inline.
-- **Empty prose** renders inline as `settings.x: "" [default]` (no fenced block). No Slice-1 leaf is empty-prose, but the rule is part of `v1`.
+- **Provenance** — every leaf carries a `[provenance]` tag from the closed vocabulary `default | detected | project | local`, naming the layer its value came from (`default` = the shipped defaults file). `detected` may append the fact (e.g. `[detected: codex on PATH]`) — unused until detection lands.
+- **Single-line values** (a path, command, or short phrase) render inline: `- settings.x: <value> [provenance]`. **Multi-line / compound values** render as a fenced ` ```text ` sub-block indented under the leaf line (which ends with just its `[provenance]` tag). Today: `settings.task_store.create` fences (multi-line); `settings.task_store.status` and the two feedback-snapshot paths render inline.
+- **Empty prose** renders inline as `settings.x: "" [default]` (no fenced block). No current leaf is empty-prose, but the rule is part of `v1`.
 - **Skipped feedback snapshots** render inline per leaf as `settings.feedback_snapshots.dir: skipped [default]` and `settings.feedback_snapshots.exemplar: skipped [default]`.
-- Only the five Slice-1 leaves (`settings.task_store.location`, `settings.task_store.create`, `settings.task_store.status`, `settings.feedback_snapshots.dir`, `settings.feedback_snapshots.exemplar`) ever appear this slice.
+- Only the five live leaves (`settings.task_store.location`, `settings.task_store.create`, `settings.task_store.status`, `settings.feedback_snapshots.dir`, `settings.feedback_snapshots.exemplar`) appear today.
 
 ## Inspect
 
@@ -123,7 +123,7 @@ Run on `/at:config` with no arguments:
 2. Print the resolved block, including the `source:` path, so each leaf shows its origin (`[default]` / `[project]` / `[local]`).
 3. **Lint headings.** For each `##` heading in the project and local config files, if it is not one of the nine canonical headings (§ Heading → Setting Map), warn: `unrecognised heading "<heading>" — ignored`. A full nine-section config raises zero warnings; a heading outside the nine warns. Never guess a near-miss to a canonical heading.
 
-Copied-default detection (warning when an override just restates today's default) needs fixtures and arrives in Slice 4.
+Copied-default detection (warning when an override just restates today's default) needs fixtures and is not implemented yet.
 
 ## Step 0 (for Consumers)
 

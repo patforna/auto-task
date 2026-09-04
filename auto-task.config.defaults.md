@@ -9,9 +9,9 @@ them per-leaf:
 To change a default, edit it here — nowhere else. A consuming skill never restates a
 default; it reads the resolved value.
 
-Only the sections `/at:config` owns this slice appear below. Later slices add the
-remaining sections (Verification, Worktrees, Review, Design Review, Models,
-Conventions, Transcript Capture) here as their owning skills migrate.
+Only the sections `/at:config` resolves today appear below. The remaining sections
+(Verification, Worktrees, Review, Design Review, Models, Conventions, Transcript
+Capture) move here as their owning skills migrate.
 
 ## Task Store
 

@@ -5,7 +5,6 @@ description: "Use to drive a well-defined task end-to-end with minimal human inp
 
 # Auto Task
 
-<!-- TODO: reconcile the Step 0 intro ("combine the errors ... and abort") with the Step 0.4 Outcome block, which lets degraded findings proceed (proceed-or-fix) — abort vs pause. -->
 <!-- TODO: Step 0.3 (clarify) is interactive (AskUserQuestion, possibly multiple rounds) and can stall unattended/--ship runs — decide unattended behaviour (e.g. flag-and-abort instead of asking). -->
 
 ## Usage
@@ -28,7 +27,7 @@ Workflow:
     create-task → clarify-task → plan-task → impl-task → review-code → review-task → ship-task
                   └─────────────────────────────── auto-task ────────────────────────────────┘
 
-Task files live in the project's task store — `tasks/` in the repo by default.
+Task files live in the project's task store (location per `/at:config`).
 
 ## Guidance (DO NOT IGNORE!)
 
@@ -47,17 +46,17 @@ Internalise and follow these rules:
 
 ## Step 0: Preflight
 
-Run 0.1 and 0.2 first, then run (0.3-0.4) and (0.5) in parallel to speed things up. If any of the preflight checks fail, combine the errors and flag them to the user in one go at the end of the Preflight step and abort.
+Run 0.1 and 0.2 first, then run (0.3-0.4) and (0.5) in parallel to speed things up. If any of the preflight checks fail, combine the errors and flag them to the user in one go at the end of the Preflight step, then stop for the 0.4 Outcome decision.
 
 ### 0.1 Load Config
 
 <!-- TODO: de-dupe this and the section in create-task -->
 
-Project config can override a bunch of defaults (e.g. verification command, worktree location and init, standing review context, design-review serve command, model choices, commit conventions, transcript capture, etc.). Check for existence of config overrides in `.claude/auto-task.config.md` and `.claude/auto-task.config.local.md` (personal overrides — win on conflict) (see `/at:create-task` § Task Store and Project Config for details). **Read them first if they exist and pass them to every subagent you spawn so they read them too**.
+Project config can override a bunch of defaults (e.g. verification command, worktree location and init, standing review context, design-review serve command, model choices, commit conventions, transcript capture, etc.). Check for existence of config overrides in `.claude/auto-task.config.md` and `.claude/auto-task.config.local.md` (personal overrides — win on conflict) (see `/at:config` for details). **Read them first if they exist and pass them to every subagent you spawn so they read them too**.
 
 ### 0.2 Task check
 
-Find the task (default: `tasks/`; possibly overridden), read it fully, and output its title and status. If installed, show some creativity and render "Task-NNN" using figlet =)
+Find the task (in the task store per `/at:config`), read it fully, and output its title and status. If installed, show some creativity and render "Task-NNN" using figlet =)
 
 If you can't locate the task, abort and flag it to the user.
 
