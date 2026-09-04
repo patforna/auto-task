@@ -79,14 +79,14 @@
 @checklist Preflight|Planning|Implementing|Reviewing|Verifying
 @pause 0.5
 @run 0.98 Preflight|task · worktree · deps|0:44
-@run 0.98 Planning|run claude + codex · synthesize|{bold}2{/} plans · {bold}1{/} conflict resolved|2:29
+@run 0.98 Planning|claude + codex · synthesize|2:29
 @run 0.98 Implementing|test · code · refactor · commit|2:10
-@run 0.98 Reviewing|run claude + codex · triage|{bold}2{/} reviews · {bold}1{/} flag · {bold}0{/} blocking|1:48
+@run 0.98 Reviewing|claude + codex · triage|1:48
 @run 0.98 Verifying|run CLI · check ACs|2:09
 
 @row {green}✓{/} Task 001 ready for signoff
 @detail task/001-hello-world-cli
-@detail {bold}8{/} commits · {bold}3/3{/} tests pass · {bold}1{/} flag · {bold}9m 20s{/}
+@detail {bold}8{/} commits · {bold}3/3{/} tests · {bold}4/4{/} ACs · {bold}1{/} flag · {bold}9m 20s{/}
 
 @pause 0.5
 @ask Ship?
