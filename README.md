@@ -10,9 +10,9 @@ Built for experienced engineers who want to ship software at an accelerated pace
 
 <p align="center">
   <img src="demo/demo.gif" width="738" alt="A terminal: /at:create-task turns a one-line request into task 001, asking one question along the way. /at:auto-task then runs preflight, planning, implementation, review and verification unattended, and reports back for signoff: 8 commits, 3/3 tests passing, 1 flag, 9m 20s. A human answers &quot;yes&quot; and it ships.">
+  <br>
+  <sub><em>Marketing version</em> of an auto-task run. For a real run, see <a href="examples/runs/083-persist-column-picker.md">this sample transcript</a>.</sub>
 </p>
-
-"Marketing version" of an auto-task run above. For a real run, see [this sample transcript](examples/runs/083-persist-column-picker.md).
 
 > [!NOTE]
 > This is a very early extract from my daily workflow — rough edges included. Feedback, Issues and PRs welcome!
