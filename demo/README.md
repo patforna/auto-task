@@ -65,7 +65,7 @@ The numbers are not all durations:
 | `@step! <secs> <l>\|<g>`                      | the same, but left **spinning** until an `@resolve`. For a step genuinely blocked on the human |
 | `@resolve <secs>`                             | finish the pending `@step!` in place, however far the cursor has moved on. `<secs>` is the beat before the tick lands. One pending step at a time |
 | `@checklist <a>\|<b>\|<c>`                    | print every phase up front, all pending, so the shape of the run is on screen before any of it happens |
-| `@run <secs> <l>\|<g>\|<clock>`               | tick one checklist row over: it spins for `<secs>`, then lands. Rows must run in the order they were listed. `<clock>` is **how long that row took**, `M:SS` |
+| `@run <secs> <l>\|<g>\|<clock>`               | tick one checklist row over: it spins for `<secs>`, then lands. Rows must run in the order they were listed. `<clock>` is **how long that row took**, `M:SS`. Pitch `<secs>` off `<clock>` — a row that took three times as long should not land in the same beat |
 | `@run <secs> <l>\|<running>\|<done>\|<clock>` | four fields swap the gloss when the row lands — `fixing 2 of 3` becomes `3 fixed` |
 | `@row <glyph> <l>\|<g>[\|<clock>]`            | one finished phase row, printed as-is: no spinner, no tick, no `...`. **No number.** For a phase that never runs, e.g. the signoff. With neither gloss nor clock it is a heading, and its label runs free |
 | `@detail <text>`                              | an indented line under a heading: col 3, in the gloss grey, its `·` separators tinted for you. **No number.** |
@@ -154,7 +154,7 @@ Constants at the top of `cast.py`:
 | `STEP_PENDING_MARK`                              | `·`             | a phase that hasn't run yet |
 | `RUNNING_MARK`                                   | `...`           | appended to a label while its row spins, dropped when it lands |
 | `SEP`                                            | `·`             | tinted automatically wherever it turns up in a gloss or an `@detail` |
-| `HOLD_JITTER`                                    | `0.40`          | ± on a row's hold, so a stack of rows isn't metronomic |
+| `HOLD_JITTER`                                    | `0.03`          | ± on a row's hold. Near-vestigial: each `@run` hold is now pitched off the clock its row displays, and above ~`0.05` the jitter reorders them |
 | `FRAME`, `CLOCK_TICK`                            | `0.11`, `0.22`  | spinner frame interval, and how often a running clock moves — two frames: often enough to read as counting, slow enough not to strobe |
 | `SELECT_*`                                       | see file        | picker intro, walk, settle, flash, rest |
 | `SELECT_FILL`, `SELECT_PAD`                      | `True`, `5`     | the highlight bar spans the frame, fzf-style; the pad is `"  ❯ "` in front of an option and a space behind it, so a filled bar ends exactly on `COLS` |

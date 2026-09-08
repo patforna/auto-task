@@ -208,9 +208,13 @@ WORD_PAUSE_CHANCE = 0.45   # ...this often
 HESITATE = (0.16, 0.30)    # an occasional longer think
 HESITATE_CHANCE = 0.05
 
-# A spinning row holds for `secs` give or take this fraction, so a run of rows
-# doesn't tick like a metronome. Symmetric, so the average duration is unchanged.
-HOLD_JITTER = 0.40
+# A spinning row holds for `secs` give or take this fraction. It was 0.40 back when
+# every @run shared one duration and something had to stop the block ticking like a
+# metronome. The holds now carry that themselves — each is pitched off the clock its
+# row displays — so the jitter's only remaining job is to not undo them. Above ~0.05
+# it reorders the rows: at 0.40 the 2:29 row was the fastest thing on screen.
+# Symmetric, so the average duration is unchanged.
+HOLD_JITTER = 0.03
 
 # Named themes. Each carries its own accent (used for every in-progress state and
 # the human's mark), prompt tint and the three phase-row greys, because all of

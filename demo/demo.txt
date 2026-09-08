@@ -34,6 +34,8 @@
 #                           lands.  Rows must run in the order they were listed.
 #                           <clock> is how long THAT row took, M:SS — it counts up
 #                           from 0:00 to it.  Four fields swap the gloss on landing.
+#                           Pitch <secs> off <clock>: a row that took three times as
+#                           long shouldn't land in the same beat as the quick one.
 #   @row <glyph> <l>|<g>    one finished phase row, printed as-is: no spinner, no
 #                           tick, no "...".  Takes NO number; a third field adds
 #                           a clock.  With no gloss at all, it is a heading.
@@ -72,17 +74,17 @@
 # one has a beat in front of it.  /clear is also what you would really do here —
 # the task file carries the state, so the build starts on fresh context.
 @prompt /clear
-@pause 0.35
+@pause 0.25
 @clear
 @prompt /at:auto-task 001
 @pause 0.3
 @checklist Preflight|Planning|Implementing|Reviewing|Verifying
 @pause 0.5
-@run 0.98 Preflight|task · worktree · deps|0:44
-@run 0.98 Planning|claude + codex · synthesize|2:29
-@run 0.98 Implementing|test · code · refactor · commit|2:10
-@run 0.98 Reviewing|claude + codex · triage|1:48
-@run 0.98 Verifying|run CLI · check ACs|2:09
+@run 1.05 Preflight|task · worktree · deps|0:44
+@run 1.70 Planning|claude + codex · synthesize|2:29
+@run 1.60 Implementing|test · code · refactor · commit|2:10
+@run 1.45 Reviewing|claude + codex · triage|1:48
+@run 1.58 Verifying|run CLI · check ACs|2:09
 
 @row {green}✓{/} Task 001 ready for signoff
 @detail task/001-hello-world-cli
@@ -92,6 +94,6 @@
 @ask Ship?
 @pause 0.9
 @prompt yes
-@pause 0.45
+@pause 0.25
 
 @row {green}✓{/} Shipped 🎉|squash-merged · build green · worktree removed
