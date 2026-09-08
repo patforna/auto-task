@@ -6,7 +6,7 @@ An opinionated agentic workflow to turn well-defined units of work into shippabl
 
 _auto-task_ aims to deliver high-quality code with high autonomy. To achieve this, it combines human-curated skills with research-backed techniques: workspace isolation, persistent task state, fresh-context subagents, multi-model-family panels and synthesis, TDD, evidence-cited triage, and more.
 
-Built for experienced engineers who want to ship software at an accelerated pace but remain in control while doing so.
+Built for experienced engineers who want to ship software at an accelerated pace without giving up control.
 
 <p align="center">
   <img src="demo/demo.gif" width="738" alt="A terminal: /at:create-task turns a one-line request into task 001, asking one question along the way. /at:auto-task then runs preflight, planning, implementation, review and verification unattended, and reports back for signoff: 8 commits, 3/3 tests passing, 1 flag, 9m 20s. A human answers &quot;yes&quot; and it ships.">
@@ -15,7 +15,7 @@ Built for experienced engineers who want to ship software at an accelerated pace
 </p>
 
 > [!NOTE]
-> This is a very early extract from my daily workflow — rough edges included. Feedback, Issues and PRs welcome!
+> This is a very early extract from my daily workflow — rough edges included. Feedback, Issues and PRs welcome! For the story behind it, see [Getting Out of the Loop: 8 Months Solo-Building with AI](https://github.com/patforna/writing).
 
 ## How It Works
 
