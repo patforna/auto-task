@@ -147,3 +147,11 @@ An adversarial gap-check found three majors and five minors/nits; all were real 
 Minors: § 1's hard-block row relabelled from plan-task Step 6 (opt-in, `skills/plan-task/SKILL.md:97-99`) to **auto-task Step 2**, the site that actually blocks; the impl-task Step 1 change row marked **unchanged** (readiness gates on the section's presence only, `skills/impl-task/SKILL.md:45`); the clarify-task Step 6 conditional re-gated on plan shape so it covers the reachable `in-dev` case too — plus the wrinkle that Step 0.3 runs before Step 1's worktree, so the block must be read off the task branch; a **review-task Step 3** row added (superseded plan steps are not deviations, `## Amendments` is the justification, `skills/review-task/SKILL.md:51`). Nits: the six skills carrying the "task file plus repo state" sentence named instead of "all"; an **auto-task Step 1** row added to the § 5 change table; Bottom Line 1 no longer claims all three near-affordances change code.
 
 § 5 was re-read end to end as one piece afterwards: it tells one story — the amendment is written on the task branch after amend-task ensures the workspace, plan shape is the operative signal, one amendment at a time, and the change table lists every site including auto-task Steps 1 and 2.
+
+### 2026-09-09 — impl-task re-run on an already-implemented plan
+
+`/at:impl-task` was invoked again after the plan had been fully executed. Nothing was re-implemented: Step 3 found every plan step already landed and committed, which is the "unexpected green" impl-task's own Guidance says to distrust. Re-walking the plan would have re-run the panel and rewritten the research doc.
+
+Instead this run did Step 4 and Step 5 only — verified the diff against the plan and the eight ACs (three files changed, doc at 194 lines with no frontmatter, index row under the existing Skills/meta group, every AC mapped to a present section), and recorded this note.
+
+Worth keeping: this is a live instance of the gap the task documents. A second impl-task run on a finished task has no delta to execute and no way to say so except prose — exactly what the research's plan-shape signal and impl-task Step 3 scope clause are designed to fix.
