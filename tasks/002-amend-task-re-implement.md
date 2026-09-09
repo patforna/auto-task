@@ -113,3 +113,13 @@ Delivered: `docs/research/2026-09-09-amend-task-re-implement.md` (183 lines) plu
 **Follow-up not yet captured** (both flagged in the doc's Panel Limitations, neither in scope here): amending an *epic sub-task*, where locked decisions are shared across siblings; and whether the README and demo text need to name the amendment path once it exists. The follow-up implementation task should also expect to touch about a dozen skill files, since the new skill is the small half of the recommendation.
 
 **Environment note:** the bash sandbox denies writes outside the primary checkout, so worktree edits went through the Edit/Write tools; the one padding-sensitive table edit ran with the sandbox disabled.
+
+### 2026-09-09 — review findings applied
+
+Review of the delivered doc found three design holes in § 5's recommendation, all fixed in the doc only (187 lines, still inside the 150–200 target):
+
+- **Re-entry passed through auto-task Step 2.** Step 2 is unconditional — it consults neither status nor an existing plan — so resuming at Step 3 still re-plans via plan-task Step 6 and overwrites the amendment. § 5 now carries an `auto-task Step 2` skip row.
+- **`status: amended` is not a durable marker.** impl-task Step 1 writes `in-dev` unconditionally, and runs before Step 3, so an amendment interrupted mid-flight loses the marker. The auto-task Step 1 bypass, the ship-task Step 1 refusal and the impl-task Step 3 scope clause now key on **plan shape** — an `### Amendment N` block with no matching per-amendment Implementation Notes block. `amended` stays as the declared intent.
+- **`--ship` does gate.** auto-task Step 9 auto-ships only with no Critical/Major left for a human call — the case most likely to produce an amendment is exactly the one that still stops.
+
+Eight minor findings and five nits also applied (block-table rows reclassified, quote elisions restored, the "every skill" claims scoped to the skills that actually carry the text, ship-task Step 2 added to the status table, `in-dev → amended` reconciled with § 3(a)'s quiesced rule). Two proposed findings were rejected as non-defects and left alone. Every fix was re-verified against the skill text in this worktree.
