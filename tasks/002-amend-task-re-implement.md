@@ -80,3 +80,36 @@ Answer the question from the pipeline skills' own step text, run as a two-perspe
 - For a research task the conclusions are the deliverable, so this plan fixes method, evidence base, output shape and scope fence — not the recommendation.
 - No test harness and no verification command in this repo; don't invent one for a markdown deliverable. The checks that matter: `git status` shows exactly two changed files (the new doc and the research README), and each of the eight ACs maps to a named section of the doc.
 - Dominant failure mode is the report sliding into drafting the skill. If a section starts reading like a SKILL.md, cut it back.
+
+## Implementation Notes
+
+Delivered: `docs/research/2026-09-09-amend-task-re-implement.md` (183 lines) plus one index entry. Exactly two files changed besides this one.
+
+**Deviations from the plan and from impl-task, both deliberate.**
+
+- **No TDD, no verification command.** The deliverable is a markdown document and this repo has no test harness, so `/at:tdd` and impl-task Step 3's failing-test rule do not apply and nothing was invented to stand in for them. Each plan step's check was the AC it satisfies, verified by reading the draft against the eight ACs; the plan's own two checks (two changed files, every AC mapped to a named section) both hold.
+- **Index entry is a cell extension, not a new table row.** The plan said "add one row under the existing Skills/meta group", but that table is one row *per group* with the docs listed inside the cell — a second row labelled `Skills/meta` would have looked like a defect. The doc is appended to the existing Skills/meta cell, which is what "listed under an existing group" (AC8) asks for and keeps the table's form. Cell padding was left at the table's existing 184-char width, so the rest of the table is untouched.
+
+**AC → section map** (all against the delivered doc):
+
+| AC | Where |
+| --- | --- |
+| 1 support verdict, closest affordances, exactly where they block | Bottom Line 1 · § 1 (affordances, hard-blocks table, softer sites) |
+| 2 separation from the review-feedback loop | § 2 |
+| 3 both entry points, plus the shipped verdict | § 3 (a), (b), (c) with the named substitute |
+| 4 contradicting amendments and how a retraction is recorded | § 4 |
+| 5 one option, status transitions, plan/AC deltas | § 5 (status table, plan delta, AC delta, re-entry, human-only) |
+| 6 alternatives with a one-line rejection each | § 6 (17 entries) |
+| 7 ends at the report | Scope line under the Problem Anchor; `git status` shows no skill, README or config change |
+| 8 dated doc in the research folder, listed under an existing group | The doc itself · `docs/research/README.md` Skills/meta row |
+
+**Surprises and judgement calls.**
+
+- The panel's two panelists disagreed on whether auto-task Step 6.1's two reject rows are blocks. They are not: they block *agent*-initiated amendment, which must stay. Reading them as blocks is what leads to building an amend disposition inside triage — the wrong thing. The report puts them in the mechanism section, not the block list.
+- The pricing fact that makes the recommendation cheap: `settings.task_store.status` in `auto-task.config.defaults.md` says only "Edit the task file's `status:` frontmatter field in place" — it owns *how* status is written, not which values exist. Adding `amended` therefore touches zero config files and does not trigger CLAUDE.md's four-file rule.
+- Two questions the plan left open were closed in the report rather than deferred: the amendment step-numbering scheme (`A<N>.1, A<N>.2, …`) and re-entry mechanism (`status: amended`, not a `--resume <step>` flag).
+- Every quoted deciding sentence was re-grepped against the skills in this worktree after drafting; all matched.
+
+**Follow-up not yet captured** (both flagged in the doc's Panel Limitations, neither in scope here): amending an *epic sub-task*, where locked decisions are shared across siblings; and whether the README and demo text need to name the amendment path once it exists. The follow-up implementation task should also expect to touch about a dozen skill files, since the new skill is the small half of the recommendation.
+
+**Environment note:** the bash sandbox denies writes outside the primary checkout, so worktree edits went through the Edit/Write tools; the one padding-sensitive table edit ran with the sandbox disabled.
