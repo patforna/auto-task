@@ -15,5 +15,5 @@ The research corpus behind auto-task's skill design, migrated from the TAD repo 
 | Repo health          | 2026-03-16 repo-health-skill-research                                                                                                                                                    |
 | Memory/knowledge     | 2026-03-20 agentic-memory-knowledge-mgmt, agentic-memory-final-proposal (both rejected — overengineered)                                                                                 |
 | Research methodology | 2026-03-20 aris-deep-dive, autonomous-literature-research; 2026-03-21 agentic-research-design; 2026-03-17 karpathy-autoresearch                                                          |
-| Skills/meta          | 2026-03-25 reusable-claude-skills, git-commit-messages (rejected — YAGNI); 2026-04-09 skill-improvements-proposal                                                                        |
+| Skills/meta          | 2026-03-25 reusable-claude-skills, git-commit-messages (rejected — YAGNI); 2026-04-09 skill-improvements-proposal; 2026-09-09 amend-task-re-implement                                    |
 | Book syntheses       | 2026-03-13 tdd-by-example; 2026-03-17 clean-code, ddd, goos, philosophy-of-software-design — provenance for the core-skills lens skills (clean-code, ddd, goos, software-design, tdd)    |
